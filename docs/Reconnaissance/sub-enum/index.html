@@ -119,27 +119,136 @@ function toggleScript() {
 </div>
 
 <div class="tool">
-  <h3>DNSRecon</h3>
-  <p>Enumerate DNS records with JSON output.</p>
+  <h3>DNSRecon 🔍</h3>
+  <p>Advanced DNS Enumeration and Reconnaissance Tool.</p>
   <pre>dnsrecon -d &lt;domain&gt; -n 8.8.8.8 -j dnsrecon.json</pre>
+
+  <!-- Toggle Button -->
+  <button onclick="toggleNote(this)" aria-expanded="false" aria-controls="dnsrecon-details" style="cursor:pointer; margin-top:10px;">
+    ▶ Show Details
+  </button>
+
+  <!-- Collapsible Content -->
+  <pre id="dnsrecon-details" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
+🔹 Standard Record Enumeration:
+    dnsrecon -d example.com
+
+🔹 Zone Transfer (AXFR):
+    dnsrecon -d example.com -a
+
+🔹 Reverse DNS Lookup:
+    dnsrecon -r 192.168.1.0/24
+
+🔹 Google Dorking:
+    dnsrecon -d example.com -g
+
+🔹 Subdomain Brute Forcing:
+    dnsrecon -d example.com -D wordlist.txt -t brt
+
+🔹 Cache Snooping:
+    dnsrecon -d example.com -t snoop
+
+🔹 Zone Walking (NSEC/NSEC3):
+    dnsrecon -d example.com -t zonewalk
+  </pre>
 </div>
 
+<script>
+function toggleNote(button) {
+  const toggleId = button.getAttribute('aria-controls');
+  const content = document.getElementById(toggleId);
+
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    button.textContent = '▼ Hide Details';
+    button.setAttribute('aria-expanded', 'true');
+  } else {
+    content.style.display = 'none';
+    button.textContent = '▶ Show Details';
+    button.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
+
 <div class="tool">
-  <h3>TheHarvester</h3>
+  <h3>TheHarvester 🔍</h3>
   <p>Harvest subdomains and emails from public sources.</p>
   <pre>theharvester -d &lt;domain&gt; -b all -f theharvester.xml</pre>
+
+  <!-- Toggle Button -->
+  <button onclick="toggleNote(this)" aria-expanded="false" aria-controls="theharvester-details" style="cursor:pointer; margin-top:10px;">
+    ▶ Show Details
+  </button>
+
+  <!-- Collapsible Content -->
+  <pre id="theharvester-details" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
+🌐 Sources Supported:
+  - Google
+  - Bing
+  - Baidu
+  - Yahoo
+  - DuckDuckGo
+  - Hunter.io
+  - LinkedIn
+  - Twitter
+  - Shodan (API key required)
+  - VirusTotal
+  - DNSDumpster
+  - Anubis
+  - Otx.alienvault.com
+  - Github
+  - ThreatCrowd
+
+⚙️ Common Usage Examples:
+
+# Basic domain search:
+  theharvester -d example.com -b google
+
+# Multiple engines + save to HTML:
+  theharvester -d example.com -b google,bing,linkedin -f report.html
+
+# Emails only (using hunter.io):
+  theharvester -d example.com -b hunter
+
+# Limit results to 100:
+  theharvester -d example.com -b bing -l 100
+
+# Shodan host data (API key needed):
+  theharvester -d example.com -b shodan
+
+🔍 Use Cases:
+
+- Pre-engagement reconnaissance for pen testing
+- Target identification in red teaming
+- Attack surface mapping
+- Threat intelligence gathering
+- Email harvesting for phishing simulations
+  </pre>
 </div>
 
-<div class="tool">
-  <h3>Sublert</h3>
-  <p>Passive subdomain enumeration.</p>
-  <pre>sublert -d &lt;domain&gt; &gt; sublert.txt</pre>
-</div>
+<script>
+function toggleNote(button) {
+  const toggleId = button.getAttribute('aria-controls');
+  const content = document.getElementById(toggleId);
+
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    button.textContent = '▼ Hide Details';
+    button.setAttribute('aria-expanded', 'true');
+  } else {
+    content.style.display = 'none';
+    button.textContent = '▶ Show Details';
+    button.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
 
 <div class="tool">
   <h3>Shosubgo</h3>
   <p>Another passive subdomain enumerator.</p>
-  <pre>shosubgo -d &lt;domain&gt; -o shosubgo.txt</pre>
+  <pre>shosubgo -d &lt;domain&gt; -s YOUR_SHODAN_API_KEY -o shosubgo.txt</pre>
 </div>
 
 <div class="tool">
@@ -155,27 +264,17 @@ function toggleScript() {
 </div>
 
 <div class="tool">
-  <h3>Anubis</h3>
-  <p>Enumerates subdomains from passive sources.</p>
-  <pre>anubis -d &lt;domain&gt; &gt; anubis.txt</pre>
-</div>
-
-<div class="tool">
   <h3>CT-Exposer</h3>
   <p>Extract subdomains from Certificate Transparency logs.</p>
-  <pre>ct-exposer -d &lt;domain&gt; -o ct-exposer.txt</pre>
+  <pre>sudo ct-exposer -d &lt;domain&gt; -o ct-exposer.txt</pre>
 </div>
 
-<div class="tool">
-  <h3>CCrawldns</h3>
-  <p>Crawls and discovers DNS entries.</p>
-  <pre>ccrawldns &lt;domain&gt; &gt; ccrawldns.txt</pre>
-</div>
 
 <div class="tool">
   <h3>DNSSearch</h3>
   <p>Search DNS records.</p>
-  <pre>dnssearch &lt;domain&gt; &gt; dnssearch.txt</pre>
+  <pre>dnssearch -domain &lt;domain&gt; &gt; dnssearch.txt</pre>
+  <p>Needs a dictionary or wordlists named as name.txt in the same directory</p>
 </div>
 
 <div class="tool">
@@ -184,123 +283,113 @@ function toggleScript() {
   <pre>domained -d &lt;domain&gt; -o domained.txt</pre>
 </div>
 
-<div class="tool">
-  <h3>QuickRecon</h3>
-  <p>Quick subdomain reconnaissance.</p>
-  <pre>quickrecon -d &lt;domain&gt; -o quickrecon.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Lrod</h3>
-  <p>Lightweight subdomain discovery tool.</p>
-  <pre>lrod -d &lt;domain&gt; -o lrod.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Mildew</h3>
-  <p>Subdomain enumeration tool.</p>
-  <pre>mildew -d &lt;domain&gt; -o mildew.txt</pre>
-</div>
 
 <div class="tool">
   <h3>Netscout</h3>
   <p>Passive DNS enumeration.</p>
-  <pre>netscout -d &lt;domain&gt; -o netscout.txt</pre>
+  <pre>netscout -u &lt;url&gt; -d &lt;depth&gt; -o netscout_output.txt</pre>
+
+  <!-- Toggle Button -->
+  <button onclick="toggleNote(this)" aria-expanded="false" aria-controls="netscout-script" style="cursor:pointer; margin-top:10px;">
+    ▶ Pyton Script to seperate all outputs
+  </button>
+
+  <!-- Collapsible Content -->
+  <pre id="netscout-script" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
+import os
+import re
+
+os.makedirs("records", exist_ok=True)
+
+files = {
+    "content": "records/content_pages.txt",
+    "external": "records/external_links.txt",
+    "subdomains": "records/subdomains.txt",
+    "media": "records/media_and_files.txt",
+    "errors": "records/errors_and_warnings.txt",
+    "all": "records/all_urls.txt"
+}
+
+for path in files.values():
+    open(path, "w").close()
+
+patterns = {
+    "external": re.compile(r"https?://(www\.)?(facebook|instagram|youtube|twitter|whatsapp|apps\.apple|play\.google)\.com"),
+    "subdomains": re.compile(r"https?://(?!www\.)[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.(bdnews24\.com)"),
+    "media": re.compile(r"/(image|media|tube|archive|mobile)"),
+    "content": re.compile(r"/(bangladesh|politics|education|health|business|opinion|science|world|cricket|technology|environment|people|aviation|sport|economy|campus|stripe|fashion|neighbours|inside-out|hello)"),
+    "error": re.compile(r"WARN:|invalid|parse"),
+}
+
+with open("netscout_output.txt", "r") as infile:
+    for line in infile:
+        line = line.strip()
+        if not line or line.startswith("█") or line.startswith("=") or line.startswith("[x] Attempting"):
+            continue
+
+        if line.startswith("[x] https://") or line.startswith("[x] http://"):
+            url = line[4:].strip()
+            with open(files["all"], "a") as f: f.write(url + "\n")
+
+            if patterns["external"].search(url):
+                open(files["external"], "a").write(url + "\n")
+            elif patterns["subdomains"].search(url):
+                open(files["subdomains"], "a").write(url + "\n")
+            elif patterns["media"].search(url):
+                open(files["media"], "a").write(url + "\n")
+            elif patterns["content"].search(url.lower()):
+                open(files["content"], "a").write(url + "\n")
+
+        elif patterns["error"].search(line):
+            open(files["errors"], "a").write(line + "\n")
+
+print("[+] Output categorized into 'records/' folder")
+  </pre>
 </div>
 
-<div class="tool">
-  <h3>DNS2GeoIP</h3>
-  <p>Map subdomains' IPs to geographic locations.</p>
-  <pre>dns2geoip -d &lt;domain&gt; &gt; dns2geoip.txt</pre>
-</div>
+<script>
+function toggleNote(button) {
+  const toggleId = button.getAttribute('aria-controls');
+  const content = document.getElementById(toggleId);
 
-<div class="tool">
-  <h3>DNSCobra</h3>
-  <p>DNS enumeration tool.</p>
-  <pre>dnscobra -d &lt;domain&gt; -o dnscobra.txt</pre>
-</div>
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    button.textContent = '▼ Hide Details';
+    button.setAttribute('aria-expanded', 'true');
+  } else {
+    content.style.display = 'none';
+    button.textContent = '▶ Show Details';
+    button.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
 
 <div class="tool">
   <h3>Bluto</h3>
   <p>Subdomain enumeration.</p>
-  <pre>bluto -d &lt;domain&gt; -o bluto.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Dripper</h3>
-  <p>Subdomain enumeration tool.</p>
-  <pre>dripper -d &lt;domain&gt; -o dripper.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Graphinder</h3>
-  <p>Visualizes subdomain relationships.</p>
-  <pre>graphinder -d &lt;domain&gt; -o graphinder.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Knock</h3>
-  <p>DNS enumeration and brute forcing.</p>
-  <pre>knock -d &lt;domain&gt; -o knock.txt</pre>
+  <pre>bluto -domain &lt;domain&gt; -o bluto.txt</pre>
 </div>
 
 <hr />
 
-<h2>2. Permutation and Brute-force Enumeration Tools</h2>
-
-<div class="tool">
-  <h3>Altdns</h3>
-  <p>Generate permutations of subdomains and resolve them.</p>
-  <pre>altdns -i amass.txt -o altdns_output.txt -w dns.txt -r -s altdns_resolved.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Puredns</h3>
-  <p>Fast DNS resolver and bruteforcer.</p>
-  <pre>puredns bruteforce dns.txt example.com --resolvers /etc/resolv.conf --write puredns.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Dnscan</h3>
-  <p>Bruteforce subdomains using a wordlist.</p>
-  <pre>dnscan -d example.com -w dns.txt -o dnscan.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Dnsspider</h3>
-  <p>DNS spider tool for brute forcing subdomains.</p>
-  <pre>dnsspider -d example.com -w dns.txt -o dnsspider.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Syborg</h3>
-  <p>Subdomain enumeration and brute forcing.</p>
-  <pre>syborg example.com -o syborg.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Waldo</h3>
-  <p>Fast brute forcing subdomains using wordlist and threads.</p>
-  <pre>waldo -d example.com -w dns.txt -t 50 -o waldo.txt</pre>
-</div>
-
 <hr />
 
-<h2>3. Aggregate and Deduplicate Subdomains</h2>
+<h2>2. Aggregate and Deduplicate Subdomains</h2>
 
 <p>Combine all results from various tools and remove duplicates:</p>
 <pre>cat results/example.com/*.txt | sort -u &gt; results/example.com/all_subs.txt</pre>
 
 <hr />
 
-<h2>4. Resolve Live Subdomains</h2>
+<h2>3. Resolve Live Subdomains</h2>
 
 <p>Use <code>httpx</code> to check which subdomains are alive and responding over HTTP/HTTPS:</p>
 <pre>httpx -l results/example.com/all_subs.txt -threads 50 -o results/example.com/live_subs.txt</pre>
 
 <hr />
 
-<h2>5. Subdomain Takeover Checks</h2>
+<h2>4. Subdomain Takeover Checks</h2>
 
 <p>Check live subdomains for potential takeover vulnerabilities:</p>
 <pre>
