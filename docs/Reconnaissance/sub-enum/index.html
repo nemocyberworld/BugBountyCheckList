@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Subdomain Enumeration Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📚 Subdomain Enumeration Notes</h1>
+
+<p>This guide summarizes popular subdomain enumeration tools used in reconnaissance phases. It covers passive enumeration, permutation/brute-force techniques, aggregation of results, resolving live subdomains, and subdomain takeover checks.</p>
+
+<hr />
+
+<h2>1. Passive Enumeration Tools</h2>
+
+<div class="tool">
+  <h3>Amass</h3>
+  <p>Passive enumeration using multiple data sources and APIs.</p>
+  <pre>amass enum -passive -d &lt;domain&gt; -o amass.txt</pre>
+
+  <!-- Toggle Button -->
+  <button onclick="toggleScript()" aria-expanded="false" aria-controls="bashScript" style="cursor:pointer; margin-top:10px;">
+    ▶ Show Golang Script to Extract Subdomains with Progress & Timing
+  </button>
+
+  <!-- Collapsible Script Section -->
+  <pre id="bashScript" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+	"time"
+)
+
+func main() {
+	// Ask for target domain
+	fmt.Print("Enter your target domain: ")
+	var domain string
+	fmt.Scanln(&domain)
+
+	inputFile := filepath.Join("results", domain, "amass.txt")
+	outputFile := filepath.Join("results", domain, "extracted_subdomains.txt")
+
+	fmt.Printf("[*] Starting subdomain extraction for domain: %s\n", domain)
+
+	// Check if input file exists; if not, run amass
+	if _, err := os.Stat(inputFile); os.IsNotExist(err) {
+		fmt.Printf("[!] Input file not found: %s\n", inputFile)
+		fmt.Println("[*] Running amass to enumerate subdomains...")
+
+		// Make sure output directory exists
+		if err := os.MkdirAll(filepath.Dir(inputFile), 0755); err != nil {
+			fmt.Printf("[!] Could not create directory: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Run amass and save directly to file
+		cmd := exec.Command("amass", "enum", "-passive", "-d", domain, "-o", inputFile)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("[!] Failed to run amass: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("[+] Amass enumeration complete.")
+
+		// Check if amass output has content
+		info, err := os.Stat(inputFile)
+		if err != nil || info.Size() == 0 {
+			fmt.Printf("[!] Amass did not find any subdomains for %s\n", domain)
+			os.Exit(0)
+		}
+	} else {
+		fmt.Printf("[*] Reading from: %s\n", inputFile)
+	}
+
+	// Open input file
+	file, err := os.Open(inputFile)
+	if err != nil {
+		fmt.Printf("[!] Error opening file: %v\n", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	// Count total lines first for progress estimation
+	totalLines, err := lineCount(inputFile)
+	if err != nil {
+		fmt.Printf("[!] Error counting lines: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("[*] Total lines to process: %d\n", totalLines)
+
+	startTime := time.Now()
+
+	// Regex for valid subdomains: something.something.tld
+	subdomainRegex := regexp.MustCompile(`^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$`)
+
+	scanner := bufio.NewScanner(file)
+	processed := 0
+	subdomains := make(map[string]struct{})
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		if subdomainRegex.MatchString(line) {
+			subdomains[line] = struct{}{}
+		}
+
+		processed++
+
+		// Update progress every 100 lines or at the end
+		if processed%100 == 0 || processed == totalLines {
+			elapsed := time.Since(startTime)
+			rate := float64(processed) / elapsed.Seconds()
+			remaining := totalLines - processed
+
+			var eta time.Duration
+			if rate > 0 {
+				eta = time.Duration(float64(remaining)/rate) * time.Second
+			} else {
+				eta = 0
+			}
+
+			fmt.Printf("\rProcessed: %d/%d lines | Elapsed: %s | ETA: %s        ",
+				processed, totalLines,
+				formatDuration(elapsed),
+				formatDuration(eta),
+			)
+		}
+	}
+	fmt.Println() // Newline after progress
+
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("[!] Error reading file: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Sort and write unique subdomains to output file
+	fmt.Println("[*] Removing duplicates and sorting...")
+	subsSlice := make([]string, 0, len(subdomains))
+	for s := range subdomains {
+		subsSlice = append(subsSlice, s)
+	}
+	sort.Strings(subsSlice)
+
+	// Ensure output directory exists
+	outDir := filepath.Dir(outputFile)
+	if err := os.MkdirAll(outDir, 0755); err != nil {
+		fmt.Printf("[!] Error creating output directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	out, err := os.Create(outputFile)
+	if err != nil {
+		fmt.Printf("[!] Error creating output file: %v\n", err)
+		os.Exit(1)
+	}
+	defer out.Close()
+
+	for _, sub := range subsSlice {
+		fmt.Fprintln(out, sub)
+	}
+
+	totalTime := time.Since(startTime)
+	fmt.Println("[+] Extraction complete!")
+	fmt.Printf("[+] Output saved to: %s\n", outputFile)
+	fmt.Printf("[+] Total time taken: %s\n", formatDuration(totalTime))
+}
+
+// lineCount counts the number of lines in a file
+func lineCount(path string) (int, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	count := 0
+	for scanner.Scan() {
+		count++
+	}
+	return count, scanner.Err()
+}
+
+// formatDuration formats duration as HH:mm:ss
+func formatDuration(d time.Duration) string {
+	h := int(d.Hours())
+	m := int(d.Minutes()) % 60
+	s := int(d.Seconds()) % 60
+	return fmt.Sprintf("%02dh:%02dm:%02ds", h, m, s)
+}
+  </pre>
+</div>
+
+<script>
+function toggleScript() {
+  const scriptBlock = document.getElementById('bashScript');
+  const btn = event.target;
+  if (scriptBlock.style.display === 'none') {
+    scriptBlock.style.display = 'block';
+    btn.textContent = '▼ Hide Bash Script to Extract Subdomains with Progress & Timing';
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    scriptBlock.style.display = 'none';
+    btn.textContent = '▶ Show Bash Script to Extract Subdomains with Progress & Timing';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
+
+<div class="tool">
+  <h3>Subfinder</h3>
+  <p>Fast passive subdomain discovery.</p>
+  <pre>subfinder -d &lt;domain&gt; -o subfinder.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Assetfinder</h3>
+  <p>Find subdomains using public sources.</p>
+  <pre>assetfinder --subs-only &lt;domain&gt; &gt; assetfinder.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Sublist3r</h3>
+  <p>Enumerate subdomains via search engines and APIs.</p>
+  <pre>sublist3r -d &lt;domain&gt; -o sublist3r.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>DNSRecon</h3>
+  <p>Enumerate DNS records with JSON output.</p>
+  <pre>dnsrecon -d &lt;domain&gt; -n 8.8.8.8 -j dnsrecon.json</pre>
+</div>
+
+<div class="tool">
+  <h3>TheHarvester</h3>
+  <p>Harvest subdomains and emails from public sources.</p>
+  <pre>theharvester -d &lt;domain&gt; -b all -f theharvester.xml</pre>
+</div>
+
+<div class="tool">
+  <h3>Sublert</h3>
+  <p>Passive subdomain enumeration.</p>
+  <pre>sublert -d &lt;domain&gt; &gt; sublert.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Shosubgo</h3>
+  <p>Another passive subdomain enumerator.</p>
+  <pre>shosubgo -d &lt;domain&gt; -o shosubgo.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Subdomainer</h3>
+  <p>Subdomain enumeration tool.</p>
+  <pre>subdomainer -d &lt;domain&gt; -o subdomainer.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Subscraper</h3>
+  <p>Enumerates subdomains using various techniques.</p>
+  <pre>subscraper -t &lt;domain&gt; -o subscraper.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Anubis</h3>
+  <p>Enumerates subdomains from passive sources.</p>
+  <pre>anubis -d &lt;domain&gt; &gt; anubis.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>CT-Exposer</h3>
+  <p>Extract subdomains from Certificate Transparency logs.</p>
+  <pre>ct-exposer -d &lt;domain&gt; -o ct-exposer.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>CCrawldns</h3>
+  <p>Crawls and discovers DNS entries.</p>
+  <pre>ccrawldns &lt;domain&gt; &gt; ccrawldns.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>DNSSearch</h3>
+  <p>Search DNS records.</p>
+  <pre>dnssearch &lt;domain&gt; &gt; dnssearch.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Domained</h3>
+  <p>Subdomain enumeration and analysis.</p>
+  <pre>domained -d &lt;domain&gt; -o domained.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>QuickRecon</h3>
+  <p>Quick subdomain reconnaissance.</p>
+  <pre>quickrecon -d &lt;domain&gt; -o quickrecon.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Lrod</h3>
+  <p>Lightweight subdomain discovery tool.</p>
+  <pre>lrod -d &lt;domain&gt; -o lrod.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Mildew</h3>
+  <p>Subdomain enumeration tool.</p>
+  <pre>mildew -d &lt;domain&gt; -o mildew.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Netscout</h3>
+  <p>Passive DNS enumeration.</p>
+  <pre>netscout -d &lt;domain&gt; -o netscout.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>DNS2GeoIP</h3>
+  <p>Map subdomains' IPs to geographic locations.</p>
+  <pre>dns2geoip -d &lt;domain&gt; &gt; dns2geoip.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>DNSCobra</h3>
+  <p>DNS enumeration tool.</p>
+  <pre>dnscobra -d &lt;domain&gt; -o dnscobra.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Bluto</h3>
+  <p>Subdomain enumeration.</p>
+  <pre>bluto -d &lt;domain&gt; -o bluto.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Dripper</h3>
+  <p>Subdomain enumeration tool.</p>
+  <pre>dripper -d &lt;domain&gt; -o dripper.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Graphinder</h3>
+  <p>Visualizes subdomain relationships.</p>
+  <pre>graphinder -d &lt;domain&gt; -o graphinder.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Knock</h3>
+  <p>DNS enumeration and brute forcing.</p>
+  <pre>knock -d &lt;domain&gt; -o knock.txt</pre>
+</div>
+
+<hr />
+
+<h2>2. Permutation and Brute-force Enumeration Tools</h2>
+
+<div class="tool">
+  <h3>Altdns</h3>
+  <p>Generate permutations of subdomains and resolve them.</p>
+  <pre>altdns -i amass.txt -o altdns_output.txt -w dns.txt -r -s altdns_resolved.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Puredns</h3>
+  <p>Fast DNS resolver and bruteforcer.</p>
+  <pre>puredns bruteforce dns.txt example.com --resolvers /etc/resolv.conf --write puredns.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Dnscan</h3>
+  <p>Bruteforce subdomains using a wordlist.</p>
+  <pre>dnscan -d example.com -w dns.txt -o dnscan.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Dnsspider</h3>
+  <p>DNS spider tool for brute forcing subdomains.</p>
+  <pre>dnsspider -d example.com -w dns.txt -o dnsspider.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Syborg</h3>
+  <p>Subdomain enumeration and brute forcing.</p>
+  <pre>syborg example.com -o syborg.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Waldo</h3>
+  <p>Fast brute forcing subdomains using wordlist and threads.</p>
+  <pre>waldo -d example.com -w dns.txt -t 50 -o waldo.txt</pre>
+</div>
+
+<hr />
+
+<h2>3. Aggregate and Deduplicate Subdomains</h2>
+
+<p>Combine all results from various tools and remove duplicates:</p>
+<pre>cat results/example.com/*.txt | sort -u &gt; results/example.com/all_subs.txt</pre>
+
+<hr />
+
+<h2>4. Resolve Live Subdomains</h2>
+
+<p>Use <code>httpx</code> to check which subdomains are alive and responding over HTTP/HTTPS:</p>
+<pre>httpx -l results/example.com/all_subs.txt -threads 50 -o results/example.com/live_subs.txt</pre>
+
+<hr />
+
+<h2>5. Subdomain Takeover Checks</h2>
+
+<p>Check live subdomains for potential takeover vulnerabilities:</p>
+<pre>
+subjack -w results/example.com/live_subs.txt -t 50 -timeout 30 -ssl -v -o results/example.com/subjack.txt
+subover -l results/example.com/live_subs.txt -o results/example.com/subover.txt
+second-order -d example.com -l results/example.com/live_subs.txt -o results/example.com/second_order.txt
+</pre>
+
+<hr />
+
+<h2>6. Screenshot Live Subdomains</h2>
+
+<p>Capture screenshots of live subdomains using <code>gowitness</code>:</p>
+<pre>gowitness file -f results/example.com/live_subs.txt -P results/example.com/screenshots --threads 50</pre>
+
+<hr />
+
+<h2>Summary</h2>
+
+<ul>
+  <li>Use passive tools first to gather as many subdomains as possible.</li>
+  <li>Run permutation/bruteforce tools on the initial results and wordlists.</li>
+  <li>Aggregate and deduplicate all results into one file.</li>
+  <li>Use <code>httpx</code> to filter live/active subdomains.</li>
+  <li>Check for takeover vulnerabilities with <code>subjack</code>, <code>subover</code>, and <code>second-order</code>.</li>
+  <li>Optionally, screenshot live domains for quick visual assessment.</li>
+</ul>
+
+<p>Happy hunting! 🕵️‍♂️🔍</p>
+
+</body>
+</html>
