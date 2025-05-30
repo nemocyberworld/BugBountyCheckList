@@ -30,185 +30,56 @@
 
   <!-- Toggle Button -->
   <button onclick="toggleScript()" aria-expanded="false" aria-controls="bashScript" style="cursor:pointer; margin-top:10px;">
-    ▶ Show Golang Script to Extract Subdomains with Progress & Timing
-  </button>
+    ▶ Show Python Script to Extract All Types of Records Uniquely</button>
 
   <!-- Collapsible Script Section -->
   <pre id="bashScript" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
-package main
+import re
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"regexp"
-	"sort"
-	"strings"
-	"time"
-)
+def extract_records(filename):
+    pattern = re.compile(r'--> ([^ ]+) -->')
+    domain_pattern = re.compile(
+        r'\b(?:[a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}\b'
+    )  # simple domain regex
 
-func main() {
-	// Ask for target domain
-	fmt.Print("Enter your target domain: ")
-	var domain string
-	fmt.Scanln(&domain)
+    records = {}
+    subdomains = set()
 
-	inputFile := filepath.Join("results", domain, "amass.txt")
-	outputFile := filepath.Join("results", domain, "extracted_subdomains.txt")
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.rstrip('\n')
+            # Extract tagged records
+            match = pattern.search(line)
+            if match:
+                record_type = match.group(1)
+                records.setdefault(record_type, []).append(line)
 
-	fmt.Printf("[*] Starting subdomain extraction for domain: %s\n", domain)
+            # Extract subdomains anywhere in the line
+            domains_found = domain_pattern.findall(line)
+            for domain in domains_found:
+                subdomains.add(domain)
 
-	// Check if input file exists; if not, run amass
-	if _, err := os.Stat(inputFile); os.IsNotExist(err) {
-		fmt.Printf("[!] Input file not found: %s\n", inputFile)
-		fmt.Println("[*] Running amass to enumerate subdomains...")
+    if not records and not subdomains:
+        print("No matching records or subdomains found.")
+        return
 
-		// Make sure output directory exists
-		if err := os.MkdirAll(filepath.Dir(inputFile), 0755); err != nil {
-			fmt.Printf("[!] Could not create directory: %v\n", err)
-			os.Exit(1)
-		}
+    # Write tagged record files
+    for record_type, lines in records.items():
+        output_file = f"{record_type}.txt"
+        with open(output_file, 'w') as f_out:
+            f_out.write("\n".join(lines) + "\n")
+        print(f"Wrote {len(lines)} lines to {output_file}")
 
-		// Run amass and save directly to file
-		cmd := exec.Command("amass", "enum", "-passive", "-d", domain, "-o", inputFile)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+    # Write subdomains uniquely
+    if subdomains:
+        with open("subdomains.txt", 'w') as f_sub:
+            for sd in sorted(subdomains):
+                f_sub.write(sd + "\n")
+        print(f"Wrote {len(subdomains)} unique subdomains to subdomains.txt")
 
-		err := cmd.Run()
-		if err != nil {
-			fmt.Printf("[!] Failed to run amass: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Println("[+] Amass enumeration complete.")
+if __name__ == "__main__":
+    extract_records('amass.txt')
 
-		// Check if amass output has content
-		info, err := os.Stat(inputFile)
-		if err != nil || info.Size() == 0 {
-			fmt.Printf("[!] Amass did not find any subdomains for %s\n", domain)
-			os.Exit(0)
-		}
-	} else {
-		fmt.Printf("[*] Reading from: %s\n", inputFile)
-	}
-
-	// Open input file
-	file, err := os.Open(inputFile)
-	if err != nil {
-		fmt.Printf("[!] Error opening file: %v\n", err)
-		os.Exit(1)
-	}
-	defer file.Close()
-
-	// Count total lines first for progress estimation
-	totalLines, err := lineCount(inputFile)
-	if err != nil {
-		fmt.Printf("[!] Error counting lines: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Printf("[*] Total lines to process: %d\n", totalLines)
-
-	startTime := time.Now()
-
-	// Regex for valid subdomains: something.something.tld
-	subdomainRegex := regexp.MustCompile(`^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$`)
-
-	scanner := bufio.NewScanner(file)
-	processed := 0
-	subdomains := make(map[string]struct{})
-
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
-		if subdomainRegex.MatchString(line) {
-			subdomains[line] = struct{}{}
-		}
-
-		processed++
-
-		// Update progress every 100 lines or at the end
-		if processed%100 == 0 || processed == totalLines {
-			elapsed := time.Since(startTime)
-			rate := float64(processed) / elapsed.Seconds()
-			remaining := totalLines - processed
-
-			var eta time.Duration
-			if rate > 0 {
-				eta = time.Duration(float64(remaining)/rate) * time.Second
-			} else {
-				eta = 0
-			}
-
-			fmt.Printf("\rProcessed: %d/%d lines | Elapsed: %s | ETA: %s        ",
-				processed, totalLines,
-				formatDuration(elapsed),
-				formatDuration(eta),
-			)
-		}
-	}
-	fmt.Println() // Newline after progress
-
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("[!] Error reading file: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Sort and write unique subdomains to output file
-	fmt.Println("[*] Removing duplicates and sorting...")
-	subsSlice := make([]string, 0, len(subdomains))
-	for s := range subdomains {
-		subsSlice = append(subsSlice, s)
-	}
-	sort.Strings(subsSlice)
-
-	// Ensure output directory exists
-	outDir := filepath.Dir(outputFile)
-	if err := os.MkdirAll(outDir, 0755); err != nil {
-		fmt.Printf("[!] Error creating output directory: %v\n", err)
-		os.Exit(1)
-	}
-
-	out, err := os.Create(outputFile)
-	if err != nil {
-		fmt.Printf("[!] Error creating output file: %v\n", err)
-		os.Exit(1)
-	}
-	defer out.Close()
-
-	for _, sub := range subsSlice {
-		fmt.Fprintln(out, sub)
-	}
-
-	totalTime := time.Since(startTime)
-	fmt.Println("[+] Extraction complete!")
-	fmt.Printf("[+] Output saved to: %s\n", outputFile)
-	fmt.Printf("[+] Total time taken: %s\n", formatDuration(totalTime))
-}
-
-// lineCount counts the number of lines in a file
-func lineCount(path string) (int, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return 0, err
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	count := 0
-	for scanner.Scan() {
-		count++
-	}
-	return count, scanner.Err()
-}
-
-// formatDuration formats duration as HH:mm:ss
-func formatDuration(d time.Duration) string {
-	h := int(d.Hours())
-	m := int(d.Minutes()) % 60
-	s := int(d.Seconds()) % 60
-	return fmt.Sprintf("%02dh:%02dm:%02ds", h, m, s)
-}
   </pre>
 </div>
 
@@ -459,6 +330,10 @@ second-order -d example.com -l results/example.com/live_subs.txt -o results/exam
 </ul>
 
 <p>Happy hunting! 🕵️‍♂️🔍</p>
-
+  <div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
 </body>
 </html>
