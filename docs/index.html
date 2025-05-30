@@ -23,6 +23,12 @@
     .subcategory {
       margin-left: 1.5rem;
     }
+    .subcategory.nested {
+  margin-left: 20px;
+  border-left: 2px solid #ddd;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
   </style>
 </head>
 <body>
@@ -32,152 +38,1255 @@
     <p class="lead">Track your web pentesting progress by checking each subcategory.</p>
 
     <!-- Category: Reconnaissance -->
-    <div class="category">
-      <h2>🛰️ Reconnaissance</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="subdomain-enum">
-        <label class="form-check-label" for="subdomain-enum">Subdomain Enumeration</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="dns-enum">
-        <label class="form-check-label" for="dns-enum">DNS Enumeration</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="tech-detection">
-        <label class="form-check-label" for="tech-detection">Technology Detection</label>
-      </div>
-    </div>
+<div class="category">
+  <h2>🛰️ Reconnaissance</h2>
 
-    <!-- Category: Information Disclosure -->
-    <div class="category">
-      <h2>📢 Information Disclosure</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="robots-txt">
-        <label class="form-check-label" for="robots-txt">robots.txt / sitemap.xml</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="headers-info">
-        <label class="form-check-label" for="headers-info">Server Headers Disclosure</label>
-      </div>
-    </div>
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-subdomain">
+    <label class="form-check-label" for="recon-subdomain">Subdomain Enumeration (amass, subfinder, <a href="http://crt.sh" target="_blank">crt.sh</a>)</label>
+  </div>
 
-    <!-- Category: Authentication -->
-    <div class="category">
-      <h2>🔐 Authentication</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="brute-force-login">
-        <label class="form-check-label" for="brute-force-login">Brute Force Login</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="2fa-bypass">
-        <label class="form-check-label" for="2fa-bypass">2FA Bypass</label>
-      </div>
-    </div>
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-port-scan">
+    <label class="form-check-label" for="recon-port-scan">Port Scanning (nmap, rustscan)</label>
+  </div>
 
-    <!-- Category: Authorization -->
-    <div class="category">
-      <h2>🛂 Authorization</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="idor">
-        <label class="form-check-label" for="idor">IDOR (Insecure Direct Object Reference)</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="vertical-priv">
-        <label class="form-check-label" for="vertical-priv">Vertical Privilege Escalation</label>
-      </div>
-    </div>
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-dir-brute">
+    <label class="form-check-label" for="recon-dir-brute">Directory Bruteforcing (ffuf, dirsearch)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-wayback">
+    <label class="form-check-label" for="recon-wayback">Wayback Machine / Archive Recon</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-js-analysis">
+    <label class="form-check-label" for="recon-js-analysis">JS File Analysis (endpoints, keys, secrets)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-asn">
+    <label class="form-check-label" for="recon-asn">ASN / CIDR Discovery</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-vhost">
+    <label class="form-check-label" for="recon-vhost">Virtual Host Discovery</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-content">
+    <label class="form-check-label" for="recon-content">Content Discovery (robots.txt, sitemap.xml)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-github-dorks">
+    <label class="form-check-label" for="recon-github-dorks">GitHub Dorking (company leaks, tokens)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-search-dorks">
+    <label class="form-check-label" for="recon-search-dorks">Search Engine Dorks (Google, Shodan, Censys)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-whois">
+    <label class="form-check-label" for="recon-whois">WHOIS & DNS Recon</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="recon-zone-transfer">
+    <label class="form-check-label" for="recon-zone-transfer">DNS Zone Transfers</label>
+  </div>
+</div>
+
+
+<!-- Category: Information Disclosure -->
+<div class="category">
+  <h2>📢 Information Disclosure</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="debug-messages">
+    <label class="form-check-label" for="debug-messages">Debug messages in responses</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="leaked-git">
+    <label class="form-check-label" for="leaked-git">Leaked <code>.git/</code> directory</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="leaked-env">
+    <label class="form-check-label" for="leaked-env">Leaked <code>.env</code> file</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="stack-trace">
+    <label class="form-check-label" for="stack-trace">Stack trace on exception</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="verbose-errors">
+    <label class="form-check-label" for="verbose-errors">Verbose error messages</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="robots-sensitive">
+    <label class="form-check-label" for="robots-sensitive">Sensitive info in <code>robots.txt</code></label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="exposed-backups">
+    <label class="form-check-label" for="exposed-backups">Exposed backup files (.bak, .old, .zip)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="js-api-keys">
+    <label class="form-check-label" for="js-api-keys">API keys in JavaScript files</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="internal-ips">
+    <label class="form-check-label" for="internal-ips">Internal IPs in response headers</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="credit-card-logs">
+    <label class="form-check-label" for="credit-card-logs">Credit card info in logs</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="misconfigured-github">
+    <label class="form-check-label" for="misconfigured-github">Misconfigured GitHub repo (public leaks)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="env-in-response">
+    <label class="form-check-label" for="env-in-response">Environment variables in response body</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="sentry-logs">
+    <label class="form-check-label" for="sentry-logs">Exposed Sentry / monitoring logs</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="source-maps">
+    <label class="form-check-label" for="source-maps">Source maps exposed in production</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="memory-dumps">
+    <label class="form-check-label" for="memory-dumps">Leaked memory dumps</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="tokens-in-comments">
+    <label class="form-check-label" for="tokens-in-comments">User tokens in HTML comments</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="path-disclosure">
+    <label class="form-check-label" for="path-disclosure">Full path disclosure</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="version-disclosure">
+    <label class="form-check-label" for="version-disclosure">Version disclosure via headers</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="referer-sensitive">
+    <label class="form-check-label" for="referer-sensitive">Sensitive data in Referer headers</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="email-pass-pairs">
+    <label class="form-check-label" for="email-pass-pairs">Email/password pairs in export files</label>
+  </div>
+</div>
+
+<!-- Category: Authentication -->
+<div class="category">
+  <h2>🔐 Authentication</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="brute-force-login">
+    <label class="form-check-label" for="brute-force-login">Brute Force Login</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="2fa-bypass">
+    <label class="form-check-label" for="2fa-bypass">2FA Bypass</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="no-rate-limit">
+    <label class="form-check-label" for="no-rate-limit">No rate limiting on login</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="no-account-lockout">
+    <label class="form-check-label" for="no-account-lockout">Missing account lockout</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="user-enum-login">
+    <label class="form-check-label" for="user-enum-login">User enumeration on login</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="reusable-reset-token">
+    <label class="form-check-label" for="reusable-reset-token">Reusable password reset token</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="reset-link-expiry">
+    <label class="form-check-label" for="reset-link-expiry">Reset link doesn't expire</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="reset-to-admin-email">
+    <label class="form-check-label" for="reset-to-admin-email">Password reset sent to admin email</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="weak-password-policy">
+    <label class="form-check-label" for="weak-password-policy">Weak password policy</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="2fa-fallback-bypass">
+    <label class="form-check-label" for="2fa-fallback-bypass">2FA bypass via fallback method</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="no-session-invalidate">
+    <label class="form-check-label" for="no-session-invalidate">Session not invalidated after password change</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="session-fixation">
+    <label class="form-check-label" for="session-fixation">Session fixation</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="insecure-remember-me">
+    <label class="form-check-label" for="insecure-remember-me">Insecure "remember me" token</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="oauth-no-reauth">
+    <label class="form-check-label" for="oauth-no-reauth">OAuth login without reauthentication</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="open-admin-registration">
+    <label class="form-check-label" for="open-admin-registration">Open registration to admin role</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="predictable-reset-token">
+    <label class="form-check-label" for="predictable-reset-token">Predictable password reset tokens</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="public-reg-internal-app">
+    <label class="form-check-label" for="public-reg-internal-app">Public registration for internal application</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="null-password-bypass">
+    <label class="form-check-label" for="null-password-bypass">Bypassing login with null/empty password</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="fallback-login-ssh">
+    <label class="form-check-label" for="fallback-login-ssh">Fallback login method enabled (e.g., SSH)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="unverified-email-login">
+    <label class="form-check-label" for="unverified-email-login">Login allowed with unverified email</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="reset-token-referer">
+    <label class="form-check-label" for="reset-token-referer">Reset token leaked in Referer header</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="session-id-in-url">
+    <label class="form-check-label" for="session-id-in-url">Session ID exposed in URL</label>
+  </div>
+</div>
+
+<!-- Category: Authorization -->
+<div class="category">
+  <h2>🛂 Authorization</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="idor">
+    <label class="form-check-label" for="idor">IDOR (Insecure Direct Object Reference)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="uuid-guessing">
+    <label class="form-check-label" for="uuid-guessing">Accessing others’ data via UUID guessing</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="horizontal-priv">
+    <label class="form-check-label" for="horizontal-priv">Horizontal Privilege Escalation</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="vertical-priv">
+    <label class="form-check-label" for="vertical-priv">Vertical Privilege Escalation</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="no-access-control">
+    <label class="form-check-label" for="no-access-control">No access control on sensitive endpoints</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="admin-feature-access">
+    <label class="form-check-label" for="admin-feature-access">Admin-only feature accessible by normal users</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="feature-toggle-flaw">
+    <label class="form-check-label" for="feature-toggle-flaw">Misconfigured feature toggles</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="change-role-body">
+    <label class="form-check-label" for="change-role-body">Changing roles via PUT/POST body</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="graphql-id-change">
+    <label class="form-check-label" for="graphql-id-change">Accessing data by changing GraphQL ID</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="jwt-role-tamper">
+    <label class="form-check-label" for="jwt-role-tamper">JWT with upgradable role claims</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="group-id-tamper">
+    <label class="form-check-label" for="group-id-tamper">Tampering group ID to escalate privileges</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="middleware-misconfig">
+    <label class="form-check-label" for="middleware-misconfig">Misconfigured middleware (e.g., no auth check)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="async-job-authz-missing">
+    <label class="form-check-label" for="async-job-authz-missing">Authorization missing in async jobs</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="frontend-no-validation">
+    <label class="form-check-label" for="frontend-no-validation">Lack of validation in frontend</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-api-bypass">
+    <label class="form-check-label" for="mobile-api-bypass">Bypass auth using mobile API endpoints</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="ui-only-auth">
+    <label class="form-check-label" for="ui-only-auth">Auth enforced only via UI</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="access-control-matrix">
+    <label class="form-check-label" for="access-control-matrix">Disclosure of access control matrix</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="local-file-proxy-bypass">
+    <label class="form-check-label" for="local-file-proxy-bypass">Local file request bypasses proxy RBAC</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="wildcard-perms">
+    <label class="form-check-label" for="wildcard-perms">Wildcard permissions misused</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="soft-deleted-access">
+    <label class="form-check-label" for="soft-deleted-access">Access via soft-deleted accounts</label>
+  </div>
+</div>
+
 
     <!-- Category: Input Validation -->
-    <div class="category">
-      <h2>💉 Input Validation</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="xss">
-        <label class="form-check-label" for="xss">Cross Site Scripting (XSS)</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="sql-injection">
-        <label class="form-check-label" for="sql-injection">SQL Injection</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="command-injection">
-        <label class="form-check-label" for="command-injection">Command Injection</label>
-      </div>
-    </div>
+<div class="category">
+  <h2>💉 Input Validation</h2>
 
-    <!-- Category: Client-Side -->
-    <div class="category">
-      <h2>🖥️ Client-Side</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="csrf">
-        <label class="form-check-label" for="csrf">Cross-Site Request Forgery (CSRF)</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="clickjacking">
-        <label class="form-check-label" for="clickjacking">Clickjacking</label>
-      </div>
-    </div>
+  <!-- Category: Input Validation -->
+<div class="category">
+  <h2>💉 Input Validation</h2>
 
-    <!-- Category: File Handling -->
-    <div class="category">
-      <h2>📂 File Handling</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="file-upload">
-        <label class="form-check-label" for="file-upload">Unrestricted File Upload</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="path-traversal">
-        <label class="form-check-label" for="path-traversal">Path Traversal</label>
-      </div>
-    </div>
+  <!-- Main XSS checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="xss">
+    <label class="form-check-label" for="xss">Cross Site Scripting (XSS)</label>
+  </div>
 
-    <!-- Category: Business Logic -->
-    <div class="category">
-      <h2>📊 Business Logic</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="coupon-abuse">
-        <label class="form-check-label" for="coupon-abuse">Coupon/Reward Abuse</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="rate-limit">
-        <label class="form-check-label" for="rate-limit">Rate Limiting Issues</label>
-      </div>
+  <!-- Detailed XSS sub-subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="reflected-xss">
+      <label class="form-check-label" for="reflected-xss">Reflected XSS</label>
     </div>
-
-    <!-- Category: Misc -->
-    <div class="category">
-      <h2>🧪 Miscellaneous</h2>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="open-redirect">
-        <label class="form-check-label" for="open-redirect">Open Redirect</label>
-      </div>
-      <div class="form-check subcategory">
-        <input class="form-check-input" type="checkbox" id="ssrf">
-        <label class="form-check-label" for="ssrf">Server Side Request Forgery (SSRF)</label>
-      </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="stored-xss">
+      <label class="form-check-label" for="stored-xss">Stored XSS</label>
     </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="dom-xss">
+      <label class="form-check-label" for="dom-xss">DOM-based XSS</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-filename">
+      <label class="form-check-label" for="xss-filename">XSS in file name</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="svg-js-upload">
+      <label class="form-check-label" for="svg-js-upload">SVG upload with JavaScript</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-redirect-url">
+      <label class="form-check-label" for="xss-redirect-url">XSS in redirect URL</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-json-response">
+      <label class="form-check-label" for="xss-json-response">XSS in JSON response</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-markdown-renderer">
+      <label class="form-check-label" for="xss-markdown-renderer">XSS in markdown renderer</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-pdf-export">
+      <label class="form-check-label" for="xss-pdf-export">XSS in PDF export</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-404-page">
+      <label class="form-check-label" for="xss-404-page">XSS in 404 page</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-document-write">
+      <label class="form-check-label" for="xss-document-write">Payload in document.write</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csp-bypass">
+      <label class="form-check-label" for="csp-bypass">CSP bypass</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="legacy-browser-xss">
+      <label class="form-check-label" for="legacy-browser-xss">Legacy browser XSS vector</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="drag-drop-xss">
+      <label class="form-check-label" for="drag-drop-xss">Drag-and-drop XSS</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-input-autofill">
+      <label class="form-check-label" for="xss-input-autofill">XSS via input autofill</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="mutation-xss-react">
+      <label class="form-check-label" for="mutation-xss-react">Mutation XSS in React</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="unescaped-template-vars">
+      <label class="form-check-label" for="unescaped-template-vars">Unescaped template variables</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-title-tag">
+      <label class="form-check-label" for="xss-title-tag">XSS in &lt;title&gt; tag (tabnabbing)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-email-field">
+      <label class="form-check-label" for="xss-email-field">XSS via email field</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="nested-json-xss">
+      <label class="form-check-label" for="nested-json-xss">Nested JSON XSS</label>
+    </div>
+  </div>
 
-    <!-- Category: API Testing -->
+  <!-- Injection Attacks main checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="injection-attacks">
+    <label class="form-check-label" for="injection-attacks">Injection Attacks</label>
+  </div>
+
+  <!-- Detailed Injection Attack types -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="sql-injection-classic">
+      <label class="form-check-label" for="sql-injection-classic">SQL Injection (classic)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="blind-sqli">
+      <label class="form-check-label" for="blind-sqli">Blind SQLi (timing-based)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="second-order-sqli">
+      <label class="form-check-label" for="second-order-sqli">Second-order SQLi</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="nosql-injection">
+      <label class="form-check-label" for="nosql-injection">NoSQL Injection (MongoDB)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="command-injection">
+      <label class="form-check-label" for="command-injection">Command Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="ldap-injection">
+      <label class="form-check-label" for="ldap-injection">LDAP Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="ssti">
+      <label class="form-check-label" for="ssti">SSTI (Server-Side Template Injection)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xxe">
+      <label class="form-check-label" for="xxe">XXE (XML External Entity)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="crlf-injection">
+      <label class="form-check-label" for="crlf-injection">CRLF Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="log-injection">
+      <label class="form-check-label" for="log-injection">Log Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="regex-dos">
+      <label class="form-check-label" for="regex-dos">Regex DoS</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="host-header-injection">
+      <label class="form-check-label" for="host-header-injection">Host Header Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="code-injection-sandbox">
+      <label class="form-check-label" for="code-injection-sandbox">Code Injection in sandbox</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xpath-injection">
+      <label class="form-check-label" for="xpath-injection">XPath Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="graphql-injection">
+      <label class="form-check-label" for="graphql-injection">GraphQL Injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="os-level-injection">
+      <label class="form-check-label" for="os-level-injection">OS-level injection via file parser</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="deserialization-attacks">
+      <label class="form-check-label" for="deserialization-attacks">Deserialization attacks</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="php-object-injection">
+      <label class="form-check-label" for="php-object-injection">PHP object injection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="yaml-deserialization">
+      <label class="form-check-label" for="yaml-deserialization">YAML deserialization</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="dynamic-eval-injection">
+      <label class="form-check-label" for="dynamic-eval-injection">Dynamic language eval injection</label>
+    </div>
+  </div>
+
+<!-- Command Injection main checkbox -->
+<div class="form-check subcategory">
+  <input class="form-check-input" type="checkbox" id="command-injection">
+  <label class="form-check-label" for="command-injection">Command Injection</label>
+</div>
+
+<!-- Detailed Command Injection types -->
+<div class="subcategory nested">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="classic-command-injection">
+    <label class="form-check-label" for="classic-command-injection">Classic Command Injection</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="blind-command-injection">
+    <label class="form-check-label" for="blind-command-injection">Blind Command Injection</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="time-based-command-injection">
+    <label class="form-check-label" for="time-based-command-injection">Time-based Command Injection</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="reverse-shell-injection">
+    <label class="form-check-label" for="reverse-shell-injection">Reverse Shell Injection</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="blind-reverse-shell">
+    <label class="form-check-label" for="blind-reverse-shell">Blind Reverse Shell Injection</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="file-injection-via-command">
+    <label class="form-check-label" for="file-injection-via-command">File Injection via Command</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="os-command-injection-via-parameter">
+    <label class="form-check-label" for="os-command-injection-via-parameter">OS Command Injection via Parameter</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="command-injection-via-environment-variables">
+    <label class="form-check-label" for="command-injection-via-environment-variables">Command Injection via Environment Variables</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="injection-via-shell-metacharacters">
+    <label class="form-check-label" for="injection-via-shell-metacharacters">Injection via Shell Metacharacters (e.g., `;`, `&&`)</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="injection-via-pipes-and-redirects">
+    <label class="form-check-label" for="injection-via-pipes-and-redirects">Injection via Pipes and Redirects (e.g., `|`, `>`)</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="injection-via-backticks">
+    <label class="form-check-label" for="injection-via-backticks">Injection via Backticks (`` ` ``)</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="injection-via-dollar-parentheses">
+    <label class="form-check-label" for="injection-via-dollar-parentheses">Injection via $( ) command substitution</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="blind-time-delay-command-injection">
+    <label class="form-check-label" for="blind-time-delay-command-injection">Blind Time-Delay Command Injection</label>
+  </div>
+</div>
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="ldap-injection">
+    <label class="form-check-label" for="ldap-injection">LDAP Injection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="xpath-injection">
+    <label class="form-check-label" for="xpath-injection">XPath Injection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="open-redirect">
+    <label class="form-check-label" for="open-redirect">Open Redirect</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="buffer-overflow">
+    <label class="form-check-label" for="buffer-overflow">Buffer Overflow</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="csrf">
+    <label class="form-check-label" for="csrf">Cross-Site Request Forgery (CSRF)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="format-string-injection">
+    <label class="form-check-label" for="format-string-injection">Format String Injection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="path-traversal">
+    <label class="form-check-label" for="path-traversal">Path Traversal</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="http-header-injection">
+    <label class="form-check-label" for="http-header-injection">HTTP Header Injection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="insecure-deserialization">
+    <label class="form-check-label" for="insecure-deserialization">Insecure Deserialization</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="integer-overflow">
+    <label class="form-check-label" for="integer-overflow">Integer Overflow/Underflow</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="unvalidated-redirects">
+    <label class="form-check-label" for="unvalidated-redirects">Unvalidated Redirects and Forwards</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="header-injection">
+    <label class="form-check-label" for="header-injection">Header Injection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="http-request-smuggling">
+    <label class="form-check-label" for="http-request-smuggling">HTTP Request Smuggling</label>
+  </div>
+
+</div>
+
+<!-- Category: Client-Side -->
+<div class="category">
+  <h2>🖥️ Client-Side</h2>
+
+  <!-- Main CSRF checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="csrf">
+    <label class="form-check-label" for="csrf">Cross-Site Request Forgery (CSRF)</label>
+  </div>
+
+  <!-- Detailed CSRF subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-payment">
+      <label class="form-check-label" for="csrf-payment">CSRF on payment</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-settings-change">
+      <label class="form-check-label" for="csrf-settings-change">CSRF on settings change</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="logout-csrf">
+      <label class="form-check-label" for="logout-csrf">Logout CSRF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-password-change">
+      <label class="form-check-label" for="csrf-password-change">CSRF on password change</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="no-csrf-token">
+      <label class="form-check-label" for="no-csrf-token">No CSRF token in form</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="misconfigured-samesite">
+      <label class="form-check-label" for="misconfigured-samesite">Misconfigured SameSite attribute</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="referer-leakage-csrf">
+      <label class="form-check-label" for="referer-leakage-csrf">Referer leakage causes CSRF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-mobile-endpoints">
+      <label class="form-check-label" for="csrf-mobile-endpoints">CSRF via mobile endpoints</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-2fa-toggle">
+      <label class="form-check-label" for="csrf-2fa-toggle">CSRF on 2FA toggle</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-xss-combo">
+      <label class="form-check-label" for="csrf-xss-combo">CSRF + XSS combo</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="cors-misused-csrf">
+      <label class="form-check-label" for="cors-misused-csrf">CORS misused as CSRF protection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="content-type-csrf">
+      <label class="form-check-label" for="content-type-csrf">Content-type based CSRF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="json-csrf">
+      <label class="form-check-label" for="json-csrf">JSON CSRF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="no-csrf-multipart-upload">
+      <label class="form-check-label" for="no-csrf-multipart-upload">No CSRF on multipart upload</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="preflight-bypass-get">
+      <label class="form-check-label" for="preflight-bypass-get">Preflight bypass via GET</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-profile-pic-upload">
+      <label class="form-check-label" for="csrf-profile-pic-upload">CSRF on profile picture upload</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="csrf-legacy-iframe">
+      <label class="form-check-label" for="csrf-legacy-iframe">CSRF in legacy iframe</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="bypass-null-origin">
+      <label class="form-check-label" for="bypass-null-origin">Bypass via null origin</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="dns-rebinding-csrf">
+      <label class="form-check-label" for="dns-rebinding-csrf">DNS rebinding to trigger CSRF</label>
+    </div>
+  </div>
+
+  <!-- Main Clickjacking checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="clickjacking">
+    <label class="form-check-label" for="clickjacking">Clickjacking</label>
+  </div>
+
+  <!-- Detailed Clickjacking subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="clickjacking-login-iframe">
+      <label class="form-check-label" for="clickjacking-login-iframe">Clickjacking login iframe</label>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Category: File Handling -->
+<div class="category">
+  <h2>📂 File Handling</h2>
+
+  <!-- Main File Upload checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="file-upload">
+    <label class="form-check-label" for="file-upload">Unrestricted File Upload</label>
+  </div>
+
+  <!-- Detailed File Upload Issues subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-executable-file">
+      <label class="form-check-label" for="upload-executable-file">Uploading executable file</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="double-extension-bypass">
+      <label class="form-check-label" for="double-extension-bypass">Double extension bypass</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="bypass-mime-check">
+      <label class="form-check-label" for="bypass-mime-check">Bypassing MIME type check</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="file-overwrite">
+      <label class="form-check-label" for="file-overwrite">File overwrite</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-ssrf-vector">
+      <label class="form-check-label" for="upload-ssrf-vector">Uploading with SSRF vector</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="lfi-via-filename">
+      <label class="form-check-label" for="lfi-via-filename">LFI via filename</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="xss-via-uploaded-filename">
+      <label class="form-check-label" for="xss-via-uploaded-filename">XSS via uploaded filename</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-to-web-root">
+      <label class="form-check-label" for="upload-to-web-root">Upload to web root</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="misconfigured-cdn-cache">
+      <label class="form-check-label" for="misconfigured-cdn-cache">Misconfigured CDN cache</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="polyglot-file-upload">
+      <label class="form-check-label" for="polyglot-file-upload">Polyglot file upload</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="image-malicious-exif">
+      <label class="form-check-label" for="image-malicious-exif">Image with malicious EXIF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="rar-zip-bombs">
+      <label class="form-check-label" for="rar-zip-bombs">RAR/ZIP bombs</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-large-file-dos">
+      <label class="form-check-label" for="upload-large-file-dos">Uploading large file to cause DoS</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-local-file-path-name">
+      <label class="form-check-label" for="upload-local-file-path-name">Upload with local file path in name</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="svg-embedded-js">
+      <label class="form-check-label" for="svg-embedded-js">SVG with embedded JS</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="backup-file-upload">
+      <label class="form-check-label" for="backup-file-upload">Backup file upload</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="ghostscript-rce-uploaded-file">
+      <label class="form-check-label" for="ghostscript-rce-uploaded-file">Ghostscript RCE via uploaded file</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="file-upload-directory-traversal">
+      <label class="form-check-label" for="file-upload-directory-traversal">File upload directory traversal</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="insecure-pdf-parsing">
+      <label class="form-check-label" for="insecure-pdf-parsing">Insecure PDF parsing</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="upload-bypass-nested-multipart">
+      <label class="form-check-label" for="upload-bypass-nested-multipart">Upload bypass via nested multipart</label>
+    </div>
+  </div>
+
+  <!-- Main Path Traversal checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="path-traversal">
+    <label class="form-check-label" for="path-traversal">Path Traversal</label>
+  </div>
+
+</div>
+</div>
+
+
+<!-- Category: Business Logic -->
+<div class="category">
+  <h2>📊 Business Logic</h2>
+
+  <!-- Main Coupon/Reward Abuse checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="coupon-abuse">
+    <label class="form-check-label" for="coupon-abuse">Coupon/Reward Abuse</label>
+  </div>
+
+  <!-- Main Rate Limiting Issues checkbox -->
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="rate-limit">
+    <label class="form-check-label" for="rate-limit">Rate Limiting Issues</label>
+  </div>
+
+  <!-- Detailed Business Logic Bugs subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="buy-negative-price">
+      <label class="form-check-label" for="buy-negative-price">Buying product with negative price</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="skipping-payment-step">
+      <label class="form-check-label" for="skipping-payment-step">Skipping payment step</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="infinite-coupon-redemption">
+      <label class="form-check-label" for="infinite-coupon-redemption">Infinite coupon redemption</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="price-manipulation-cart">
+      <label class="form-check-label" for="price-manipulation-cart">Price manipulation in cart</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="loyalty-points-fraud">
+      <label class="form-check-label" for="loyalty-points-fraud">Loyalty points fraud</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="refer-a-friend-abuse">
+      <label class="form-check-label" for="refer-a-friend-abuse">Refer-a-friend abuse</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="duplicate-request-multiple-rewards">
+      <label class="form-check-label" for="duplicate-request-multiple-rewards">Duplicate request = multiple rewards</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="logic-flaw-rate-limit">
+      <label class="form-check-label" for="logic-flaw-rate-limit">Logic flaw in rate limit</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="changing-plan-without-paying">
+      <label class="form-check-label" for="changing-plan-without-paying">Changing plan without paying</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="gifting-subscription-bypass">
+      <label class="form-check-label" for="gifting-subscription-bypass">Gifting subscription bypass</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="inventory-bypass">
+      <label class="form-check-label" for="inventory-bypass">Inventory bypass</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="uploading-same-receipt-multiple-times">
+      <label class="form-check-label" for="uploading-same-receipt-multiple-times">Uploading same receipt multiple times</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="applying-expired-discount">
+      <label class="form-check-label" for="applying-expired-discount">Applying expired discount</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="refund-logic-abuse">
+      <label class="form-check-label" for="refund-logic-abuse">Refund logic abuse</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="abuse-trial-periods">
+      <label class="form-check-label" for="abuse-trial-periods">Abuse of trial periods</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="bonus-triggered-without-conditions">
+      <label class="form-check-label" for="bonus-triggered-without-conditions">Bonus triggered without conditions met</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="oauth-token-reuse">
+      <label class="form-check-label" for="oauth-token-reuse">OAuth token reuse</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="redeeming-coupons-others-accounts">
+      <label class="form-check-label" for="redeeming-coupons-others-accounts">Redeeming coupons on others' accounts</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="buying-restricted-item-guest">
+      <label class="form-check-label" for="buying-restricted-item-guest">Buying restricted item as guest</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="flawed-voting-rating-logic">
+      <label class="form-check-label" for="flawed-voting-rating-logic">Flawed voting/rating logic</label>
+    </div>
+  </div>
+</div>
+
+
+<!-- Category: Misc -->
+<div class="category">
+  <h2>🧪 Miscellaneous</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="open-redirect">
+    <label class="form-check-label" for="open-redirect">Open Redirect</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="ssrf">
+    <label class="form-check-label" for="ssrf">Server Side Request Forgery (SSRF)</label>
+  </div>
+
+  <!-- Additional advanced/misc subcategories -->
+  <div class="subcategory nested">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="subdomain-takeover">
+      <label class="form-check-label" for="subdomain-takeover">Subdomain takeover</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="blind-ssrf">
+      <label class="form-check-label" for="blind-ssrf">Blind SSRF</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="dns-rebinding">
+      <label class="form-check-label" for="dns-rebinding">DNS rebinding</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="prototype-pollution">
+      <label class="form-check-label" for="prototype-pollution">Prototype pollution</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="websocket-hijacking">
+      <label class="form-check-label" for="websocket-hijacking">WebSocket hijacking</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="jwt-none-algorithm">
+      <label class="form-check-label" for="jwt-none-algorithm">JWT None algorithm</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="jwt-unsigned-tokens">
+      <label class="form-check-label" for="jwt-unsigned-tokens">JWT unsigned tokens accepted</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="path-traversal-misc">
+      <label class="form-check-label" for="path-traversal-misc">Path traversal (../etc/passwd)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="unrestricted-internal-redirect">
+      <label class="form-check-label" for="unrestricted-internal-redirect">Unrestricted internal redirection</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="broken-captcha-bypass">
+      <label class="form-check-label" for="broken-captcha-bypass">Broken CAPTCHA bypass</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="cache-poisoning">
+      <label class="form-check-label" for="cache-poisoning">Cache poisoning</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="host-header-injection">
+      <label class="form-check-label" for="host-header-injection">Host header injection (reset link)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="misconfigured-cronjob-rce">
+      <label class="form-check-label" for="misconfigured-cronjob-rce">Misconfigured cronjob leading to RCE</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="publicly-accessible-s3-bucket">
+      <label class="form-check-label" for="publicly-accessible-s3-bucket">Publicly accessible S3 bucket</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="desync-attack">
+      <label class="form-check-label" for="desync-attack">Desync attack (HTTP Request Smuggling)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="insecure-http-method">
+      <label class="form-check-label" for="insecure-http-method">Insecure HTTP method enabled (PUT, TRACE)</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="abuse-x-forwarded-headers">
+      <label class="form-check-label" for="abuse-x-forwarded-headers">Abuse of X-Forwarded headers</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="webhook-injection">
+      <label class="form-check-label" for="webhook-injection">Webhook injection</label>
+    </div>
+  </div>
+</div>
+
+<!-- Category: CORS Misconfigurations -->
+<div class="category">
+  <h2>🌐 CORS Misconfigurations</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="wildcard-origin-credentials">
+    <label class="form-check-label" for="wildcard-origin-credentials">Wildcard origin + credentials</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="unvalidated-reflected-origin">
+    <label class="form-check-label" for="unvalidated-reflected-origin">Unvalidated reflected origin</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="cors-on-admin-panel">
+    <label class="form-check-label" for="cors-on-admin-panel">CORS on admin panel</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="misconfigured-preflight">
+    <label class="form-check-label" for="misconfigured-preflight">Misconfigured preflight</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="allowed-subdomain-cors-leak">
+    <label class="form-check-label" for="allowed-subdomain-cors-leak">Allowed subdomain CORS leak</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="jsonp-with-cors">
+    <label class="form-check-label" for="jsonp-with-cors">JSONP with CORS enabled</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="internal-service-exposed-via-cors">
+    <label class="form-check-label" for="internal-service-exposed-via-cors">Internal service exposed via CORS</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="cross-origin-token-access">
+    <label class="form-check-label" for="cross-origin-token-access">Cross-origin token access</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="wildcard-allow-headers">
+    <label class="form-check-label" for="wildcard-allow-headers">Wildcard in Access-Control-Allow-Headers</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="permissive-cors-private-api">
+    <label class="form-check-label" for="permissive-cors-private-api">Overly permissive CORS on private API</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="unauthenticated-endpoints-cors">
+    <label class="form-check-label" for="unauthenticated-endpoints-cors">Unauthenticated endpoints with CORS</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="cors-allow-star-credentials">
+    <label class="form-check-label" for="cors-allow-star-credentials">CORS allowed via * but credentials sent</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="origin-spoof-bypass">
+    <label class="form-check-label" for="origin-spoof-bypass">Origin spoof bypass</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="allowed-localhost">
+    <label class="form-check-label" for="allowed-localhost">Allowed local origins (localhost)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="legacy-browser-cors-bypass">
+    <label class="form-check-label" for="legacy-browser-cors-bypass">Legacy browser CORS bypass</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="cors-error-endpoint">
+    <label class="form-check-label" for="cors-error-endpoint">CORS in error handling endpoint</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="multi-origin-bypass">
+    <label class="form-check-label" for="multi-origin-bypass">Multi-origin bypass</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="malicious-iframes-cors">
+    <label class="form-check-label" for="malicious-iframes-cors">Malicious iframes triggering CORS</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="cors-on-logout-endpoint">
+    <label class="form-check-label" for="cors-on-logout-endpoint">CORS on logout endpoint</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-key-leak-cors">
+    <label class="form-check-label" for="api-key-leak-cors">API key leak via misused CORS</label>
+  </div>
+</div>
+
+
+<!-- Category: API Security Testing -->
 <div class="category">
   <h2>🔗 API Security Testing</h2>
 
   <div class="form-check subcategory">
-    <input class="form-check-input" type="checkbox" id="api-auth">
-    <label class="form-check-label" for="api-auth">Authentication Bypass</label>
+    <input class="form-check-input" type="checkbox" id="api-auth-bypass">
+    <label class="form-check-label" for="api-auth-bypass">Authentication Bypass</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-broken-auth">
+    <label class="form-check-label" for="api-broken-auth">Broken Object Level Authorization (BOLA)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-broken-func-auth">
+    <label class="form-check-label" for="api-broken-func-auth">Broken Function Level Authorization (BFLA)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-idor">
+    <label class="form-check-label" for="api-idor">IDOR (Insecure Direct Object Reference)</label>
   </div>
 
   <div class="form-check subcategory">
     <input class="form-check-input" type="checkbox" id="api-rate-limit">
-    <label class="form-check-label" for="api-rate-limit">Rate Limiting</label>
+    <label class="form-check-label" for="api-rate-limit">Rate Limiting Bypass</label>
   </div>
 
   <div class="form-check subcategory">
-    <input class="form-check-input" type="checkbox" id="api-idors">
-    <label class="form-check-label" for="api-idors">IDORs in API Endpoints</label>
-  </div>
-
-  <div class="form-check subcategory">
-    <input class="form-check-input" type="checkbox" id="api-methods">
-    <label class="form-check-label" for="api-methods">HTTP Method Abuse (GET/POST/PUT/DELETE)</label>
+    <input class="form-check-input" type="checkbox" id="api-method-abuse">
+    <label class="form-check-label" for="api-method-abuse">HTTP Method Abuse (GET/POST/PUT/DELETE)</label>
   </div>
 
   <div class="form-check subcategory">
@@ -201,11 +1310,392 @@
   </div>
 
   <div class="form-check subcategory">
-    <input class="form-check-input" type="checkbox" id="api-versioning">
-    <label class="form-check-label" for="api-versioning">API Version Exposure</label>
+    <input class="form-check-input" type="checkbox" id="api-version-exposure">
+    <label class="form-check-label" for="api-version-exposure">API Version Exposure</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-verbose-error">
+    <label class="form-check-label" for="api-verbose-error">Verbose Error Messages</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-ssrf">
+    <label class="form-check-label" for="api-ssrf">SSRF via API</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-cors">
+    <label class="form-check-label" for="api-cors">CORS Misconfigurations in API</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-graphql-idor">
+    <label class="form-check-label" for="api-graphql-idor">GraphQL Endpoint IDOR</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-json-hijacking">
+    <label class="form-check-label" for="api-json-hijacking">JSON Hijacking</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-swagger-leak">
+    <label class="form-check-label" for="api-swagger-leak">Swagger/Docs Exposure</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-replay-attack">
+    <label class="form-check-label" for="api-replay-attack">Replay Attacks (No nonce/timestamp)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-file-upload">
+    <label class="form-check-label" for="api-file-upload">Unrestricted File Upload via API</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-cache-poisoning">
+    <label class="form-check-label" for="api-cache-poisoning">API Cache Poisoning</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-unauthenticated-access">
+    <label class="form-check-label" for="api-unauthenticated-access">Unauthenticated API Access</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-batch-request">
+    <label class="form-check-label" for="api-batch-request">Abuse of Batch Request APIs</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-over-permission">
+    <label class="form-check-label" for="api-over-permission">Over-Permissioned Tokens</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="api-websocket">
+    <label class="form-check-label" for="api-websocket">WebSocket Security in API</label>
   </div>
 </div>
 
+<!-- Category: Mobile App Security Testing -->
+<div class="category">
+  <h2>📱 Mobile App Security Testing</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-insecure-storage">
+    <label class="form-check-label" for="mobile-insecure-storage">Insecure Local Storage (Shared Prefs, SQLite, Keychain)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-unencrypted-traffic">
+    <label class="form-check-label" for="mobile-unencrypted-traffic">Unencrypted Network Traffic (HTTP)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-ssl-pinning">
+    <label class="form-check-label" for="mobile-ssl-pinning">SSL Pinning Misconfigured or Bypassed</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-debuggable">
+    <label class="form-check-label" for="mobile-debuggable">Debuggable Build Enabled</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-code-analysis">
+    <label class="form-check-label" for="mobile-code-analysis">Reverse Engineering (APK/IPA/Dex/Smali)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-sensitive-logs">
+    <label class="form-check-label" for="mobile-sensitive-logs">Sensitive Data in System/Crash Logs</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-screenshot-leak">
+    <label class="form-check-label" for="mobile-screenshot-leak">Leakage via Screen Capture/Snapshot</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-intent-abuse">
+    <label class="form-check-label" for="mobile-intent-abuse">Insecure Intent Handling / Intent Sniffing</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-root-bypass">
+    <label class="form-check-label" for="mobile-root-bypass">Bypass Root/Jailbreak Detection</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-activity-exported">
+    <label class="form-check-label" for="mobile-activity-exported">Exported Activity/Services/Broadcasts</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-frida-hooking">
+    <label class="form-check-label" for="mobile-frida-hooking">Runtime Hooking (Frida/Xposed Detection)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-hardcoded-keys">
+    <label class="form-check-label" for="mobile-hardcoded-keys">Hardcoded Secrets/API Keys in App</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-deeplink">
+    <label class="form-check-label" for="mobile-deeplink">Insecure Deeplinks / URL Schemes</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-clipboard-leak">
+    <label class="form-check-label" for="mobile-clipboard-leak">Sensitive Data Leaked to Clipboard</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-webview">
+    <label class="form-check-label" for="mobile-webview">WebView Misuse (JavaScript Injection, File Access)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-backup-leak">
+    <label class="form-check-label" for="mobile-backup-leak">Backup Enabled for Sensitive Data</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-paste-injection">
+    <label class="form-check-label" for="mobile-paste-injection">Injection via Autofill or Paste Events</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-root-access">
+    <label class="form-check-label" for="mobile-root-access">Accessing Root Files/System Resources</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-ssl-disabled">
+    <label class="form-check-label" for="mobile-ssl-disabled">SSL/TLS Disabled in Some Components</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="mobile-insecure-auth">
+    <label class="form-check-label" for="mobile-insecure-auth">Insecure Authentication Flow (Tokens, OTPs)</label>
+  </div>
+</div>
+
+
+<!-- Category: IoT Device Security Testing -->
+<div class="category">
+  <h2>📡 IoT Device Security Testing</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-physical-access">
+    <label class="form-check-label" for="iot-physical-access">Physical Access (JTAG, UART, SWD, Debug Ports)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-firmware-analysis">
+    <label class="form-check-label" for="iot-firmware-analysis">Firmware Extraction & Analysis (Binwalk, strings, Ghidra)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-cleartext-config">
+    <label class="form-check-label" for="iot-cleartext-config">Cleartext Credentials or API Keys in Firmware</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-unsigned-updates">
+    <label class="form-check-label" for="iot-unsigned-updates">Unsigned/Unencrypted Firmware Updates</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-network-services">
+    <label class="form-check-label" for="iot-network-services">Exposed Network Services (Telnet, FTP, Web UI, SSH)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-web-auth">
+    <label class="form-check-label" for="iot-web-auth">Web Interface Authentication & Session Handling</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-api-testing">
+    <label class="form-check-label" for="iot-api-testing">Cloud API & Mobile App Communication Security</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-bluetooth">
+    <label class="form-check-label" for="iot-bluetooth">Bluetooth/BLE Vulnerabilities (Unauthenticated Pairing, Sniffing)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-zigbee">
+    <label class="form-check-label" for="iot-zigbee">Zigbee/Z-Wave/NFC/WiFi Attack Surface</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-default-creds">
+    <label class="form-check-label" for="iot-default-creds">Default Credentials or Hardcoded Logins</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-serial-interface">
+    <label class="form-check-label" for="iot-serial-interface">Access via Serial Interfaces (Bootloader/Recovery)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-insecure-boot">
+    <label class="form-check-label" for="iot-insecure-boot">Insecure Boot Process / No Secure Boot</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-open-ports">
+    <label class="form-check-label" for="iot-open-ports">Open Ports Enumeration & Exploitation</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-weak-encryption">
+    <label class="form-check-label" for="iot-weak-encryption">Use of Weak or Custom Encryption Protocols</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-buffer-overflow">
+    <label class="form-check-label" for="iot-buffer-overflow">Buffer Overflows or Memory Corruption (Stack/Heap)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-hardcoded-certs">
+    <label class="form-check-label" for="iot-hardcoded-certs">Hardcoded SSL Certificates or Private Keys</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-mobile-companion">
+    <label class="form-check-label" for="iot-mobile-companion">Insecure Mobile App Integration with IoT Device</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-logging-debug">
+    <label class="form-check-label" for="iot-logging-debug">Debug Logs or Verbose Output Enabled in Prod</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-lfi-rce">
+    <label class="form-check-label" for="iot-lfi-rce">LFI/RCE/Command Injection in Device Web Server</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="iot-cert-pinning">
+    <label class="form-check-label" for="iot-cert-pinning">Certificate Pinning Implemented/Bypassable</label>
+  </div>
+</div>
+
+
+<!-- Category: Network Security Testing -->
+<div class="category">
+  <h2>🌐 Network Security Testing</h2>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-recon">
+    <label class="form-check-label" for="network-recon">Perform Active & Passive Reconnaissance</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-scanning">
+    <label class="form-check-label" for="network-scanning">Port & Service Scanning (Nmap, Masscan, Rustscan)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-enum">
+    <label class="form-check-label" for="network-enum">Enumerate Services (SMB, RDP, FTP, SNMP, RPC)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-default-creds">
+    <label class="form-check-label" for="network-default-creds">Test for Default Credentials on Services</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-sniffing">
+    <label class="form-check-label" for="network-sniffing">Packet Sniffing & Traffic Analysis (Wireshark, tcpdump)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-mitm">
+    <label class="form-check-label" for="network-mitm">Man-in-the-Middle (MITM) Attacks (ARP Spoofing, DNS Poisoning)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-vuln-scan">
+    <label class="form-check-label" for="network-vuln-scan">Run Vulnerability Scanners (Nessus, OpenVAS, Nexpose)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-firewall-bypass">
+    <label class="form-check-label" for="network-firewall-bypass">Attempt Firewall, IDS/IPS Evasion (Fragmentation, Encoding)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-pivot">
+    <label class="form-check-label" for="network-pivot">Check for Lateral Movement & Pivoting (proxychains, socks5)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-wifi">
+    <label class="form-check-label" for="network-wifi">Wi-Fi Attacks (WPA2 Cracking, Evil Twin, Deauth, Rogue AP)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-dhcp-rogue">
+    <label class="form-check-label" for="network-dhcp-rogue">Rogue DHCP Server Setup & Poisoning</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-dns-exfil">
+    <label class="form-check-label" for="network-dns-exfil">DNS Tunneling & Exfiltration Techniques</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-vpn-test">
+    <label class="form-check-label" for="network-vpn-test">VPN Exposure & Split-Tunnel Testing</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-smb-relay">
+    <label class="form-check-label" for="network-smb-relay">SMB Relay Attacks (NTLMv1/v2 Capture, Pass-the-Hash)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-broadcast-discovery">
+    <label class="form-check-label" for="network-broadcast-discovery">Broadcast Protocol Enumeration (LLMNR, NBNS, mDNS)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-snmp-crack">
+    <label class="form-check-label" for="network-snmp-crack">Test SNMP (v1/v2) for Community String Bruteforce</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-telnet-ftp">
+    <label class="form-check-label" for="network-telnet-ftp">Insecure Protocol Use (Telnet, FTP, Rlogin)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-ssl-test">
+    <label class="form-check-label" for="network-ssl-test">SSL/TLS Misconfigurations (Weak Ciphers, Expired Certs)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-icmp-tunnel">
+    <label class="form-check-label" for="network-icmp-tunnel">ICMP Tunneling (Data Exfil via Ping)</label>
+  </div>
+
+  <div class="form-check subcategory">
+    <input class="form-check-input" type="checkbox" id="network-proxy-misuse">
+    <label class="form-check-label" for="network-proxy-misuse">Misconfigured Proxies (open SOCKS, open HTTP)</label>
+  </div>
+</div>
 
     <footer class="text-center mt-5">
       <hr>
