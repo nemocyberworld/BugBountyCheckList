@@ -246,18 +246,6 @@ function toggleNote(button) {
 
 
 <div class="tool">
-  <h3>Shosubgo</h3>
-  <p>Another passive subdomain enumerator.</p>
-  <pre>shosubgo -d &lt;domain&gt; -s YOUR_SHODAN_API_KEY -o shosubgo.txt</pre>
-</div>
-
-<div class="tool">
-  <h3>Subdomainer</h3>
-  <p>Subdomain enumeration tool.</p>
-  <pre>subdomainer -d &lt;domain&gt; -o subdomainer.txt</pre>
-</div>
-
-<div class="tool">
   <h3>Subscraper</h3>
   <p>Enumerates subdomains using various techniques.</p>
   <pre>subscraper -t &lt;domain&gt; -o subscraper.txt</pre>
@@ -269,108 +257,15 @@ function toggleNote(button) {
   <pre>sudo ct-exposer -d &lt;domain&gt; -o ct-exposer.txt</pre>
 </div>
 
-
 <div class="tool">
-  <h3>DNSSearch</h3>
-  <p>Search DNS records.</p>
-  <pre>dnssearch -domain &lt;domain&gt; &gt; dnssearch.txt</pre>
-  <p>Needs a dictionary or wordlists named as name.txt in the same directory</p>
+  <h3>Online Subdomain Finder</h3>
+  <li><a href="https://opentunnel.net/subdomain-finder/">https://opentunnel.net/subdomain-finder/</a></li>
+  <li><a href="https://suip.biz/?act=subfinder">https://suip.biz/?act=subfinder</a></li>
+  <li><a href="https://www.vedbex.com/tools/subdomain_finder">https://www.vedbex.com/tools/subdomain_finder</a></li>
+  <li><a href="https://hackertarget.com/find-dns-host-records/">https://hackertarget.com/find-dns-host-records/</a></li>
+  <li><a href="https://www.nmmapper.com/">https://www.nmmapper.com/</a></li>
+  <li><a href="https://subdomains.whoisxmlapi.com/">https://subdomains.whoisxmlapi.com/</a></li>
 </div>
-
-<div class="tool">
-  <h3>Domained</h3>
-  <p>Subdomain enumeration and analysis.</p>
-  <pre>domained -d &lt;domain&gt; -o domained.txt</pre>
-</div>
-
-
-<div class="tool">
-  <h3>Netscout</h3>
-  <p>Passive DNS enumeration.</p>
-  <pre>netscout -u &lt;url&gt; -d &lt;depth&gt; -o netscout_output.txt</pre>
-
-  <!-- Toggle Button -->
-  <button onclick="toggleNote(this)" aria-expanded="false" aria-controls="netscout-script" style="cursor:pointer; margin-top:10px;">
-    ▶ Pyton Script to seperate all outputs
-  </button>
-
-  <!-- Collapsible Content -->
-  <pre id="netscout-script" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
-import os
-import re
-
-os.makedirs("records", exist_ok=True)
-
-files = {
-    "content": "records/content_pages.txt",
-    "external": "records/external_links.txt",
-    "subdomains": "records/subdomains.txt",
-    "media": "records/media_and_files.txt",
-    "errors": "records/errors_and_warnings.txt",
-    "all": "records/all_urls.txt"
-}
-
-for path in files.values():
-    open(path, "w").close()
-
-patterns = {
-    "external": re.compile(r"https?://(www\.)?(facebook|instagram|youtube|twitter|whatsapp|apps\.apple|play\.google)\.com"),
-    "subdomains": re.compile(r"https?://(?!www\.)[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.(bdnews24\.com)"),
-    "media": re.compile(r"/(image|media|tube|archive|mobile)"),
-    "content": re.compile(r"/(bangladesh|politics|education|health|business|opinion|science|world|cricket|technology|environment|people|aviation|sport|economy|campus|stripe|fashion|neighbours|inside-out|hello)"),
-    "error": re.compile(r"WARN:|invalid|parse"),
-}
-
-with open("netscout_output.txt", "r") as infile:
-    for line in infile:
-        line = line.strip()
-        if not line or line.startswith("█") or line.startswith("=") or line.startswith("[x] Attempting"):
-            continue
-
-        if line.startswith("[x] https://") or line.startswith("[x] http://"):
-            url = line[4:].strip()
-            with open(files["all"], "a") as f: f.write(url + "\n")
-
-            if patterns["external"].search(url):
-                open(files["external"], "a").write(url + "\n")
-            elif patterns["subdomains"].search(url):
-                open(files["subdomains"], "a").write(url + "\n")
-            elif patterns["media"].search(url):
-                open(files["media"], "a").write(url + "\n")
-            elif patterns["content"].search(url.lower()):
-                open(files["content"], "a").write(url + "\n")
-
-        elif patterns["error"].search(line):
-            open(files["errors"], "a").write(line + "\n")
-
-print("[+] Output categorized into 'records/' folder")
-  </pre>
-</div>
-
-<script>
-function toggleNote(button) {
-  const toggleId = button.getAttribute('aria-controls');
-  const content = document.getElementById(toggleId);
-
-  if (content.style.display === 'none') {
-    content.style.display = 'block';
-    button.textContent = '▼ Hide Details';
-    button.setAttribute('aria-expanded', 'true');
-  } else {
-    content.style.display = 'none';
-    button.textContent = '▶ Show Details';
-    button.setAttribute('aria-expanded', 'false');
-  }
-}
-</script>
-
-
-<div class="tool">
-  <h3>Bluto</h3>
-  <p>Subdomain enumeration.</p>
-  <pre>bluto -domain &lt;domain&gt; -o bluto.txt</pre>
-</div>
-
 <hr />
 
 <hr />
