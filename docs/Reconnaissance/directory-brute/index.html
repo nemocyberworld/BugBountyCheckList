@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Directory Bruteforcing Tools - Comprehensive List</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📂 Directory Bruteforcing Tools - Comprehensive List</h1>
+
+<p>This guide covers a wide range of directory brute-forcing tools used by penetration testers and security researchers worldwide. Whether you use BlackArch, Kali, Parrot, or any Linux distro, these tools help uncover hidden directories, files, and endpoints on web servers.</p>
+
+<hr />
+
+<h2>1. Popular Directory Bruteforcing Tools</h2>
+
+<div class="tool">
+  <h3>Dirb</h3>
+  <p>A classic web content scanner using wordlists to find directories and files.</p>
+  <pre>dirb http://example.com /usr/share/dirb/wordlists/common.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Dirbuster</h3>
+  <p>Multi-threaded Java GUI tool for brute forcing directories/files.</p>
+  <pre>java -jar DirBuster.jar</pre>
+</div>
+
+<div class="tool">
+  <h3>Gobuster</h3>
+  <p>Fast CLI directory, DNS, and VHost brute-forcer written in Go.</p>
+  <pre>gobuster dir -u http://example.com -w /path/to/wordlist.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>FFUF (Fuzz Faster U Fool)</h3>
+  <p>Highly efficient and fast web fuzzer written in Go.</p>
+  <pre>ffuf -u http://example.com/FUZZ -w /path/to/wordlist.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Wfuzz</h3>
+  <p>Flexible web brute-forcer with powerful injection options.</p>
+  <pre>wfuzz -c -w wordlist.txt --hc 404 http://example.com/FUZZ</pre>
+</div>
+
+<div class="tool">
+  <h3>Feroxbuster</h3>
+  <p>Rust-based recursive content discovery tool focusing on speed and simplicity.</p>
+  <pre>feroxbuster -u http://example.com -w wordlist.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Patator</h3>
+  <p>Modular brute-forcing tool supporting many protocols including HTTP.</p>
+  <pre>patator http_fuzz url=http://example.com/FUZZ 0=wordlist.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>BruteXSS</h3>
+  <p>Primarily XSS testing but can brute-force directories during scan phases.</p>
+</div>
+
+<div class="tool">
+  <h3>Brutemap</h3>
+  <p>Automates form brute-force and can discover hidden paths in web apps.</p>
+</div>
+
+<div class="tool">
+  <h3>Dotdotpwn</h3>
+  <p>Specialized tool for detecting directory traversal vulnerabilities.</p>
+  <pre>perl dotdotpwn.pl -m http -h example.com -t 80 -f /etc/passwd</pre>
+</div>
+
+<div class="tool">
+  <h3>Dirsearch</h3>
+  <p>Python-based command-line tool for brute forcing directories and files.</p>
+  <pre>python3 dirsearch.py -u http://example.com -w wordlist.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>Arjun</h3>
+  <p>HTTP parameter discovery tool that can be used to brute force query strings and directories.</p>
+  <pre>arjun -u http://example.com</pre>
+</div>
+
+<div class="tool">
+  <h3>Uniscan</h3>
+  <p>Web vulnerability scanner that includes directory/file brute forcing modules.</p>
+  <pre>uniscan -u http://example.com -qweds</pre>
+</div>
+
+
+
+<p>Happy hunting! 🚀📂</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

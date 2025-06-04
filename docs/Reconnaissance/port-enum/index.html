@@ -28,7 +28,7 @@
 <div class="tool">
   <h3>⚡ Nmap</h3>
   <p>The gold standard in port scanning and network mapping.</p>
-  <pre>nmap -sS -sV -O -p- &lt;target&gt;</pre>
+  <pre>sudo nmap -A &lt;target&gt; -T4 -Pn</pre>
 </div>
 
 <div class="tool">
@@ -44,16 +44,17 @@
 </div>
 
 <div class="tool">
-  <h3>Naabu</h3>
-  <p>Fast port scanner by ProjectDiscovery, written in Go.</p>
-  <pre>naabu -host &lt;target&gt;</pre>
+  <h3>forkingportscanner</h3>
+  <p>Simple Forking port scanner By: magikh0e</p>
+  <pre>forkingportscanner -t &lt;target&gt; -p tcp -s 1 -e 65535</pre>
 </div>
 
 <!-- 🔽 Toggleable Custom Python Tool Section -->
 <details>
   <summary>🛠️ Custom Stealth Port Scanner (Python)</summary>
   <p>Requires <code>scapy</code>, root privileges, and Python 3.</p>
-  <pre><code>import sys
+  <pre><code>
+import sys
 import socket
 import threading
 from scapy.all import IP, TCP, sr1, conf
