@@ -1,36 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Directory Bruteforcers - Performance Comparison</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
-    h1, h2 { color: #2a7ae2; }
-    table { width: 100%; border-collapse: collapse; margin: 1em 0; }
-    th, td { border: 1px solid #ccc; padding: 0.6em; text-align: left; }
-    th { background: #f0f8ff; }
-    code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
-    pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
-    .note { font-size: 0.95em; color: #555; }
-  </style>
-  <!-- Added Tailwind CSS CDN for toggle styles -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Directory Bruteforcers - Performance Comparison</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2, h3 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  .note { font-size: 0.95em; color: #555; margin-top: 0.5em; }
+  button.toggle-btn {
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #2a7ae2;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    font-size: 0.9em;
+  }
+  #bashScript {
+    display: none;
+    background-color: #1e293b;
+    color: #d1d5db;
+    padding: 1em;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85em;
+    white-space: pre-wrap;
+    margin-top: 0.5em;
+    border: 2px solid #2a7ae2;
+  }
+  iframe {
+    border: 2px solid #2a7ae2;
+    border-radius: 8px;
+    margin-top: 1em;
+  }
+</style>
 </head>
 <body>
 
 <h1>📂 Fastest Directory Bruteforcers</h1>
 
-<!-- Toggle button for the feroxbuster script -->
-<div class="mb-4">
-  <button id="toggleScriptBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
-    Show/Hide Feroxbuster Scan Script
-  </button>
-</div>
+<p>This page compares popular directory bruteforcing tools and includes handy scripts and online tools for usage.</p>
 
-<!-- Collapsible container for the bash script -->
-<div id="bashScript" class="hidden bg-gray-800 p-4 rounded font-mono text-xs whitespace-pre-wrap border border-teal-600 mb-6" style="white-space: pre-wrap;">
-<pre><code>#!/bin/bash
+<hr />
+
+<h2>Feroxbuster</h2>
+
+<p>A fast and simple directory/file bruteforcer written in Rust.</p>
+
+<pre>feroxbuster -u http://target -w wordlist.txt -r -x .php,.sql,.bak,.conf</pre>
+
+<button class="toggle-btn" aria-expanded="false" aria-controls="bashScript" onclick="toggleScript(event)">
+  ▶ Show Feroxbuster Scan Script
+</button>
+
+<pre id="bashScript">
+#!/bin/bash
 
 # ───────────────────────────────────────────────
 # 🌐 Ask for Target URL
@@ -53,43 +81,46 @@ feroxbuster -u "$TARGET_URL" \
 
 # 📦 Done!
 echo -e "\n✅ Scan complete. Output saved to: ferox-output.txt"
-</code></pre>
-</div>
-
-<script>
-  // Toggle bash script visibility
-  document.getElementById("toggleScriptBtn").addEventListener("click", () => {
-    const scriptDiv = document.getElementById("bashScript");
-    scriptDiv.classList.toggle("hidden");
-  });
-</script>
-
-<h3>feroxbuster</h3>
-<pre>feroxbuster -u http://target -w wordlist.txt -r -x .php,.sql,.bak,.conf</pre>
+</pre>
 
 <p class="note">⚠️ Actual speeds may vary depending on server response time, connection quality, and system resources.</p>
 
-<!-- ... existing content above ... -->
+<h2>Feroxbuster Extractor Tool</h2>
 
-<h3>Feroxbuster Extractor Tool</h3>
 <iframe
   src="https://nemocyberworld.github.io/Feroxbuster-Extractor/"
   width="100%"
   height="600"
-  style="border: 2px solid #2a7ae2; border-radius: 8px;"
   title="Feroxbuster Extractor Tool"
   loading="lazy"
   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
 ></iframe>
 
-<!-- ... rest of your content ... -->
-
+<hr />
 
 <div style="margin-top: 2em;">
   <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
     &#8592; Go Back
   </a>
 </div>
+
+<script>
+function toggleScript(event) {
+  const btn = event.target;
+  const scriptBlock = document.getElementById('bashScript');
+  const isHidden = scriptBlock.style.display === 'none' || scriptBlock.style.display === '';
+
+  if (isHidden) {
+    scriptBlock.style.display = 'block';
+    btn.textContent = '▼ Hide Feroxbuster Scan Script';
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    scriptBlock.style.display = 'none';
+    btn.textContent = '▶ Show Feroxbuster Scan Script';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
 
 </body>
 </html>
