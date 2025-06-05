@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wayback Machine / Archive Recon Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📚 Wayback Machine / Archive Recon Notes</h1>
+
+
+<div class="tool">
+  <h3>Waybackurls</h3>
+  <p>Fetches URLs from the Wayback Machine for a given domain.</p>
+  <pre>echo example.com | waybackurls > wayback.txt</pre>
+</div>
+<div class="tool">
+  <h3>📑 Filter Live URLs from Wayback Results</h3>
+  <p>Use this Bash one-liner to check which URLs from <code>wayback.txt</code> are live (HTTP 200/301/302):</p>
+
+  <details>
+    <summary style="cursor: pointer; font-weight: bold; color: #2a7ae2;">Toggle Script</summary>
+    <pre><code>while read url; do
+  status=$(curl -o /dev/null -s -w "%{http_code}" "$url")
+  if [[ "$status" == "200" || "$status" == "301" || "$status" == "302" ]]; then
+    echo "$status $url"
+  fi
+done &lt; wayback.txt</code></pre>
+  </details>
+</div>
+
+
+<div class="tool">
+  <h3>gau (GetAllUrls)</h3>
+  <p>Retrieves URLs from multiple sources like Wayback, Common Crawl, etc.</p>
+  <pre>echo example.com | gau > gau.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>hakrawler</h3>
+  <p>Crawls target website and optionally pulls archived data like JS endpoints.</p>
+  <pre>echo "url" | hakrawler -d 5 -u > hakrawler.txt</pre>
+</div>
+
+<div class="tool">
+  <h3>waymore</h3>
+  <p>Advanced Python tool for Wayback recon with filtering and deduplication.</p>
+  <pre>waymore -i "url" -mode U -oU waymore.txt
+t</pre>
+</div>
+
+<!-- Summary Section -->
+<h2>Summary</h2>
+<ul>
+  <li>Use <code>waybackurls</code>, <code>gau</code>, and <code>waymore</code> to extract archived URLs.</li>
+  <li>Filter interesting file types: <code>.php</code>, <code>.zip</code>, <code>.bak</code>, <code>.sql</code>, etc.</li>
+  <li>Analyze responses using <code>curl</code> or <code>httpx</code>.</li>
+  <li>Use <code>arjun</code> to discover hidden parameters in old endpoints.</li>
+  <li>Use online archives to manually explore changes over time.</li>
+</ul>
+
+<p>Happy hunting! 🕵️‍♂️🔍</p>
+
+<!-- Embedded URL Extractor Tool -->
+<h2>🧠 URL Extractor Tool (Web Version)</h2>
+<p>Use the embedded URL Extractor to paste and extract unique URLs from raw Wayback output or recon results.</p>
+
+<iframe src="https://nemocyberworld.github.io/URL-Extractor/"
+        style="width:100%; height:600px; border:2px solid #2a7ae2; border-radius:8px; margin-top:1em;"
+        title="URL Extractor Tool"
+        loading="lazy">
+</iframe>
+
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
