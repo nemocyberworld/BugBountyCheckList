@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WHOIS & DNS Recon for Bug Bounty</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+    h1, h2 { color: #2a7ae2; }
+    code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
+    pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+    ul { margin-top: 0; }
+    .tool { margin-bottom: 1.5em; }
+    a { color: #2a7ae2; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 0.5em 1em; text-align: left; }
+    th { background-color: #2a7ae2; color: white; }
+    .collapsible {
+      background-color: #2a7ae2;
+      color: white;
+      cursor: pointer;
+      padding: 0.6em 1em;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 1em;
+      margin: 1em 0;
+      border-radius: 4px;
+    }
+    .active, .collapsible:hover {
+      background-color: #185abc;
+    }
+    .content {
+      display: none;
+      padding: 0 1em;
+      margin-bottom: 1em;
+      background-color: #f9f9f9;
+      border-left: 4px solid #2a7ae2;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🕵️‍♂️ WHOIS & DNS Recon for Bug Bounty Hunters</h1>
+
+<p>Effective bug bounty reconnaissance starts with understanding your target’s online presence. WHOIS and DNS recon provide valuable insights into domain ownership, infrastructure, and attack vectors. This guide focuses on practical techniques for bug bounty hunters.</p>
+
+<hr />
+
+<h2>1. Why WHOIS & DNS Recon Matters</h2>
+<ul>
+  <li><strong>WHOIS data</strong> reveals domain registration details and contact info.</li>
+  <li><strong>DNS records</strong> expose infrastructure—servers, mail, subdomains, CDN providers.</li>
+  <li>Combining both helps find shadow IT, forgotten subdomains, and misconfigurations.</li>
+</ul>
+
+<h3>Key Record Types & Their Bug Bounty Importance</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Record Type</th>
+      <th>Importance for Bug Bounty Hunters</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>WHOIS Registrant Email & Contact</code></td><td>Used for social engineering and username/email hunting.</td></tr>
+    <tr><td><code>WHOIS Registrar & Dates</code></td><td>Domain age hints at security posture and legacy issues.</td></tr>
+    <tr><td><code>Nameservers (NS)</code></td><td>DNS provider info; misconfigurations may allow takeover.</td></tr>
+    <tr><td><code>A / AAAA</code></td><td>IP addresses for scanning and identifying targets.</td></tr>
+    <tr><td><code>MX (Mail Servers)</code></td><td>Mail servers reveal phishing or interception vectors.</td></tr>
+    <tr><td><code>CNAME (Aliases)</code></td><td>Linked services that might be vulnerable or misconfigured.</td></tr>
+    <tr><td><code>TXT (SPF, DKIM, DMARC)</code></td><td>Email security; misconfigs lead to spoofing or leaks.</td></tr>
+    <tr><td><code>SOA</code></td><td>DNS zone authority info for advanced recon.</td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>2. WHOIS Recon Techniques</h2>
+
+<div class="tool">
+  <h3>Using <code>whois</code> CLI</h3>
+  <pre>whois example.com</pre>
+  <p>Shows registrar, registrant contact, dates, and nameservers.</p>
+</div>
+
+<div class="tool">
+  <h3>Online WHOIS Services</h3>
+  <ul>
+    <li><a href="https://whois.domaintools.com/" target="_blank" rel="noopener">DomainTools WHOIS Lookup</a></li>
+    <li><a href="https://www.whois.com/whois/" target="_blank" rel="noopener">Whois.com</a></li>
+  </ul>
+</div>
+
+<hr />
+
+<h2>3. DNS Recon Essentials</h2>
+<ul>
+  <li><code>A</code> — IPv4 addresses</li>
+  <li><code>AAAA</code> — IPv6 addresses</li>
+  <li><code>NS</code> — Nameservers</li>
+  <li><code>MX</code> — Mail servers</li>
+  <li><code>CNAME</code> — Aliases</li>
+  <li><code>TXT</code> — SPF, DKIM, DMARC</li>
+  <li><code>SOA</code> — Start of authority</li>
+</ul>
+
+<div class="tool">
+  <h3>Using <code>dig</code></h3>
+  <pre>dig example.com any +noall +answer
+dig mx example.com
+dig ns example.com
+dig txt example.com</pre>
+</div>
+
+<div class="tool">
+  <h3>Using <code>nslookup</code></h3>
+  <pre>nslookup -type=any example.com
+nslookup -type=mx example.com</pre>
+</div>
+
+<hr />
+
+<h2>4. Automating WHOIS & DNS Recon</h2>
+<p>For large scopes, automate with tools like <code>amass</code>, <code>subfinder</code>, and <code>assetfinder</code>.</p>
+
+<div class="tool">
+  <h3>Amass Example</h3>
+  <pre>amass enum -d example.com -o amass_results.txt</pre>
+</div>
+
+<!-- Collapsible Python Script Toggle -->
+<button type="button" class="collapsible">🧠 View Python Script for Automation</button>
+<div class="content">
+<pre><code>#!/usr/bin/env python3
+import os
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+from termcolor import cprint
+
+OUTPUT_DIR = Path("recon-output")
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+def banner():
+    cprint("\n[+] WHOIS & DNS Recon Automation (BlackArch Edition)", "cyan", attrs=["bold"])
+    cprint("    by H4K2LIV3\n", "magenta")
+
+def run_command(command, title, output_file):
+    cprint(f"\n[&gt;] {title}", "yellow", attrs=["bold"])
+    try:
+        result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=60)
+        print(result.stdout)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w") as f:
+            f.write(result.stdout)
+            if result.stderr:
+                f.write("\n[ERRORS]\n" + result.stderr)
+    except subprocess.TimeoutExpired:
+        cprint("[-] Command timed out", "red")
+    except Exception as e:
+        cprint(f"[-] Error: {str(e)}", "red")
+
+def main(domain):
+    banner()
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    domain_dir = OUTPUT_DIR / f"{domain}_{timestamp}"
+    domain_dir.mkdir(parents=True, exist_ok=True)
+
+    tools = [
+        (f"whois {domain}", "WHOIS Info", "whois.txt"),
+        (f"amass enum -d {domain} -o -", "Amass Subdomain Enumeration", "amass.txt"),
+        (f"theharvester -d {domain} -b all", "theHarvester Emails &amp; Users", "harvester.txt"),
+        (f"dig {domain} any +noall +answer", "DIG Records (ANY)", "dig_any.txt"),
+        (f"dig mx {domain}", "DIG MX Records", "dig_mx.txt"),
+        (f"dig txt {domain}", "DIG TXT Records", "dig_txt.txt"),
+        (f"nslookup -type=any {domain}", "Nslookup ANY", "nslookup_any.txt"),
+        (f"dnsrecon -d {domain}", "DNSRecon Scan", "dnsrecon.txt"),
+        (f"PERL5OPT=-Mwarnings=NONE dnsenum {domain}", "DNSEnum Scan", "dnsenum.txt")
+    ]
+
+    for cmd, desc, fname in tools:
+        run_command(cmd, desc, domain_dir / fname)
+
+    cprint(f"\n[✓] All recon data saved in: {domain_dir}\n", "green", attrs=["bold"])
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        cprint("Usage: python3 blackarch_recon.py &lt;domain.com&gt;\n", "red", attrs=["bold"])
+        sys.exit(1)
+    main(sys.argv[1])
+</code></pre>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll(".collapsible");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("active");
+      const content = btn.nextElementSibling;
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+  });
+</script>
+
+<hr />
+
+<p>Master these recon skills to enhance your bug bounty hunting success! 🔍🕵️‍♂️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">&#8592; Go Back</a>
+</div>
+
+</body>
+</html>
