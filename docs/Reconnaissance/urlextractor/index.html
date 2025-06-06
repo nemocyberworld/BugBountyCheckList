@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>URLextractor Recon Tool Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧠 URLextractor Recon Tool (BlackArch)</h1>
+
+<p><strong>URLextractor</strong> is a shell-based reconnaissance tool created by <code>eschultze</code>, included in <a href="https://blackarch.org/tools.html" target="_blank">BlackArch Linux</a>. It's designed for passive recon and URL analysis.</p>
+
+<hr />
+
+<h2>1. About the Tool</h2>
+
+<pre>
+##################################################
+#                  URLextractor                  #
+# Information Gathering & Website Reconnaissance #
+#              coded by eschultze                #
+#           https://phishstats.info/             #
+#                version - 0.2.0                 #
+##################################################
+</pre>
+
+<p><strong>Purpose:</strong> Extracts useful information from a target URL using passive methods.</p>
+
+<h2>2. Usage</h2>
+<pre>./extractor http://site.com/
+./extractor http://site.com/login/
+./extractor http://site.com/proxy.pac</pre>
+
+<p>If you run it without arguments:</p>
+<pre>
+[ALERT] NO target set
+[ALERT] USAGE: ./extractor http://site.com/ OR http://site.com/path/dir/file.php
+</pre>
+
+<hr />
+
+<h2>3. What It Extracts</h2>
+<ul>
+  <li>IP address resolution</li>
+  <li>GeoIP (region, country, ISP)</li>
+  <li>SSL Certificate Info</li>
+  <li>Subdomain detection</li>
+  <li>robots.txt or other exposed endpoints</li>
+  <li>MD5 of content for comparison</li>
+  <li>Abuse contact details</li>
+</ul>
+
+<hr />
+
+<h2>4. Complement with Web Parser</h2>
+<p>The terminal output can be overwhelming. Use a web parser (browser-based) to extract structured fields like:</p>
+<ul>
+  <li>Target hostname and IP</li>
+  <li>Country, ASN, ISP</li>
+  <li>Certificate issuer</li>
+  <li>Subdomains</li>
+  <li>Found links and pages</li>
+</ul>
+
+<p>Paste raw output into a parser like:</p>
+<ul>
+  <li><a href="#">[ Try Web Parser Here – Paste URLextractor Output ]</a></li>
+</ul>
+
+<hr />
+
+<h2>5. Example Bash Script to Save Outputs</h2>
+<pre>
+#!/bin/bash
+
+TARGET=$1
+OUTFILE=$(echo "$TARGET" | sed 's|https\?://||; s|/|_|g')
+./urlextractor "$TARGET" | tee "${OUTFILE}_recon.txt"
+</pre>
+
+<hr />
+
+<h2>6. Additional Resources</h2>
+<ul>
+  <li><a href="https://phishstats.info/" target="_blank">https://phishstats.info/</a> – original author's site</li>
+  <li><a href="https://blackarch.org/tools.html" target="_blank">BlackArch Tools List</a></li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Simple shell-based recon tool for passive information gathering</li>
+  <li>Use with websites, PAC files, and full paths</li>
+  <li>Combine with a parser for better readability and report generation</li>
+</ul>
+
+<p>Stay stealthy & safe! 🕶️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
