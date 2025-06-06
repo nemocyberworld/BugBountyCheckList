@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DNS Zone Transfer Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; white-space: pre-wrap; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+  button.toggle-btn {
+    cursor: pointer;
+    background: #2a7ae2;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+</style>
+</head>
+<body>
+
+<h1>📚 DNS Zone Transfer Enumeration</h1>
+
+<p>This guide covers DNS zone transfer techniques during reconnaissance and how to use various tools available in BlackArch Linux to attempt AXFR-based information disclosure.</p>
+
+<hr />
+
+<h2>Zone Transfer Explanation</h2>
+<p><strong>Zone Transfer (AXFR)</strong> is a DNS mechanism used to replicate DNS databases between name servers. If misconfigured, attackers can download the entire DNS zone file, exposing subdomains, hosts, and internal infrastructure.</p>
+
+<h2>Python Zone Transfer Script</h2>
+
+<button class="toggle-btn" aria-expanded="false" aria-controls="pythonScript" onclick="toggleScript(this)">
+  ▶ Show Python Script
+</button>
+
+<pre id="pythonScript" style="display:none;">
+import dns.query
+import dns.zone
+import dns.resolver
+import sys
+from datetime import datetime
+
+OUTPUT_FILE = "zone_transfer_results.txt"
+
+def find_zone_root(domain):
+    parts = domain.split('.')
+    for i in range(len(parts) - 1):
+        test_domain = '.'.join(parts[i:])
+        try:
+            dns.resolver.resolve(test_domain, 'NS')
+            return test_domain
+        except:
+            continue
+    return None
+
+def attempt_zone_transfer(domain):
+    print(f"\n[+] Looking for NS records for: {domain}")
+    try:
+        answers = dns.resolver.resolve(domain, 'NS')
+        nameservers = [str(rdata.target).strip('.') for rdata in answers]
+    except Exception as e:
+        print(f"[-] Failed to resolve NS records: {e}")
+        return
+
+    success = False
+    with open(OUTPUT_FILE, "a") as f:
+        f.write(f"\n--- Zone Transfer Attempt for {domain} ---\n")
+        f.write(f"Timestamp: {datetime.now()}\n")
+        f.write(f"Nameservers: {', '.join(nameservers)}\n")
+
+        for ns in nameservers:
+            try:
+                print(f"\n[+] Trying zone transfer from NS: {ns}")
+                zone = dns.zone.from_xfr(dns.query.xfr(ns, domain, lifetime=5))
+                if zone:
+                    print(f"[!] Zone transfer SUCCESS from {ns}")
+                    f.write(f"\n[!] Zone transfer SUCCESS from {ns}\n")
+                    for name, node in zone.nodes.items():
+                        rdatasets = node.rdatasets
+                        for rdataset in rdatasets:
+                            full_name = f"{name}.{domain}" if str(name) != '@' else domain
+                            line = f"{full_name} - {rdataset}"
+                            print(line)
+                            f.write(line + "\n")
+                    success = True
+                else:
+                    print(f"[-] Empty zone transfer from {ns}")
+            except Exception as e:
+                print(f"[-] Zone transfer from {ns} failed: {e}")
+                f.write(f"[-] Zone transfer from {ns} failed: {e}\n")
+
+    if not success:
+        print("\n[-] No successful zone transfers found.")
+    else:
+        print(f"\n[+] Results saved in '{OUTPUT_FILE}'")
+
+if __name__ == "__main__":
+    print("🔎 DNS Zone Transfer Automation Tool")
+    domain_input = input("Enter your target domain (e.g., example.com): ").strip().lower()
+    
+    zone_root = find_zone_root(domain_input)
+    if not zone_root:
+        print("[-] Could not find a valid DNS zone to test.")
+        sys.exit(1)
+    
+    print(f"[+] Discovered zone root: {zone_root}")
+    attempt_zone_transfer(zone_root)
+</pre>
+
+<p>Happy recon hunting! 🕵️‍♀️💻</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+<script>
+function toggleScript(button) {
+  const scriptBlock = document.getElementById('pythonScript');
+  const isHidden = scriptBlock.style.display === 'none';
+  scriptBlock.style.display = isHidden ? 'block' : 'none';
+  button.textContent = isHidden ? '▼ Hide Python Script' : '▶ Show Python Script';
+  button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+}
+</script>
+
+</body>
+</html>
