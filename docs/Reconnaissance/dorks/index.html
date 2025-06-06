@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dorks for Recon: Google, GitHub, Shodan, Censys</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; white-space: pre-wrap; }
+  ul { margin-top: 0; }
+  button {
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #2a7ae2;
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 5px;
+    font-size: 1em;
+  }
+  .dork-section { margin-bottom: 2em; }
+</style>
+</head>
+<body>
+
+<h1>🔍 Understanding Dorks for Reconnaissance</h1>
+
+<p><strong>Dorks</strong> are specialized search queries designed to uncover hidden, sensitive, or valuable information from various platforms such as Google, GitHub, Shodan, and Censys. They are powerful tools used in cybersecurity, bug bounty hunting, and OSINT (Open Source Intelligence).</p>
+
+<hr />
+
+<div class="dork-section">
+  <h2>1. Google Dorks</h2>
+  <p>Google dorks leverage advanced Google search operators to find sensitive data, files, login portals, and vulnerabilities indexed by Google. These dorks help identify exposed information unintentionally made public.</p>
+</div>
+
+<div class="dork-section">
+  <h2>2. GitHub Dorks</h2>
+  <p>GitHub dorks focus on searching public repositories for leaked secrets such as API keys, passwords, and configuration files. Attackers and defenders both use GitHub dorks to identify exposed sensitive information in code.</p>
+</div>
+
+<div class="dork-section">
+  <h2>3. Shodan Dorks</h2>
+  <p>Shodan dorks query the Shodan search engine for internet-connected devices and services. These dorks help find exposed IoT devices, servers, databases, and vulnerable software versions based on banner data.</p>
+</div>
+
+<div class="dork-section">
+  <h2>4. Censys Dorks</h2>
+  <p>Censys dorks use the Censys search platform to discover hosts and services on the internet, including SSL certificates, open ports, and metadata. Censys dorks provide detailed technical insights useful for vulnerability research.</p>
+</div>
+
+<hr />
+
+<button onclick="toggleDorks()" aria-expanded="false" aria-controls="dorkExamples">
+  ▶ Show Sample Dork Queries
+</button>
+
+<pre id="dorkExamples" style="display:none;">
+# Google Dorks Examples:
+intitle:"index of" "admin"
+filetype:env DB_PASSWORD
+inurl:login.php
+
+# GitHub Dorks Examples:
+password filename:.env
+apikey language:python
+private key filename:id_rsa
+
+# Shodan Dorks Examples:
+port:22 country:"US"
+product:"Apache" version:"2.4.1"
+has_screenshot:true
+
+# Censys Dorks Examples: "example.com"
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li><strong>Dorks</strong> are tailored search queries targeting specific data or vulnerabilities.</li>
+  <li>Each platform has unique syntax and focus — Google for web content, GitHub for code leaks, Shodan & Censys for internet-connected devices.</li>
+  <li>Using dorks effectively can reveal hidden attack surfaces or security weaknesses.</li>
+  <li>Always use dorks ethically and with permission when performing security assessments.</li>
+</ul>
+
+<p>Mastering dorks is an essential skill for any cybersecurity researcher or bug bounty hunter! 🕵️‍♀️💻</p>
+
+<script>
+function toggleDorks() {
+  const examples = document.getElementById('dorkExamples');
+  const btn = event.target;
+  if (examples.style.display === 'none') {
+    examples.style.display = 'block';
+    btn.textContent = '▼ Hide Sample Dork Queries';
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    examples.style.display = 'none';
+    btn.textContent = '▶ Show Sample Dork Queries';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
+<h2>Try the CMP-Dorker Tool</h2>
+<p>Use the embedded CMP-Dorker tool below to experiment with powerful dork queries across multiple platforms without leaving this page.</p>
+<iframe
+  src="https://nemocyberworld.github.io/CMP-Dorker/"
+  title="CMP-Dorker Tool"
+  style="
+    width: 100%;
+    height: 1200px;
+    border: 2px solid #2a7ae2;
+    border-radius: 8px;
+    box-sizing: border-box;
+  "
+></iframe>
+
+
+
+</body>
+</html>
