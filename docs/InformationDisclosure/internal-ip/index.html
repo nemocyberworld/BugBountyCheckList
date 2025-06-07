@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Internal IPs in Response Headers</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🕵️ Information Disclosure: Internal IPs in Response Headers</h1>
+
+<p>Sometimes web servers or internal proxies leak internal/private IP addresses in HTTP response headers. These IPs can give attackers insight into the internal network structure, and may aid in lateral movement during an internal attack or post-exploitation.</p>
+
+<hr />
+
+<h2>1. Common Headers That May Leak IPs</h2>
+<ul>
+  <li><code>X-Forwarded-For</code></li>
+  <li><code>X-Originating-IP</code></li>
+  <li><code>Via</code></li>
+  <li><code>Server</code></li>
+  <li><code>Received</code> (mostly in mail servers)</li>
+  <li><code>X-Host</code> or <code>X-Real-IP</code></li>
+</ul>
+
+<hr />
+
+<h2>2. What Private IPs Look Like</h2>
+<p>Private/internal IP address ranges (per <code>RFC1918</code>):</p>
+<ul>
+  <li><code>10.0.0.0 - 10.255.255.255</code></li>
+  <li><code>172.16.0.0 - 172.31.255.255</code></li>
+  <li><code>192.168.0.0 - 192.168.255.255</code></li>
+</ul>
+
+<p>IPv6 equivalents include ranges like <code>fc00::/7</code>.</p>
+
+<hr />
+
+<h2>3. Real-World Example</h2>
+<p>Response headers from a reverse proxy or load balancer might look like this:</p>
+
+<pre>
+HTTP/1.1 200 OK
+Date: Sat, 07 Jun 2025 12:34:56 GMT
+Content-Type: text/html
+Server: Apache
+X-Forwarded-For: 10.0.0.13
+Via: 1.1 192.168.1.5
+</pre>
+
+<p>This reveals two internal IPs: <code>10.0.0.13</code> and <code>192.168.1.5</code>.</p>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<p>You can use <code>curl -I</code> or tools like <code>httpx</code> or <code>nuclei</code> to inspect response headers:</p>
+
+<pre>
+curl -I https://example.com
+</pre>
+
+<p>Look for headers leaking IPs. You can also use regex to automate:</p>
+
+<pre>
+curl -I https://example.com | grep -Eo "10\.[0-9.]+|192\.168\.[0-9.]+|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9.]+" 
+</pre>
+
+<hr />
+
+<h2>5. Risks and Impact</h2>
+<ul>
+  <li>Reveals internal network layout</li>
+  <li>Helps with internal recon if attacker gains access</li>
+  <li>May assist in SSRF attacks (e.g., knowing internal services)</li>
+</ul>
+
+<hr />
+
+<h2>6. How to Prevent It</h2>
+<ul>
+  <li>Sanitize or strip internal headers before sending responses to clients</li>
+  <li>Use web application firewalls or reverse proxies to filter or rewrite headers</li>
+  <li>Configure servers (Apache, NGINX, etc.) not to expose internal infrastructure</li>
+</ul>
+
+<h3>Example - Apache</h3>
+<pre>
+Header unset X-Forwarded-For
+</pre>
+
+<h3>Example - NGINX</h3>
+<pre>
+proxy_hide_header X-Forwarded-For;
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Internal IP addresses can leak through HTTP headers</li>
+  <li>This can assist attackers in internal mapping and chaining attacks</li>
+  <li>Always sanitize outgoing headers on internet-facing apps</li>
+</ul>
+
+<p>🧠 Don’t let your internal map become public. Filter what your app reveals.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

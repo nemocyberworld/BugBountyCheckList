@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Version Disclosure via Headers</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔍 Information Disclosure: Version Disclosure via Headers</h1>
+
+<p>Web servers and applications often include HTTP response headers that reveal software version details. This can provide attackers with useful reconnaissance data to tailor exploits for known vulnerabilities in those specific versions.</p>
+
+<hr />
+
+<h2>1. What Is Version Disclosure?</h2>
+<p>When a web server or framework includes specific version numbers in response headers, like:</p>
+
+<pre>
+Server: Apache/2.4.49 (Unix)
+X-Powered-By: PHP/7.4.3
+</pre>
+
+<p>This exposes the exact version of the web server or runtime environment.</p>
+
+<hr />
+
+<h2>2. Why It's a Risk</h2>
+<ul>
+  <li>Allows attackers to match the version against known CVEs</li>
+  <li>Makes fingerprinting of the backend stack easier</li>
+  <li>Facilitates targeted attacks (e.g., RCEs, DoS, bypasses)</li>
+  <li>Violates the principle of information minimization</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Detect It</h2>
+<ul>
+  <li>Use <code>curl -I</code> to fetch HTTP headers:</li>
+  <pre>curl -I https://example.com</pre>
+  <li>Look for headers like:</li>
+  <ul>
+    <li><code>Server</code></li>
+    <li><code>X-Powered-By</code></li>
+    <li><code>X-AspNet-Version</code></li>
+    <li><code>X-Runtime</code></li>
+  </ul>
+  <li>Use tools like <code>whatweb</code>, <code>wappalyzer</code>, or <code>nmap --script=http-headers</code></li>
+</ul>
+
+<hr />
+
+<h2>4. Example Output</h2>
+
+<pre>
+HTTP/1.1 200 OK
+Date: Sat, 07 Jun 2025 17:00:00 GMT
+Server: nginx/1.18.0 (Ubuntu)
+X-Powered-By: Express/4.17.1
+</pre>
+
+<p>This gives the attacker insights into the exact versions of <code>nginx</code> and <code>Express</code>.</p>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Remove or mask version identifiers from headers</li>
+  <li>For Apache:
+    <pre>
+ServerTokens Prod
+ServerSignature Off
+    </pre>
+  </li>
+  <li>For Nginx:
+    <pre>
+server_tokens off;
+    </pre>
+  </li>
+  <li>For Express.js:
+    <pre>
+app.disable('x-powered-by');
+    </pre>
+  </li>
+  <li>For PHP:
+    <pre>
+expose_php = Off
+    </pre>
+  </li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Version disclosure aids attackers in identifying known vulnerabilities</li>
+  <li>Default configurations often leak too much info</li>
+  <li>Sanitizing headers strengthens security posture with minimal cost</li>
+</ul>
+
+<p>🛡️ Hide your stack — don’t give attackers a roadmap to your system.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

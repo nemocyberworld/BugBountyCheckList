@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - API Keys in JavaScript Files</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔑 Information Disclosure: API Keys in JavaScript Files</h1>
+
+<p>JavaScript files are downloaded and executed by the browser, meaning anything hardcoded in them is visible to the end user. Exposing API keys in frontend code is a serious security risk.</p>
+
+<hr />
+
+<h2>1. Where This Happens</h2>
+<p>Developers may embed keys directly in frontend JS during prototyping or for ease of use with third-party services (e.g., Firebase, Stripe, Google Maps):</p>
+
+<pre>
+const firebaseConfig = {
+  apiKey: "AIzaSyEXAMPLE-123456789",
+  authDomain: "yourapp.firebaseapp.com",
+  ...
+};
+</pre>
+
+<p>Or in REST API usage:</p>
+
+<pre>
+fetch("https://api.thirdparty.com/data?api_key=sk_test_abcdef123456")
+</pre>
+
+<hr />
+
+<h2>2. Why It’s Dangerous</h2>
+<ul>
+  <li>API keys can grant direct access to sensitive resources (databases, storage, billing)</li>
+  <li>Even "public" keys can be abused if rate-limiting or domain-restriction isn't enforced</li>
+  <li>Attackers may automate the collection and abuse of leaked keys</li>
+</ul>
+
+<hr />
+
+<h2>3. How Attackers Find API Keys</h2>
+
+<p>Common methods:</p>
+<ul>
+  <li>Searching public JS files manually or via tools</li>
+  <li>Using tools like <code>LinkFinder</code>, <code>JSParser</code>, or <code>SecretFinder</code></li>
+  <li>Regex searches in JavaScript code for patterns like <code>AKIA[0-9A-Z]{16}</code> (AWS keys)</li>
+</ul>
+
+<pre>
+curl https://example.com/assets/app.js | grep -i 'key\|token\|auth'
+</pre>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<ul>
+  <li>Use tools like:
+    <ul>
+      <li><code>LinkFinder</code>: parses JS files for endpoints & keys</li>
+      <li><code>SecretFinder</code>: finds sensitive data in JS</li>
+    </ul>
+  </li>
+  <li>Manually inspect <code>.js</code> files referenced in the page source</li>
+  <li>Search in browser dev tools & via automated recon</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li><strong>Never store secrets in frontend JavaScript</strong></li>
+  <li>Use environment variables on the server side</li>
+  <li>Implement access control and rate limiting on APIs</li>
+  <li>Restrict keys to specific domains, IPs, or referrers</li>
+  <li>Rotate exposed credentials immediately</li>
+</ul>
+
+<hr />
+
+<h2>6. Safe Use of Public Keys (If Required)</h2>
+<p>Some APIs require client-side usage (e.g., Google Maps). In these cases:</p>
+<ul>
+  <li>Restrict API key usage to specific domains via the provider's dashboard</li>
+  <li>Set usage quotas and monitor key usage</li>
+  <li>Separate sensitive operations (e.g., database access) to server-side only</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never hardcode sensitive API keys in public JavaScript</li>
+  <li>Treat all frontend code as fully visible to the attacker</li>
+  <li>Use backend proxies or server-side logic to protect secrets</li>
+</ul>
+
+<p>🔐 If it runs in the browser, assume it’s public. Don’t hide secrets in plain sight.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Verbose Error Messages</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔎 Information Disclosure: Verbose Error Messages</h1>
+
+<p>Verbose error messages occur when an application exposes detailed internal information in error responses. These messages may include stack traces, database errors, file paths, environment variables, or configuration details, which can assist attackers in crafting targeted exploits.</p>
+
+<hr />
+
+<h2>1. What Are Verbose Error Messages?</h2>
+<p>When an application fails to properly handle unexpected inputs or internal errors, it may return highly descriptive messages to the client. These messages are useful for developers during debugging but should never be exposed in production environments.</p>
+
+<hr />
+
+<h2>2. Common Sensitive Data in Verbose Errors</h2>
+<ul>
+  <li>Internal file paths (e.g., <code>/var/www/app/index.php</code>)</li>
+  <li>Database query errors or SQL syntax issues</li>
+  <li>Language-specific stack traces (PHP, Java, Python, etc.)</li>
+  <li>Software and framework versions</li>
+  <li>Authentication or authorization logic failures</li>
+  <li>Environment variables or configuration values</li>
+</ul>
+
+<hr />
+
+<h2>3. Real-World Example</h2>
+<pre>
+java.sql.SQLException: Access denied for user 'root'@'localhost' (using password: YES)
+    at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)
+    at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3973)
+    at com.myapp.auth.LoginHandler.validate(LoginHandler.java:52)
+</pre>
+
+<p>This reveals:</p>
+<ul>
+  <li>The database type (MySQL)</li>
+  <li>Technology stack (Java backend)</li>
+  <li>Possible vulnerable class and method names</li>
+</ul>
+
+<hr />
+
+<h2>4. Why This Is Dangerous</h2>
+<ul>
+  <li>Assists attackers in fingerprinting technologies</li>
+  <li>May disclose authentication or session logic</li>
+  <li>Can lead to further exploits like SQLi, RCE, or LFI</li>
+  <li>Helps build wordlists for brute-force or fuzzing</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li>Set application to production mode in live environments</li>
+  <li>Disable detailed error reporting to users</li>
+  <li>Log errors internally with minimal output to the user</li>
+  <li>Use generic user-friendly error messages like "Something went wrong"</li>
+</ul>
+
+<h3>PHP (Laravel)</h3>
+<pre>
+APP_ENV=production
+APP_DEBUG=false
+</pre>
+
+<h3>Python (Flask)</h3>
+<pre>
+app.debug = False
+</pre>
+
+<h3>Node.js</h3>
+<pre>
+app.use((err, req, res, next) => {
+  res.status(500).send("Internal Server Error");
+});
+</pre>
+
+<h3>Apache</h3>
+<pre>
+ErrorDocument 500 /500.html
+</pre>
+
+<hr />
+
+<h2>6. Detection as a Pentester</h2>
+<ul>
+  <li>Trigger edge cases (divide by zero, null inputs, malformed JSON/XML)</li>
+  <li>Observe if server returns overly detailed error messages</li>
+  <li>Use tools like <code>ffuf</code>, <code>Burp Suite</code>, or <code>zap</code> to trigger application faults</li>
+</ul>
+
+<pre>
+curl -X POST http://example.com/api/login -d '{ "username": "admin", "password": ' // malformed
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Verbose errors are useful in development, dangerous in production</li>
+  <li>Always sanitize and suppress detailed error messages before user exposure</li>
+  <li>Internal logging is fine, external exposure is not</li>
+</ul>
+
+<p>🛡️ Secure error handling is a critical part of defense-in-depth. Leak less, protect more.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

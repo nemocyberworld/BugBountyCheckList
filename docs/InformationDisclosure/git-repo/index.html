@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Misconfigured Public GitHub Repos</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔓 Information Disclosure: Misconfigured Public GitHub Repositories</h1>
+
+<p>Publicly exposed GitHub repositories can leak sensitive source code, credentials, API keys, or internal documentation that attackers can exploit.</p>
+
+<hr />
+
+<h2>1. How It Happens</h2>
+<ul>
+  <li>Developers accidentally push private keys, passwords, or config files to public repos</li>
+  <li>Repositories meant to be private are set to public by mistake</li>
+  <li>Old or archived repos containing secrets remain publicly accessible</li>
+</ul>
+
+<hr />
+
+<h2>2. What Can Be Leaked</h2>
+<ul>
+  <li>API keys, tokens, and passwords inside code or config files</li>
+  <li>Database connection strings</li>
+  <li>Internal documentation or architecture diagrams</li>
+  <li>Proprietary or sensitive business logic</li>
+</ul>
+
+<hr />
+
+<h2>3. Real-World Example</h2>
+<p>Searching GitHub for keywords like <code>password</code>, <code>API_KEY</code>, or <code>secret</code> often reveals exposed secrets:</p>
+
+<pre>
+https://github.com/user/repo/blob/main/config.js
+
+const API_KEY = "AIzaSyD***************";
+const DB_PASSWORD = "SuperSecret123";
+</pre>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<ul>
+  <li>Use GitHub search with keywords like <code>password</code>, <code>secret</code>, <code>key</code></li>
+  <li>Try public repos under your target’s organization or known usernames</li>
+  <li>Leverage tools like <code>gitrob</code>, <code>truffleHog</code>, or <code>GitGuardian</code> for automated scanning</li>
+</ul>
+
+<hr />
+
+<h2>5. Risks and Impact</h2>
+<ul>
+  <li>Compromise of internal systems through leaked credentials</li>
+  <li>Loss of intellectual property or proprietary information</li>
+  <li>Reputational damage and regulatory issues</li>
+</ul>
+
+<hr />
+
+<h2>6. How to Prevent It</h2>
+<ul>
+  <li>Enforce private repository defaults and audit public repos regularly</li>
+  <li>Use GitHub secrets management and environment variables for sensitive data</li>
+  <li>Implement pre-commit hooks to detect secrets before pushing</li>
+  <li>Revoke leaked credentials immediately and rotate keys</li>
+  <li>Educate developers on secure git hygiene</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Public GitHub repos can accidentally expose sensitive data</li>
+  <li>Regular scanning and monitoring help catch leaks early</li>
+  <li>Adopt best practices in repository management and secret handling</li>
+</ul>
+
+<p>🔐 Protect your codebase by controlling what is public — secrets don’t belong in repos.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

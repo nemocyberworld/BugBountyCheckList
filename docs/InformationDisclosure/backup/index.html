@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Exposed Backup Files</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🗃️ Information Disclosure: Exposed Backup Files</h1>
+
+<p>Web developers often create backup copies of files during maintenance or updates. If these backups are placed in publicly accessible locations without proper security, attackers can download them and access sensitive source code, credentials, or internal logic.</p>
+
+<hr />
+
+<h2>1. Common Backup Extensions</h2>
+<ul>
+  <li><code>.bak</code> – backup file</li>
+  <li><code>.old</code> – old version</li>
+  <li><code>.zip</code>, <code>.tar.gz</code> – compressed archive of the site or directories</li>
+  <li><code>.swp</code>, <code>.tmp</code> – temporary or swap files</li>
+</ul>
+
+<hr />
+
+<h2>2. Why It’s Dangerous</h2>
+<ul>
+  <li>Exposes full source code of the web application</li>
+  <li>Reveals hardcoded credentials, API keys, or database connections</li>
+  <li>Leads to Remote Code Execution, SQL Injection, or Authentication Bypass if logic is exposed</li>
+</ul>
+
+<hr />
+
+<h2>3. Real-World Example</h2>
+<p>Suppose the main application file is <code>index.php</code>, but a backup file <code>index.php.bak</code> is also present:</p>
+
+<pre>
+https://example.com/index.php.bak
+</pre>
+
+<p>Downloading this file may show the full PHP source code:</p>
+
+<pre>
+&lt;?php
+$host = 'localhost';
+$user = 'admin';
+$pass = 'SuperSecretPassword!';
+...
+?&gt;
+</pre>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<p>Try appending common backup extensions to known files or paths:</p>
+
+<pre>
+https://example.com/index.php.bak
+https://example.com/admin.old
+https://example.com/config.zip
+</pre>
+
+<p>Automate discovery with tools:</p>
+
+<pre>
+gobuster dir -u https://example.com -w wordlist.txt -x .bak,.old,.zip
+</pre>
+
+<p>Or use <code>ffuf</code>:</p>
+
+<pre>
+ffuf -u https://example.com/FUZZ -w wordlist.txt -e .bak,.old,.zip
+</pre>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li>Never store backup files in the web root</li>
+  <li>Use version control (like Git) instead of manual backups</li>
+  <li>Restrict access to backup directories via server config or authentication</li>
+  <li>Regularly scan and audit public directories for sensitive file types</li>
+</ul>
+
+<h3>Apache</h3>
+<pre>
+&lt;FilesMatch "\.(bak|old|zip|tar\.gz)$"&gt;
+  Require all denied
+&lt;/FilesMatch&gt;
+</pre>
+
+<h3>NGINX</h3>
+<pre>
+location ~* \.(bak|old|zip|tar\.gz)$ {
+  deny all;
+}
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Backup files should never be publicly accessible</li>
+  <li>They often expose full source code or sensitive credentials</li>
+  <li>Automated scanning tools can quickly find them if left exposed</li>
+</ul>
+
+<p>🧨 One forgotten <code>.bak</code> can break the whole security model. Always clean up after updates.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

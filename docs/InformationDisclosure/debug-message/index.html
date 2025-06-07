@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Debug Messages in Responses</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .example { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔎 Information Disclosure: Debug Messages in Responses</h1>
+
+<p>Insecure debug messages in HTTP responses can leak critical internal details about an application, enabling attackers to craft more targeted attacks. This guide covers the causes, risks, identification methods, and mitigation strategies for such leaks.</p>
+
+<hr />
+
+<h2>1. What Are Debug Messages?</h2>
+<p>Debug messages are internal outputs intended to help developers troubleshoot issues during development. Examples include stack traces, exception errors, SQL queries, or internal configuration data.</p>
+
+<hr />
+
+<h2>2. Why They’re Dangerous</h2>
+<ul>
+  <li>Reveal backend technologies (e.g., Django, Flask, Laravel)</li>
+  <li>Disclose file paths, server configs, and source code structure</li>
+  <li>Leak sensitive data (API keys, DB errors, secrets)</li>
+  <li>Aid in identifying further vulnerabilities like SQL Injection or RCE</li>
+</ul>
+
+<hr />
+
+<h2>3. Examples</h2>
+
+<div class="example">
+  <h3>PHP Warning Example</h3>
+  <pre>Warning: mysqli_connect(): (HY000/1045): Access denied for user 'root'@'localhost' in /var/www/html/db.php on line 7</pre>
+  <p><strong>Leak:</strong> Reveals DB username, host, and file path</p>
+</div>
+
+<div class="example">
+  <h3>Django Debug Page</h3>
+  <pre>
+Environment:
+
+Request Method: GET
+Request URL: http://example.com/test
+
+Django Version: 4.2
+Exception Type: ZeroDivisionError
+Exception Value: division by zero
+
+Traceback:
+File "/app/views.py", line 22, in test_view
+    1 / 0
+  </pre>
+  <p><strong>Leak:</strong> Discloses Python stack trace, internal file structure, and logic.</p>
+</div>
+
+<div class="example">
+  <h3>Java Stack Trace</h3>
+  <pre>
+java.lang.NullPointerException
+    at com.acme.product.UserService.getUser(UserService.java:89)
+  </pre>
+  <p><strong>Leak:</strong> Reveals Java class structure and exact line number.</p>
+</div>
+
+<hr />
+
+<h2>4. How to Identify</h2>
+<ul>
+  <li>Send malformed or unexpected input (missing parameters, division by zero, etc.)</li>
+  <li>Use a web proxy (e.g., Burp Suite) to analyze HTTP responses</li>
+  <li>Search for keywords: <code>Exception</code>, <code>Traceback</code>, <code>Warning</code>, <code>Fatal error</code></li>
+  <li>Check <code>500</code>, <code>400</code>, or <code>403</code> responses for verbose messages</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Set <code>DEBUG = False</code> in production (e.g., in Django, Flask, Laravel)</li>
+  <li>Use custom error pages that don’t reveal system internals</li>
+  <li>Log errors internally, not in client responses</li>
+  <li>Use proper exception handling</li>
+  <li>Sanitize all inputs and catch unhandled exceptions</li>
+</ul>
+
+<hr />
+
+<h2>6. Tools for Testing</h2>
+<ul>
+  <li><strong>Burp Suite</strong> – Manual or automated error discovery</li>
+  <li><strong>cURL</strong> – For quickly testing endpoints:
+    <pre>curl -i http://target.com/api/broken</pre>
+  </li>
+  <li><strong>OWASP ZAP</strong> – Active scanning for verbose error messages</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never expose debug information in production environments.</li>
+  <li>All debug and stack trace details should be logged securely on the server.</li>
+  <li>Custom error messages should give users only what they need (e.g., “Something went wrong”).</li>
+</ul>
+
+<p>Remember: What seems like a harmless error message could be a goldmine for attackers. Always test and sanitize outputs in every environment.</p>
+
+<p>Stay secure! 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

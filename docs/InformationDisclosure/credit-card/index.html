@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Credit Card Info in Logs</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>💳 Information Disclosure: Credit Card Info in Logs</h1>
+
+<p>Logging sensitive data like credit card numbers is a serious violation of both security best practices and regulatory standards (e.g., PCI-DSS). If attackers gain access to log files, this can lead to full credit card leakage and financial fraud.</p>
+
+<hr />
+
+<h2>1. Where This Happens</h2>
+<ul>
+  <li>Payment forms send full card numbers as query parameters (e.g., <code>?cc=4111111111111111</code>)</li>
+  <li>Server logs request bodies or headers containing credit card data</li>
+  <li>Error or debug logs dump full POST requests or stack traces containing raw input</li>
+</ul>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<pre>
+POST /checkout HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+
+cc_number=4111111111111111&amp;expiry=12/25&amp;cvv=123
+</pre>
+
+<p>If server logs request bodies or parameters:</p>
+
+<pre>
+[INFO] Received payment: cc_number=4111111111111111
+</pre>
+
+<p>Attackers accessing logs (via LFI, RCE, admin panels, etc.) could harvest card data.</p>
+
+<hr />
+
+<h2>3. Why It’s Dangerous</h2>
+<ul>
+  <li>Violates <strong>PCI-DSS</strong> standards, which prohibit storing full PAN (Primary Account Number)</li>
+  <li>May result in massive financial fraud or regulatory fines</li>
+  <li>Logs are often poorly protected or retained longer than needed</li>
+</ul>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<ul>
+  <li>Test if sensitive fields like <code>cc_number</code> appear in query strings or reflected in logs via verbose errors</li>
+  <li>Look for LFI or exposed logs (e.g., <code>/logs/debug.log</code>, <code>/var/log/access.log</code>)</li>
+  <li>Try to trigger verbose or debug logging during form submissions</li>
+</ul>
+
+<h3>Regex to find credit card patterns:</h3>
+<pre>
+(?:4[0-9]{12}(?:[0-9]{3})?)      # Visa
+(?:5[1-5][0-9]{14})             # MasterCard
+(?:3[47][0-9]{13})              # AmEx
+</pre>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li><strong>Never log sensitive information</strong> such as PANs, CVVs, or expiration dates</li>
+  <li>Mask data if logging is required: <code>cc_number=****1111</code></li>
+  <li>Use tokenization or external payment gateways to avoid handling raw card data</li>
+  <li>Regularly audit logs for sensitive data exposure</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Storing credit card data in logs is a critical security violation</li>
+  <li>Always sanitize inputs before logging</li>
+  <li>Use third-party PCI-compliant processors to offload sensitive handling</li>
+</ul>
+
+<p>🧨 Don’t let your logs become a goldmine for attackers. Mask or eliminate sensitive data before writing to logs.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

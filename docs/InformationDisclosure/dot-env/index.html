@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Leaked .env File</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🛠️ Information Disclosure: Leaked <code>.env</code> File</h1>
+
+<p>The <code>.env</code> file is often used to store sensitive environment variables such as database credentials, API keys, and application secrets. If this file is exposed over the web, it can lead to a full compromise of the application or infrastructure.</p>
+
+<hr />
+
+<h2>1. What Is a <code>.env</code> File?</h2>
+<p>A <code>.env</code> (environment) file is used in many frameworks (Laravel, Django, Node.js, etc.) to define environment variables outside the source code. These files often contain secrets like:</p>
+<pre>
+APP_ENV=production
+APP_KEY=base64:9Hc6V...
+DB_HOST=127.0.0.1
+DB_USERNAME=root
+DB_PASSWORD=supersecret
+MAIL_PASSWORD=mailpass123
+</pre>
+
+<hr />
+
+<h2>2. Why It’s Dangerous</h2>
+<ul>
+  <li>Leads to database access or destruction</li>
+  <li>Exposes app secret keys used for JWT, sessions, etc.</li>
+  <li>Gives access to third-party services (Mailgun, Stripe, AWS, etc.)</li>
+  <li>Enables lateral movement or privilege escalation</li>
+</ul>
+
+<hr />
+
+<h2>3. How Attackers Find It</h2>
+<ul>
+  <li>Directly visiting <code>/.env</code> in the browser</li>
+  <li>Using automated tools like <code>gau</code>, <code>waybackurls</code>, <code>dirsearch</code>, or <code>feroxbuster</code></li>
+</ul>
+
+<div>
+  <h3>Example</h3>
+  <pre>curl -s http://example.com/.env</pre>
+</div>
+
+<hr />
+
+<h2>4. Real-World Impact</h2>
+<ul>
+  <li><strong>Laravel APP_KEY:</strong> If leaked, attackers can forge cookies, decrypt data, and take over sessions.</li>
+  <li><strong>DB Credentials:</strong> Leaked MySQL/PostgreSQL credentials allow direct access.</li>
+  <li><strong>Mail Configs:</strong> Attackers may spoof or phish using your mail server.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li>NEVER store <code>.env</code> files in the public web root</li>
+  <li>Block access via web server config</li>
+</ul>
+
+<h3>Apache</h3>
+<pre>
+<FilesMatch "^\.env">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+</pre>
+
+<h3>Nginx</h3>
+<pre>
+location ~ /\.env {
+  deny all;
+}
+</pre>
+
+<h3>.htaccess</h3>
+<pre>
+RewriteRule ^\.env$ - [F,L]
+</pre>
+
+<hr />
+
+<h2>6. Detection as a Pentester</h2>
+<ul>
+  <li>Try accessing <code>/.env</code> directly</li>
+  <li>Search archived URLs using tools:
+    <pre>gau example.com | grep '\.env'</pre>
+    <pre>waybackurls example.com | grep '\.env'</pre>
+  </li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>A publicly accessible <code>.env</code> file is a critical vulnerability.</li>
+  <li>Always block direct access and never push it to the web root or version control.</li>
+  <li>Use secrets managers (like AWS Secrets Manager, Vault) in production environments.</li>
+</ul>
+
+<p>🚨 One exposed variable could lead to a full system compromise. Double-check your deployments!</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

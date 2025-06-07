@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - User Tokens in HTML Comments</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Information Disclosure: User Tokens in HTML Comments</h1>
+
+<p>HTML comments are meant for developers, but if sensitive data like user tokens, session IDs, or internal notes are left inside them, they become accessible to any attacker who views the page source. This is a classic information disclosure vulnerability.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Sometimes, developers include tokens, debug output, or session-related content inside HTML comments like this:</p>
+
+<pre>
+&lt;!-- DEBUG: userToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... --&gt;
+</pre>
+
+<p>This data is never shown on the page but can be easily retrieved by viewing the source code in the browser (<code>Ctrl+U</code>).</p>
+
+<hr />
+
+<h2>2. Why It’s Dangerous</h2>
+<ul>
+  <li>Session tokens can be reused to hijack user accounts</li>
+  <li>JWTs and OAuth tokens can grant API access</li>
+  <li>Exposed data might include emails, passwords, or environment variables</li>
+  <li>Even non-sensitive data can help attackers map application logic</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Attack Scenario</h2>
+<p>Source of <code>dashboard.html</code> reveals:</p>
+
+<pre>
+&lt;!-- userId: 92347, token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiam9obiJ9 --> 
+</pre>
+
+<p>The attacker decodes the JWT or replays the token in an API request:</p>
+
+<pre>
+curl -H "Authorization: Bearer eyJhbGciOi..." https://example.com/api/user/profile
+</pre>
+
+<hr />
+
+<h2>4. How to Detect</h2>
+<ul>
+  <li>Manually review page source (<code>Ctrl+U</code> in browser)</li>
+  <li>Use automated tools like:
+    <pre>curl https://example.com | grep -i "token\|session\|api\|debug"</pre>
+  </li>
+  <li>Perform content discovery on HTML and JavaScript files using <code>dirsearch</code>, <code>ffuf</code>, or <code>waybackurls</code></li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li><strong>Never</strong> include sensitive information in HTML comments</li>
+  <li>Review frontend templates and static pages before deployment</li>
+  <li>Perform automated security scans to catch comment-based leaks</li>
+  <li>Educate developers about secure coding practices</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>HTML comments are visible to anyone — they’re not private or hidden</li>
+  <li>Tokens in comments can lead to account compromise, privilege escalation, or full API access</li>
+  <li>Always sanitize and review code before pushing to production</li>
+</ul>
+
+<p>👀 Don’t leave secrets in plain sight — comments can be as dangerous as code.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

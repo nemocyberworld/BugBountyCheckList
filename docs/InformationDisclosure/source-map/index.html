@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Source Maps Exposed</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔓 Information Disclosure: Source Maps Exposed in Production</h1>
+
+<p>Source maps (<code>.map</code> files) are used during development to map minified JavaScript code back to its original form. When exposed in production, they allow attackers to reverse-engineer your original client-side code, revealing internal logic, API endpoints, and potential vulnerabilities.</p>
+
+<hr />
+
+<h2>1. What Are Source Maps?</h2>
+<p>Source maps are JSON files that map minified/obfuscated JavaScript code back to the original source code. They're referenced in production bundles via:</p>
+
+<pre>
+//# sourceMappingURL=app.js.map
+</pre>
+
+<p>If <code>app.js.map</code> is publicly accessible, attackers can view and analyze the entire original codebase.</p>
+
+<hr />
+
+<h2>2. What Attackers Can Learn</h2>
+<ul>
+  <li>Internal variable/function names and logic</li>
+  <li>Hidden API endpoints or tokens hardcoded in frontend</li>
+  <li>Business logic vulnerabilities (e.g., auth bypass)</li>
+  <li>Framework version leakage, debug flags, comments</li>
+</ul>
+
+<hr />
+
+<h2>3. Real-World Example</h2>
+
+<pre>
+GET /static/js/main.js.map HTTP/1.1
+Host: vulnerable-site.com
+</pre>
+
+<p>Response contains readable source code, including:</p>
+
+<pre>
+function isAdmin(user) {
+  return user.role === 'admin';
+}
+
+const API_KEY = "dev-test-key";
+</pre>
+
+<p>Now an attacker can search for sensitive keywords like <code>key</code>, <code>auth</code>, <code>secret</code>, and reverse-engineer logic.</p>
+
+<hr />
+
+<h2>4. Detection Tips</h2>
+<ul>
+  <li>Scan for accessible <code>.map</code> files using tools like <code>dirsearch</code>, <code>ffuf</code>, or <code>curl</code></li>
+  <li>Use browser DevTools: open a JS file and look for <code>//# sourceMappingURL=</code></li>
+  <li>Automated scan:
+    <pre>curl -s -I https://example.com/static/js/main.js.map</pre>
+  </li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Do NOT deploy source maps to production servers</li>
+  <li>Use build tools (e.g., Webpack, Vite) to strip or disable source map generation in prod</li>
+  <li>If necessary, deploy them to a secure, authenticated location for internal debugging</li>
+  <li>Audit existing deployments and remove any exposed <code>.map</code> files</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Source maps should never be publicly available in production</li>
+  <li>They expose original JS code, increasing risk of reverse-engineering and discovery of vulnerabilities</li>
+  <li>Remove or restrict access to <code>.map</code> files as part of your build pipeline</li>
+</ul>
+
+<p>🔍 Obscurity is not security — but source maps make things far too easy for attackers.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

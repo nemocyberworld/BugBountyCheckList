@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Leaked .git/ Directory</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .example { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📁 Information Disclosure: Leaked <code>.git/</code> Directory</h1>
+
+<p>Exposing the <code>.git/</code> directory in a live web application is a critical security misconfiguration that can allow attackers to access source code, configuration files, and sensitive data. This guide explains how attackers exploit this and how to prevent it.</p>
+
+<hr />
+
+<h2>1. What Is the <code>.git/</code> Directory?</h2>
+<p>The <code>.git/</code> directory is created when a Git repository is initialized. It contains all the information about the repository, including commits, branches, and metadata required to recreate the source code history.</p>
+
+<hr />
+
+<h2>2. Why It’s Dangerous</h2>
+<ul>
+  <li>Allows full or partial source code leakage</li>
+  <li>Exposes hardcoded secrets (API keys, DB credentials)</li>
+  <li>Reveals internal logic, authentication flaws, and endpoints</li>
+  <li>Makes fingerprinting and reverse engineering easier</li>
+  <li>Can leak accidentally deleted or commented-out sensitive code</li>
+</ul>
+
+<hr />
+
+<h2>3. How Attackers Exploit It</h2>
+<ul>
+  <li>Accessing <code>/.git/config</code> to confirm the repo exists</li>
+  <li>Downloading objects manually or via tools</li>
+  <li>Reconstructing the repository to extract full source code</li>
+</ul>
+
+<div class="example">
+  <h3>Example</h3>
+  <pre>curl http://example.com/.git/config</pre>
+  <p>If this returns Git config info, the repository is exposed.</p>
+</div>
+
+<hr />
+
+<h2>4. Automated Tools to Extract <code>.git</code></h2>
+<ul>
+  <li><strong>GitTools</strong> – A collection of tools to exploit `.git` leaks:
+    <pre>git clone https://github.com/internetwache/GitTools.git</pre>
+    <pre>./GitTools/Dumper/gitdumper.sh http://target.com/.git/ /tmp/target-git</pre>
+  </li>
+  <li><strong>githack</strong> – Lightweight Python-based `.git` retriever</li>
+  <li><strong>gitleaks</strong> – Scans repos for hardcoded secrets</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li>NEVER deploy applications with <code>.git/</code> exposed to the web</li>
+  <li>Block access to <code>/.git</code> in your web server config</li>
+</ul>
+
+<h3>Apache</h3>
+<pre>
+RedirectMatch 404 ^/.git
+</pre>
+
+<h3>Nginx</h3>
+<pre>
+location ~ /\.git {
+    deny all;
+}
+</pre>
+
+<h3>htaccess</h3>
+<pre>
+RewriteRule ^(.*/)?\.git/ - [F,L]
+</pre>
+
+<hr />
+
+<h2>6. Detection as a Pentester</h2>
+<ul>
+  <li>Try accessing <code>/.git/config</code> or <code>/.git/HEAD</code></li>
+  <li>Use tools like <code>dirsearch</code> or <code>feroxbuster</code> to discover</li>
+  <li>If exposed, run <code>GitTools/Dumper</code> to clone the repo</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Leaking the <code>.git/</code> directory is a critical issue and often leads to full source code compromise.</li>
+  <li>Always exclude <code>.git</code> from deployment or block it via server config.</li>
+  <li>Scan your domains for this misconfiguration during internal audits or bug bounty recon.</li>
+</ul>
+
+<p>💡 Secure your repos before attackers find them!</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

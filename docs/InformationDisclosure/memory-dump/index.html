@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Leaked Memory Dumps</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>💣 Information Disclosure: Leaked Memory Dumps</h1>
+
+<p>Memory dumps are raw captures of an application's memory at a specific point in time, typically used for debugging crashes or performance issues. If leaked or exposed, they can reveal sensitive data, credentials, cryptographic material, and application internals.</p>
+
+<hr />
+
+<h2>1. How Memory Dumps Get Leaked</h2>
+<ul>
+  <li>Generated during crashes and left in publicly accessible locations (e.g., <code>/var/www</code>, <code>/tmp</code>)</li>
+  <li>Included in bug reports or error logs stored insecurely</li>
+  <li>Uploaded by automated systems (e.g., Windows Error Reporting, core dumps) without access control</li>
+  <li>Left behind by developers or support engineers after debugging</li>
+</ul>
+
+<hr />
+
+<h2>2. What Can Be Found in Dumps</h2>
+<ul>
+  <li>Database credentials or connection strings</li>
+  <li>Session tokens, API keys, and access tokens</li>
+  <li>Full request/response contents including POST data</li>
+  <li>Internal application logic and loaded modules</li>
+  <li>Cryptographic keys or secrets in memory</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Discovery</h2>
+<p>Leaked file: <code>core.15982</code> or <code>app.dmp</code> found via public path or open directory listing.</p>
+
+<pre>
+$ strings app.dmp | grep -Ei "password|token|secret"
+MYSQL_PASSWORD=Sup3rS3cret!
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsIn...
+</pre>
+
+<p>Attackers can extract usable secrets, replay tokens, or pivot into other systems.</p>
+
+<hr />
+
+<h2>4. Detection Tips</h2>
+<ul>
+  <li>Look for dump file extensions: <code>.dmp</code>, <code>.core</code>, <code>.mdmp</code>, <code>.heapdump</code></li>
+  <li>Use <code>dirsearch</code> or <code>ffuf</code> to brute-force for dump file paths</li>
+  <li>Search with Google dorks:
+    <pre>intitle:"index of" "core" OR "heapdump"</pre>
+  </li>
+  <li>Run <code>strings</code> or <code>binwalk</code> on suspected dump files</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Disable core dumps in production: <code>ulimit -c 0</code></li>
+  <li>Configure applications not to generate memory dumps unless explicitly required</li>
+  <li>Ensure access control and cleanup policies are in place for any diagnostic files</li>
+  <li>Use secure crash reporting systems that scrub sensitive data</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Memory dumps often contain highly sensitive runtime data</li>
+  <li>They should never be publicly accessible or persist in production environments</li>
+  <li>Regularly scan and clean up leftover debug files on exposed systems</li>
+</ul>
+
+<p>🧠 Memory leaks are bad — but memory *dumps* in the wrong place can be catastrophic.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

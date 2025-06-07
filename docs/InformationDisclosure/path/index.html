@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Full Path Disclosure</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>📂 Information Disclosure: Full Path Disclosure</h1>
+
+<p>Full path disclosure occurs when a web application exposes the absolute file system path of a script or resource on the server. This typically happens through error messages or stack traces. Although not always directly exploitable, it provides valuable recon data to attackers.</p>
+
+<hr />
+
+<h2>1. What Is Full Path Disclosure?</h2>
+<p>When an application encounters an error, it may return a message revealing the location of the affected script on the server, like:</p>
+
+<pre>
+Warning: include(config.php): failed to open stream: No such file or directory in /var/www/html/index.php on line 4
+</pre>
+
+<p>This reveals the server is running Linux and the script resides in <code>/var/www/html/index.php</code>.</p>
+
+<hr />
+
+<h2>2. Why It’s a Problem</h2>
+<ul>
+  <li>Reveals the structure of the server’s file system</li>
+  <li>Confirms the programming language and server software</li>
+  <li>Can be combined with LFI, RCE, or file upload bugs to escalate impact</li>
+  <li>Helpful for crafting precise payloads in exploitation</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Reproduce</h2>
+<p>Visit a page with a missing include or broken parameter, e.g.:</p>
+
+<pre>https://example.com/index.php?page=contact</pre>
+
+<p>Response:</p>
+<pre>
+Warning: include(contact.php): failed to open stream: No such file or directory in /home/app/public/index.php on line 12
+</pre>
+
+<p>This discloses the server path <code>/home/app/public/index.php</code>.</p>
+
+<hr />
+
+<h2>4. Detection Tips</h2>
+<ul>
+  <li>Look for verbose error messages on bad input</li>
+  <li>Use parameters like <code>?page=</code>, <code>?file=</code>, <code>?template=</code> with invalid values</li>
+  <li>Scan for common file include errors in PHP, Python, ASP.NET</li>
+  <li>Check 500 and 404 error pages manually or with scanners like <code>nikto</code>, <code>feroxbuster</code></li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Disable error display in production (e.g., <code>display_errors = Off</code> in PHP)</li>
+  <li>Log errors server-side instead of exposing them to the client</li>
+  <li>Use generic error messages for users</li>
+  <li>Set proper error-handling in frameworks and web servers</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Full path disclosure gives attackers insight into server file structure</li>
+  <li>Often a low severity issue alone, but increases risk in combination with other bugs</li>
+  <li>Prevent by suppressing detailed errors in production environments</li>
+</ul>
+
+<p>🔎 Don’t let your server paths become breadcrumbs for attackers. Clean up those error messages!</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

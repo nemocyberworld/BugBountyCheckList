@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Sensitive Info in robots.txt</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🧭 Information Disclosure: Sensitive Data in robots.txt</h1>
+
+<p>The <code>robots.txt</code> file is intended to instruct web crawlers which parts of a site should not be indexed. However, including sensitive directories or endpoints in it can unintentionally expose them to attackers.</p>
+
+<hr />
+
+<h2>1. What Is <code>robots.txt</code>?</h2>
+<p>A plain text file placed at the root of a website (<code>/robots.txt</code>) that provides directives for search engine bots about which URLs they are allowed or disallowed from crawling.</p>
+
+<pre>
+User-agent: *
+Disallow: /admin/
+Disallow: /backup/
+Disallow: /config/
+</pre>
+
+<p>While search engines follow this directive, **attackers can manually review the file** to find hidden or sensitive locations.</p>
+
+<hr />
+
+<h2>2. Why It’s a Security Risk</h2>
+<ul>
+  <li>Commonly discloses internal admin panels</li>
+  <li>Reveals sensitive files like backups, config dumps, or hidden features</li>
+  <li>Creates an unintentional attack surface for fuzzing and enumeration</li>
+</ul>
+
+<hr />
+
+<h2>3. Real Example</h2>
+<pre>
+User-agent: *
+Disallow: /staging/
+Disallow: /old-admin/
+Disallow: /hidden-login/
+Disallow: /debug-console/
+</pre>
+
+<p>This hints at:</p>
+<ul>
+  <li>Staging environments (likely outdated, maybe vulnerable)</li>
+  <li>Legacy admin panels</li>
+  <li>Hidden login pages</li>
+  <li>Developer debugging interfaces</li>
+</ul>
+
+<hr />
+
+<h2>4. How Attackers Exploit It</h2>
+<ul>
+  <li>Access and enumerate hidden endpoints</li>
+  <li>Perform brute-force or credential stuffing attacks on hidden logins</li>
+  <li>Analyze staging environments for outdated software or misconfigurations</li>
+</ul>
+
+<hr />
+
+<h2>5. Proper Usage and Prevention</h2>
+<ul>
+  <li>Do <strong>not</strong> list sensitive paths in <code>robots.txt</code></li>
+  <li>Use authentication, not obscurity, to protect sensitive directories</li>
+  <li>Use a separate <code>robots.txt</code> in staging/dev environments with restrictive access (e.g., HTTP Basic Auth)</li>
+  <li>Audit your <code>robots.txt</code> regularly for exposure risks</li>
+</ul>
+
+<hr />
+
+<h2>6. Detection as a Pentester</h2>
+<ul>
+  <li>Always check <code>/robots.txt</code> on the root domain</li>
+  <li>Manually review all disallowed paths for interesting or hidden content</li>
+  <li>Automate crawling and parsing with tools like <code>gobuster</code>, <code>dirsearch</code>, or <code>feroxbuster</code></li>
+</ul>
+
+<pre>
+curl https://example.com/robots.txt
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li><code>robots.txt</code> should not be treated as a security control</li>
+  <li>Never expose sensitive or internal paths in it</li>
+  <li>Attackers often use it as a roadmap to hidden parts of the app</li>
+</ul>
+
+<p>🛡️ Remember: What you disallow for Google, you invite hackers to explore.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

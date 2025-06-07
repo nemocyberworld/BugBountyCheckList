@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Email/Password Pairs in Export Files</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🛑 Information Disclosure: Email/Password Pairs in Export Files</h1>
+
+<p>Exported files (e.g., <code>.csv</code>, <code>.json</code>, <code>.xls</code>) containing email and password combinations can pose a severe security risk if accessible via the web. These files are often intended for internal use but may be unintentionally left publicly exposed.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+
+<p>Some applications allow users or admins to export user data, such as:</p>
+
+<pre>
+email,password
+user1@example.com,Password123!
+user2@example.com,qwerty2023
+</pre>
+
+<p>If this file is accessible through a public or unprotected URL (e.g., <code>/exports/users.csv</code>), it exposes sensitive credentials that can be used for account takeover, credential stuffing, or data breaches.</p>
+
+<hr />
+
+<h2>2. Why It's Dangerous</h2>
+<ul>
+  <li>Email/password pairs are direct access credentials</li>
+  <li>Attackers can reuse these credentials across sites (credential stuffing)</li>
+  <li>Passwords may not be hashed (especially in CSVs meant for exports)</li>
+  <li>Violates GDPR and other privacy regulations</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Detect</h2>
+<ul>
+  <li>Check exposed URLs like:
+    <ul>
+      <li><code>/exports/</code></li>
+      <li><code>/admin/backup/</code></li>
+      <li><code>/data/users.csv</code></li>
+      <li><code>/files/export.json</code></li>
+    </ul>
+  </li>
+  <li>Use tools like:
+    <ul>
+      <li><code>dirsearch</code>, <code>gobuster</code>, <code>feroxbuster</code> for directory fuzzing</li>
+      <li>Search engines (Google Dork: <code>ext:csv inurl:export</code>)</li>
+    </ul>
+  </li>
+  <li>Look for patterns like:
+    <pre>
+regex: [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,},.{4,}
+    </pre>
+  </li>
+</ul>
+
+<hr />
+
+<h2>4. Real-World Incidents</h2>
+<p>Many past data breaches have occurred due to public S3 buckets or backup files that contained unencrypted credentials. These incidents often go unnoticed until after the damage is done.</p>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Never include plain text passwords in exports</li>
+  <li>Hash passwords using strong algorithms (e.g., bcrypt, Argon2) and salt them</li>
+  <li>Restrict export file access behind authentication or IP whitelisting</li>
+  <li>Regularly audit all public/static directories</li>
+  <li>Set up DLP (Data Loss Prevention) tools and monitoring for such exposures</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Email/password pairs are highly sensitive and should never be publicly accessible</li>
+  <li>Use hashed passwords and control file access strictly</li>
+  <li>Fuzz and audit for exposed export or backup files regularly</li>
+</ul>
+
+<p>🧠 Tip: Treat export files like live database dumps — protect them with the same level of security.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

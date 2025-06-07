@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Exposed Sentry Logs</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🛠️ Information Disclosure: Exposed Sentry / Monitoring Logs</h1>
+
+<p>Sentry and similar monitoring platforms are used to capture runtime errors, stack traces, and request metadata. If these logs are exposed or misconfigured to be publicly accessible, they can reveal internal code, sensitive data, or credentials.</p>
+
+<hr />
+
+<h2>1. How This Happens</h2>
+<ul>
+  <li>Self-hosted Sentry dashboards left unauthenticated or publicly reachable</li>
+  <li>Sentry projects misconfigured to allow anonymous access to logs</li>
+  <li>Leaked Sentry API keys allowing access to project data</li>
+  <li>Public sharing of Sentry links containing crash reports with sensitive context</li>
+</ul>
+
+<hr />
+
+<h2>2. What Can Be Leaked</h2>
+<ul>
+  <li>Full stack traces including source file names, line numbers, and function calls</li>
+  <li>Environment variables or HTTP headers included in crash reports</li>
+  <li>User PII (email, session data, IP addresses)</li>
+  <li>Internal API endpoints and request payloads</li>
+</ul>
+
+<hr />
+
+<h2>3. Example of Exposed Sentry Log</h2>
+
+<pre>
+{
+  "exception": {
+    "type": "DatabaseError",
+    "value": "Access denied for user 'root'@'127.0.0.1'",
+    "stacktrace": {
+      "frames": [
+        { "filename": "db.py", "function": "connect", "lineno": 42 },
+        { "filename": "app.py", "function": "get_data", "lineno": 108 }
+      ]
+    }
+  },
+  "request": {
+    "url": "https://example.com/admin",
+    "headers": {
+      "Authorization": "Bearer sk_live_***",
+      "User-Agent": "Mozilla/5.0"
+    }
+  }
+}
+</pre>
+
+<p>This data can be used to locate sensitive endpoints, keys, and vulnerabilities.</p>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<ul>
+  <li>Check for open Sentry dashboards (e.g., <code>sentry.example.com</code>)</li>
+  <li>Search Google/DuckDuckGo: <code>site:sentry.io inurl:organizations intext:exception</code></li>
+  <li>Look for exposed links or shared logs in developer forums, issue trackers, or Slack exports</li>
+  <li>Monitor network responses for embedded Sentry event payloads</li>
+</ul>
+
+<hr />
+
+<h2>5. Prevention</h2>
+<ul>
+  <li>Ensure Sentry dashboards are authenticated and restricted</li>
+  <li>Mask or sanitize sensitive fields before logging (e.g., Authorization headers)</li>
+  <li>Rotate leaked DSNs or API keys immediately</li>
+  <li>Review retention settings and access logs regularly</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Monitoring logs should never be publicly accessible</li>
+  <li>Stack traces can leak function names, internal logic, or secrets</li>
+  <li>Harden your logging infrastructure and audit frequently</li>
+</ul>
+
+<p>🔍 Monitoring tools are powerful — but in the wrong hands, they’re a goldmine for attackers.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Stack Trace on Exception</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🧯 Information Disclosure: Stack Trace on Exception</h1>
+
+<p>Exposing stack traces during runtime exceptions can give attackers insights into the internal structure of a web application, which may lead to more severe vulnerabilities such as RCE, SQLi, or privilege escalation.</p>
+
+<hr />
+
+<h2>1. What Is a Stack Trace?</h2>
+<p>A stack trace is a report that provides detailed debugging information when an application crashes or throws an unhandled exception. It includes file names, line numbers, function/method names, and sometimes variables.</p>
+
+<hr />
+
+<h2>2. Why It's Dangerous</h2>
+<ul>
+  <li>Reveals sensitive file paths and source code structure</li>
+  <li>Exposes internal class names, libraries, and frameworks</li>
+  <li>May leak configuration details, DB queries, or secrets</li>
+  <li>Helps attackers fingerprint technologies and plan targeted exploits</li>
+</ul>
+
+<hr />
+
+<h2>3. Real Example</h2>
+<p>Consider the following stack trace leaked by a Laravel app:</p>
+<pre>
+Illuminate\Database\QueryException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'passwordd' in 'where clause'
+in /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:671
+Stack trace:
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(631): runQueryCallback()
+#1 /var/www/html/app/Http/Controllers/AuthController.php(47): queryBuilder->get()
+...
+</pre>
+
+<p>This reveals:</p>
+<ul>
+  <li>Framework: Laravel</li>
+  <li>Full file path: <code>/var/www/html/app/Http/Controllers/AuthController.php</code></li>
+  <li>Database query failure details</li>
+</ul>
+
+<hr />
+
+<h2>4. How Attackers Exploit It</h2>
+<ul>
+  <li>Use file paths to target LFI or RCE attacks</li>
+  <li>Use class/method names to analyze logic and APIs</li>
+  <li>Enumerate internal error-prone components</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent It</h2>
+<ul>
+  <li>Disable detailed error reporting in production</li>
+  <li>Catch and handle exceptions gracefully with custom error messages</li>
+  <li>Log errors internally, but never expose to the user</li>
+</ul>
+
+<h3>Laravel</h3>
+<pre>
+APP_DEBUG=false
+APP_ENV=production
+</pre>
+
+<h3>Django</h3>
+<pre>
+DEBUG = False
+ALLOWED_HOSTS = ['yourdomain.com']
+</pre>
+
+<h3>Node.js (Express)</h3>
+<pre>
+app.use((err, req, res, next) => {
+  res.status(500).send("Internal Server Error");
+});
+</pre>
+
+<hr />
+
+<h2>6. Detection as a Pentester</h2>
+<ul>
+  <li>Send malformed inputs to endpoints and observe responses</li>
+  <li>Look for verbose error output (file paths, classes, DB errors)</li>
+  <li>Fuzz using <code>ffuf</code>, <code>wfuzz</code>, or <code>Burp Intruder</code> to trigger edge cases</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Stack traces are helpful for developers but dangerous for attackers</li>
+  <li>Always sanitize user-facing errors in production</li>
+  <li>Configure your app to log errors silently and fail gracefully</li>
+</ul>
+
+<p>🛡️ Treat error handling as part of your security surface. A clean "500 Internal Server Error" is better than leaking your app’s internals.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

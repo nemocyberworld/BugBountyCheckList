@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Sensitive Data in Referer Headers</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Information Disclosure: Sensitive Data in Referer Headers</h1>
+
+<p>Referer headers are automatically sent by browsers during navigation. When sensitive information like tokens, session IDs, or credentials are embedded in URLs, they may unintentionally leak via the <code>Referer</code> header to third-party websites or services.</p>
+
+<hr />
+
+<h2>1. What Is the Referer Header?</h2>
+<p>The <code>Referer</code> (yes, it's intentionally misspelled in the HTTP spec) is an HTTP header that tells the destination page which URL the user navigated from. Example:</p>
+
+<pre>
+GET /analytics.js HTTP/1.1
+Host: thirdparty.com
+Referer: https://example.com/account?token=abcd1234
+</pre>
+
+<p>This leaks the <code>token=abcd1234</code> to <code>thirdparty.com</code>.</p>
+
+<hr />
+
+<h2>2. Why It’s a Security Risk</h2>
+<ul>
+  <li>Tokens, passwords, or other credentials in URLs may be exposed to third-party services</li>
+  <li>Referer headers are included in requests to CDNs, analytics tools, ad networks, etc.</li>
+  <li>These headers are logged by third-party servers and could be indexed or cached</li>
+</ul>
+
+<hr />
+
+<h2>3. Real-World Examples of Sensitive Info in Referers</h2>
+<ul>
+  <li>Session tokens: <code>?sessionid=XYZ</code></li>
+  <li>Password reset links: <code>?reset_token=abc</code></li>
+  <li>API keys or JWTs: <code>?api_key=123</code></li>
+  <li>User PII: <code>?email=user@example.com</code></li>
+</ul>
+
+<p>All of the above can leak if embedded in URLs and the user clicks on an external link or image.</p>
+
+<hr />
+
+<h2>4. How to Detect</h2>
+<ul>
+  <li>Look for sensitive query parameters in URLs</li>
+  <li>Monitor browser requests with DevTools → Network tab</li>
+  <li>Use a proxy like Burp Suite to inspect outgoing requests and check <code>Referer</code> headers</li>
+  <li>Use web server logs or SIEM tools to detect accidental exposure</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation</h2>
+<ul>
+  <li>Never place sensitive data in the URL (use POST bodies or headers instead)</li>
+  <li>Use the <code>Referrer-Policy</code> HTTP header to restrict what is sent:</li>
+  <pre>
+Referrer-Policy: no-referrer
+  </pre>
+  <li>Other secure options include:
+    <ul>
+      <li><code>same-origin</code>: only send Referer for same-origin requests</li>
+      <li><code>strict-origin</code>: send origin only, not path/query</li>
+      <li><code>no-referrer-when-downgrade</code>: default, but unsafe</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>The <code>Referer</code> header can unintentionally leak sensitive data if embedded in URLs</li>
+  <li>Avoid putting secrets in URLs — use secure transport mechanisms</li>
+  <li>Apply strict <code>Referrer-Policy</code> headers to control referrer behavior</li>
+</ul>
+
+<p>🕵️ Protect your users — keep secrets out of the URL and out of the logs!</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

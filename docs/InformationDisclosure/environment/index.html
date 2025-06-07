@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Information Disclosure - Environment Variables in Response Body</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>🔧 Information Disclosure: Environment Variables in Response Body</h1>
+
+<p>Exposing environment variables (e.g., <code>DB_PASSWORD</code>, <code>SECRET_KEY</code>, <code>AWS_ACCESS_KEY</code>) in HTTP response bodies is a serious security misconfiguration. These variables often hold credentials or other sensitive internal config values.</p>
+
+<hr />
+
+<h2>1. How This Happens</h2>
+<ul>
+  <li>Improper error handling or debug routes accidentally dump environment data</li>
+  <li>Frameworks misconfigured to show full system state in exceptions</li>
+  <li>Improper use of <code>printenv</code> or <code>os.environ</code> in API routes</li>
+</ul>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<pre>
+GET /debug/env HTTP/1.1
+Host: example.com
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "ENV": {
+    "DB_USER": "admin",
+    "DB_PASS": "supersecret123",
+    "SECRET_KEY": "dev_key_12345",
+    "AWS_ACCESS_KEY_ID": "AKIA********",
+    "AWS_SECRET_ACCESS_KEY": "***************"
+  }
+}
+</pre>
+
+<p>This gives attackers instant access to internal secrets that could be used to compromise infrastructure.</p>
+
+<hr />
+
+<h2>3. Risks and Impact</h2>
+<ul>
+  <li>Full database access or RCE through leaked credentials</li>
+  <li>Compromised cloud infrastructure (AWS, GCP, etc.)</li>
+  <li>Privilege escalation or lateral movement within internal systems</li>
+  <li>Violates security best practices and regulatory standards</li>
+</ul>
+
+<hr />
+
+<h2>4. Detection as a Pentester</h2>
+<ul>
+  <li>Look for debug endpoints: <code>/env</code>, <code>/debug</code>, <code>/info</code>, <code>/system</code></li>
+  <li>Trigger verbose errors or misconfigurations</li>
+  <li>Use Burp or curl to check for environment-like patterns in responses</li>
+</ul>
+
+<h3>Regex patterns to search:</h3>
+<pre>
+(AWS|SECRET|PASS|TOKEN|KEY)[_A-Z]*\s*[:=]\s*['"]?[a-zA-Z0-9/\+=_@-]{8,}['"]?
+</pre>
+
+<hr />
+
+<h2>5. Prevention</h2>
+<ul>
+  <li>Never expose environment variables to clients — sanitize all outputs</li>
+  <li>Disable verbose debug modes in production</li>
+  <li>Use structured logging with strict redaction of secrets</li>
+  <li>Audit code for any environment access that leaks to HTTP responses</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Environment variables often store critical secrets — leaking them is high risk</li>
+  <li>Always disable debug or development flags in production</li>
+  <li>Scan responses and error messages carefully during audits</li>
+</ul>
+
+<p>🚫 Don’t let <code>process.env</code> leak into the browser. Treat all environment data as highly sensitive.</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
