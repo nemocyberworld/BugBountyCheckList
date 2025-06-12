@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>No Rate Limiting on Login</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🚨 No Rate Limiting on Login</h1>
+
+<p>This guide explains the security issue of missing rate limiting on login endpoints, how attackers exploit it, and how to mitigate the risk.</p>
+
+<hr />
+
+<h2>1. What Is Rate Limiting?</h2>
+<p>Rate limiting is a security mechanism that restricts the number of allowed attempts (e.g., logins) in a specific time period. Without it, attackers can send unlimited login requests to brute-force credentials.</p>
+
+<hr />
+
+<h2>2. Exploitation Scenario</h2>
+<ul>
+  <li>Attacker uses a tool to send thousands of login requests without getting blocked.</li>
+  <li>Example tools: <code>Hydra</code>, <code>Burp Suite Intruder</code>, <code>FFUF</code>.</li>
+  <li>Target endpoint responds normally regardless of the number of failed login attempts.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Attack Using Hydra</h2>
+<pre>
+hydra -L users.txt -P passwords.txt http-post-form \
+"/login:username=^USER^&password=^PASS^:F=Invalid" -t 20
+</pre>
+<p><strong>Note:</strong> Replace endpoint and failure response pattern accordingly.</p>
+
+<hr />
+
+<h2>4. Detection Tips</h2>
+<ul>
+  <li>Look for repeated login requests from the same IP within short time windows.</li>
+  <li>Monitor logs for POST requests to login endpoints with unusual frequency.</li>
+  <li>Set up alerting for brute-force patterns (e.g., multiple failed logins).</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Strategies</h2>
+<ul>
+  <li>Implement server-side rate limiting per IP or account.</li>
+  <li>Introduce exponential backoff or delays on failed login attempts.</li>
+  <li>Use CAPTCHAs after a few failed attempts.</li>
+  <li>Log and monitor all login activity.</li>
+  <li>Block IPs or throttle requests exceeding defined thresholds.</li>
+</ul>
+
+<hr />
+
+<h2>6. Python Flask Example with Rate Limiting</h2>
+<pre>
+from flask import Flask, request
+from flask_limiter import Limiter
+
+app = Flask(__name__)
+limiter = Limiter(app, key_func=lambda: request.remote_addr)
+
+@app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
+def login():
+    return "Login attempted"
+
+if __name__ == '__main__':
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Lack of rate limiting exposes login endpoints to brute-force attacks.</li>
+  <li>Always enforce limits and monitor suspicious activity.</li>
+  <li>Combining rate limiting with CAPTCHA and logging significantly improves login security.</li>
+</ul>
+
+<p>Secure every entry point. 🔒</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

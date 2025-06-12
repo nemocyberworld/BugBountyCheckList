@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Password Reset Sent to Admin Email</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>⚠️ Password Reset Sent to Admin Email</h1>
+
+<p>This guide highlights the misconfiguration where password reset requests for regular users are routed to a central or administrative email, creating security and privacy concerns.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>In some misconfigured applications, password reset requests for individual accounts are routed to a generic admin email (e.g., <code>admin@example.com</code>) instead of the user’s registered email.</p>
+
+<hr />
+
+<h2>2. Exploitation Scenarios</h2>
+<ul>
+  <li>Admin receives password reset for another user and resets it maliciously.</li>
+  <li>Reset links get logged or intercepted in a shared inbox.</li>
+  <li>Breaks the principle of user autonomy and creates audit challenges.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Register or identify a non-admin user account.</li>
+  <li>Trigger a password reset and monitor where the email is delivered.</li>
+  <li>Check if email is incorrectly routed to admin or a central mailbox.</li>
+</ul>
+
+<hr />
+
+<h2>4. Secure Design Principles</h2>
+<ul>
+  <li>Always send password reset links to the authenticated user’s own email.</li>
+  <li>Avoid routing sensitive emails through admin or shared inboxes.</li>
+  <li>Log and notify users of password reset requests and completions.</li>
+  <li>Use role-based access controls to separate user and admin workflows.</li>
+</ul>
+
+<hr />
+
+<h2>5. Python Snippet (Safe Reset Dispatcher)</h2>
+<pre>
+def send_reset_email(user_email):
+    if not user_email or user_email == "admin@example.com":
+        raise ValueError("Cannot send reset to admin or null email")
+
+    token = generate_token(user_email)
+    send_email(
+        to=user_email,
+        subject="Reset Your Password",
+        body=f"Click to reset: https://example.com/reset?token={token}"
+    )
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never centralize password reset communications.</li>
+  <li>Validate user email associations strictly before sending reset links.</li>
+  <li>Separate user and admin flows and review email templates for security flaws.</li>
+</ul>
+
+<p>Respect user boundaries — isolate and protect account recovery channels. 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

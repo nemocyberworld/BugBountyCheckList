@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reusable Password Reset Token</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔁 Reusable Password Reset Token</h1>
+
+<p>This guide addresses the vulnerability of password reset tokens being valid for multiple uses or not expiring properly, potentially enabling account takeover.</p>
+
+<hr />
+
+<h2>1. What Is a Reusable Reset Token?</h2>
+<p>When users request a password reset, they receive a one-time token via email or SMS. If this token is not invalidated after use or doesn’t expire, attackers may reuse it to change the password later.</p>
+
+<hr />
+
+<h2>2. Exploitation Scenarios</h2>
+<ul>
+  <li>Attacker intercepts or accesses a reset token (e.g., via logs, browser history).</li>
+  <li>Token remains valid even after the user resets their password.</li>
+  <li>Attacker reuses token to reset password again and hijack the account.</li>
+</ul>
+
+<hr />
+
+<h2>3. Testing Tips</h2>
+<ul>
+  <li>Request a password reset token as a legitimate user.</li>
+  <li>Use the token to reset the password, then try using it again.</li>
+  <li>Check if the system rejects the reused or expired token.</li>
+</ul>
+
+<hr />
+
+<h2>4. Mitigation Strategies</h2>
+<ul>
+  <li>Invalidate the token after first use or after a short expiry window (e.g., 15 minutes).</li>
+  <li>Store reset tokens server-side with flags for usage and expiry timestamps.</li>
+  <li>Hash tokens before storing to avoid leakage via database compromise.</li>
+  <li>Delete/reset all existing tokens for that user after successful password change.</li>
+</ul>
+
+<hr />
+
+<h2>5. Flask Example – One-Time Token Use</h2>
+<pre>
+from flask import Flask, request, jsonify
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+
+app = Flask(__name__)
+app.secret_key = 'supersecret'
+s = URLSafeTimedSerializer(app.secret_key)
+used_tokens = set()
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    email = request.form.get('email')
+    token = s.dumps(email)
+    return jsonify({"token": token})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    token = request.form.get('token')
+    if token in used_tokens:
+        return jsonify({"error": "Token already used"}), 403
+
+    try:
+        email = s.loads(token, max_age=900)  # 15 minutes
+    except SignatureExpired:
+        return jsonify({"error": "Token expired"}), 403
+    except BadSignature:
+        return jsonify({"error": "Invalid token"}), 400
+
+    used_tokens.add(token)
+    return jsonify({"success": f"Password reset allowed for {email}"})
+
+if __name__ == '__main__':
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Reset tokens must be single-use and expire quickly.</li>
+  <li>Always validate token status and securely manage token lifecycle.</li>
+  <li>Implement logging and alerting for abnormal reuse patterns.</li>
+</ul>
+
+<p>Protect your users with robust reset token policies. 🔒</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

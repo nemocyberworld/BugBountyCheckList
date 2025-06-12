@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Missing Account Lockout</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Missing Account Lockout</h1>
+
+<p>This post highlights the security implications of not locking accounts after repeated failed login attempts. It covers attack methods, detection techniques, and how to implement effective protections.</p>
+
+<hr />
+
+<h2>1. What Is Account Lockout?</h2>
+<p>Account lockout is a security control that temporarily or permanently disables an account after a defined number of failed login attempts. It prevents brute-force and credential stuffing attacks.</p>
+
+<hr />
+
+<h2>2. Exploitation Scenario</h2>
+<ul>
+  <li>Attacker repeatedly guesses passwords for a specific user account.</li>
+  <li>Without lockout, the attacker can try unlimited combinations.</li>
+  <li>Vulnerable to automated brute-force tools.</li>
+</ul>
+
+<hr />
+
+<h2>3. Tools for Attack</h2>
+<pre>
+hydra -l victim@example.com -P passwords.txt http-post-form \
+"/login:email=^USER^&password=^PASS^:F=Invalid login" -t 10
+</pre>
+<p><strong>Note:</strong> Replace form fields and failure condition as needed.</p>
+
+<hr />
+
+<h2>4. Detection Techniques</h2>
+<ul>
+  <li>Monitor login attempts per account and IP address.</li>
+  <li>Detect patterns of repeated failures in short timeframes.</li>
+  <li>Alert on accounts with more than X failed logins in Y minutes.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation and Implementation</h2>
+<ul>
+  <li>Implement account lockout after N consecutive failed attempts (e.g., 5 attempts).</li>
+  <li>Use progressive delays or exponential backoff before lockout.</li>
+  <li>Notify the user on lockout and require additional verification to unlock.</li>
+  <li>Allow admins to review or unlock accounts manually if needed.</li>
+</ul>
+
+<hr />
+
+<h2>6. Flask Example with Account Lockout Logic</h2>
+<pre>
+from flask import Flask, request, jsonify
+from collections import defaultdict
+import time
+
+app = Flask(__name__)
+failed_attempts = defaultdict(lambda: {'count': 0, 'last_time': 0})
+LOCKOUT_THRESHOLD = 5
+LOCKOUT_DURATION = 300  # 5 minutes
+
+@app.route('/login', methods=['POST'])
+def login():
+    user = request.form.get('username')
+    now = time.time()
+    record = failed_attempts[user]
+
+    if record['count'] >= LOCKOUT_THRESHOLD and (now - record['last_time']) < LOCKOUT_DURATION:
+        return jsonify({"error": "Account locked. Try again later."}), 403
+
+    password = request.form.get('password')
+    if password != 'correct-password':
+        record['count'] += 1
+        record['last_time'] = now
+        return jsonify({"error": "Invalid credentials."}), 401
+
+    record['count'] = 0  # Reset on success
+    return jsonify({"success": "Logged in."})
+
+if __name__ == '__main__':
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Missing account lockout enables attackers to brute-force passwords endlessly.</li>
+  <li>Implement lockout mechanisms to block repeated failures and alert users.</li>
+  <li>Combine with monitoring and alerting for stronger defense.</li>
+</ul>
+
+<p>Don't let unlimited tries be your weakest link. 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

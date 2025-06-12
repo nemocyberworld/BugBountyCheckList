@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2FA Bypass Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔓 2FA Bypass Techniques</h1>
+
+<p>This guide explores methods used to bypass Two-Factor Authentication (2FA) mechanisms, tools commonly used, and defensive strategies to protect against these attacks.</p>
+
+<hr />
+
+<h2>1. Common 2FA Bypass Techniques</h2>
+<ul>
+  <li><strong>Session Hijacking:</strong> Capturing a valid session cookie after 2FA validation.</li>
+  <li><strong>Phishing with Real-time Proxy Tools:</strong> Using tools like Evilginx2 to proxy login sessions and capture 2FA tokens.</li>
+  <li><strong>2FA Code Reuse:</strong> Reusing time-based OTPs if the target reuses codes across services.</li>
+  <li><strong>Brute-forcing Backup Codes:</strong> Attempting login using guessed or leaked backup codes.</li>
+</ul>
+
+<hr />
+
+<h2>2. Tools for 2FA Bypass (Educational Use Only)</h2>
+<div class="tool">
+  <h3>Evilginx2</h3>
+  <p>A man-in-the-middle attack framework for capturing login credentials and 2FA tokens in real-time.</p>
+  <pre>sudo ./evilginx -p phishing_config.yaml</pre>
+</div>
+
+<div class="tool">
+  <h3>Muraena + Necrobrowser</h3>
+  <p>Combined phishing proxy and browser automation for post-auth session hijack.</p>
+  <pre>go run muraena.go -config config.json</pre>
+</div>
+
+<div class="tool">
+  <h3>Modlishka</h3>
+  <p>Flexible reverse proxy designed for phishing and credential/token capture.</p>
+  <pre>./modlishka -config config.json</pre>
+</div>
+
+<hr />
+
+<h2>3. Defensive Strategies</h2>
+<ul>
+  <li>Use <strong>hardware-based MFA tokens</strong> (e.g., YubiKey) instead of SMS or TOTP-based codes.</li>
+  <li>Implement <strong>device fingerprinting</strong> and anomaly detection on login sessions.</li>
+  <li>Use <strong>phishing-resistant authentication flows</strong> (e.g., WebAuthn).</li>
+  <li>Always <strong>bind 2FA tokens to the session</strong>, not just to login completion.</li>
+</ul>
+
+<hr />
+
+<h2>4. Sample Python (for Detection Logging)</h2>
+<pre>
+from flask import Flask, request
+import logging
+
+app = Flask(__name__)
+logging.basicConfig(filename='2fa_attempts.log', level=logging.INFO)
+
+@app.route('/login-2fa', methods=['POST'])
+def log_2fa():
+    user = request.form.get('username')
+    ip = request.remote_addr
+    logging.info(f"2FA Attempt by: {user} from {ip}")
+    return "Logged"
+
+if __name__ == '__main__':
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>2FA adds a critical security layer but can be bypassed if misconfigured or phished.</li>
+  <li>Attackers use reverse proxies, session hijacking, and social engineering to bypass 2FA.</li>
+  <li>Strong defense requires phishing-resistant methods and binding tokens tightly to sessions.</li>
+</ul>
+
+<p>Stay alert and build secure systems! 🧠🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>User Enumeration on Login</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>👤 User Enumeration on Login</h1>
+
+<p>This guide outlines the issue of user enumeration at the login interface, including how attackers identify valid usernames and how to defend against this information leak.</p>
+
+<hr />
+
+<h2>1. What Is User Enumeration?</h2>
+<p>User enumeration is the process of discovering valid usernames or email addresses through system behavior differences in responses. It typically happens during login or password reset processes.</p>
+
+<hr />
+
+<h2>2. Exploitation Scenarios</h2>
+<ul>
+  <li>Different error messages for invalid usernames vs. invalid passwords.</li>
+  <li>Different HTTP status codes or response times.</li>
+  <li>Use of timing attacks or enumeration via reset password forms.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Request & Response</h2>
+<pre>
+POST /login HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+
+username=nonexistent&password=test
+</pre>
+<p><strong>Response A:</strong> <code>User does not exist</code></p>
+<p><strong>Response B:</strong> <code>Invalid password</code></p>
+<p>💥 This reveals which usernames are valid!</p>
+
+<hr />
+
+<h2>4. Tools to Perform Enumeration</h2>
+<ul>
+  <li><code>Burp Suite Intruder</code> – to automate and detect user-dependent responses.</li>
+  <li><code>FFUF</code> – for fuzzing endpoints like login and reset password.</li>
+  <li><code>Hydra</code> – for brute-forcing and observing result variations.</li>
+</ul>
+
+<hr />
+
+<h2>5. Detection Tips</h2>
+<ul>
+  <li>Log and monitor for many requests to login or reset-password with varying usernames.</li>
+  <li>Use anomaly detection for accounts with login attempts but no password variation.</li>
+</ul>
+
+<hr />
+
+<h2>6. Mitigation Techniques</h2>
+<ul>
+  <li>Use generic error messages like <code>Invalid username or password</code>.</li>
+  <li>Ensure consistent response times and HTTP status codes.</li>
+  <li>Rate limit requests to login and password reset endpoints.</li>
+  <li>Implement CAPTCHA after several failed attempts.</li>
+</ul>
+
+<hr />
+
+<h2>7. Flask Login Example with Obfuscated Errors</h2>
+<pre>
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+users = {"admin": "admin123", "user1": "password1"}
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Generic response regardless of actual cause
+    if users.get(username) != password:
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    return jsonify({"success": "Logged in."})
+
+if __name__ == '__main__':
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>User enumeration can lead to account compromise by helping attackers identify valid usernames.</li>
+  <li>Consistent messaging and timing are key to preventing information leaks.</li>
+  <li>Always monitor and restrict enumeration attempts via rate limiting and logging.</li>
+</ul>
+
+<p>Don't help attackers guess who’s inside. 🎯</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

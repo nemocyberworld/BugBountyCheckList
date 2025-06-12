@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Subdomain Enumeration Notes</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📚 Subdomain Enumeration Notes</h1>
+
+<p>This guide summarizes popular subdomain enumeration tools used in reconnaissance phases. It covers passive enumeration, permutation/brute-force techniques, aggregation of results, resolving live subdomains, and subdomain takeover checks.</p>
+
+<hr />
+
+<!-- Passive Tools Section -->
+<h2>1. Passive Enumeration Tools</h2>
+
+<div class="tool">
+  <h3>Amass</h3>
+  <p>Passive enumeration using multiple data sources and APIs.</p>
+  <pre>amass enum -passive -d &lt;domain&gt; -o amass.txt</pre>
+  <button onclick="toggleScript()" aria-expanded="false" aria-controls="bashScript" style="cursor:pointer; margin-top:10px;">
+    ▶ Show Python Script to Extract All Types of Records Uniquely</button>
+  <pre id="bashScript" style="display:none; background:#f4f4f4; padding:10px; border-radius:5px; margin-top:10px; overflow-x:auto;">
+import re
+
+def extract_records(filename):
+    pattern = re.compile(r'--> ([^ ]+) -->')
+    domain_pattern = re.compile(
+        r'\b(?:[a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}\b'
+    )
+
+    records = {}
+    subdomains = set()
+
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.rstrip('\n')
+            match = pattern.search(line)
+            if match:
+                record_type = match.group(1)
+                records.setdefault(record_type, []).append(line)
+
+            domains_found = domain_pattern.findall(line)
+            for domain in domains_found:
+                subdomains.add(domain)
+
+    if not records and not subdomains:
+        print("No matching records or subdomains found.")
+        return
+
+    for record_type, lines in records.items():
+        output_file = f"{record_type}.txt"
+        with open(output_file, 'w') as f_out:
+            f_out.write("\n".join(lines) + "\n")
+        print(f"Wrote {len(lines)} lines to {output_file}")
+
+    if subdomains:
+        with open("subdomains.txt", 'w') as f_sub:
+            for sd in sorted(subdomains):
+                f_sub.write(sd + "\n")
+        print(f"Wrote {len(subdomains)} unique subdomains to subdomains.txt")
+
+if __name__ == "__main__":
+    extract_records('amass.txt')
+  </pre>
+</div>
+
+<script>
+function toggleScript() {
+  const scriptBlock = document.getElementById('bashScript');
+  const btn = event.target;
+  if (scriptBlock.style.display === 'none') {
+    scriptBlock.style.display = 'block';
+    btn.textContent = '▼ Hide Bash Script to Extract Subdomains with Progress & Timing';
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    scriptBlock.style.display = 'none';
+    btn.textContent = '▶ Show Bash Script to Extract Subdomains with Progress & Timing';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+</script>
+
+<!-- More Tool Sections (Subfinder, Assetfinder, etc.) -->
+<!-- Add each tool like this: -->
+<div class="tool">
+  <h3>Tool Name</h3>
+  <p>Short description.</p>
+  <pre>tool-command -example</pre>
+</div>
+
+<!-- Online Finders -->
+<div class="tool">
+  <h3>Online Subdomain Finder</h3>
+  <li><a href="https://opentunnel.net/subdomain-finder/">https://opentunnel.net/subdomain-finder/</a></li>
+  <li><a href="https://suip.biz/?act=subfinder">https://suip.biz/?act=subfinder</a></li>
+  <li><a href="https://www.vedbex.com/tools/subdomain_finder">https://www.vedbex.com/tools/subdomain_finder</a></li>
+</div>
+
+<hr />
+
+<!-- Aggregate Section -->
+<h2>2. Aggregate and Deduplicate Subdomains</h2>
+<pre>cat results/example.com/*.txt | sort -u &gt; results/example.com/all_subs.txt</pre>
+
+<hr />
+
+<!-- Live Resolve -->
+<h2>3. Resolve Live Subdomains</h2>
+<pre>httpx -l results/example.com/all_subs.txt -threads 50 -o results/example.com/live_subs.txt</pre>
+
+<hr />
+
+<!-- Takeover Section -->
+<h2>4. Subdomain Takeover Checks</h2>
+<pre>
+subjack -w results/example.com/live_subs.txt -t 50 -timeout 30 -ssl -v -o results/example.com/subjack.txt
+subover -l results/example.com/live_subs.txt -o results/example.com/subover.txt
+second-order -d example.com -l results/example.com/live_subs.txt -o results/example.com/second_order.txt
+</pre>
+
+<hr />
+
+<!-- Screenshot Section -->
+<h2>5. Screenshot Live Subdomains</h2>
+<pre>gowitness file -f results/example.com/live_subs.txt -P results/example.com/screenshots --threads 50</pre>
+
+<hr />
+
+<!-- Summary Section -->
+<h2>Summary</h2>
+<ul>
+  <li>Use passive tools first to gather as many subdomains as possible.</li>
+  <li>Run permutation/bruteforce tools on the initial results and wordlists.</li>
+  <li>Aggregate and deduplicate all results into one file.</li>
+  <li>Use <code>httpx</code> to filter live/active subdomains.</li>
+  <li>Check for takeover vulnerabilities with <code>subjack</code>, <code>subover</code>, and <code>second-order</code>.</li>
+  <li>Optionally, screenshot live domains for quick visual assessment.</li>
+</ul>
+
+<p>Happy hunting! 🕵️‍♂️🔍</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

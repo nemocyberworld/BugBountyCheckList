@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reset Link Doesn't Expire</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>⏳ Reset Link Doesn't Expire</h1>
+
+<p>This guide explores the security issue of password reset links remaining valid indefinitely, making them vulnerable to unauthorized use or exploitation over time.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When a reset link is generated and sent to a user, it should expire after a short time window. If it remains valid forever, attackers who obtain it later (e.g., via logs or old emails) can hijack the account.</p>
+
+<hr />
+
+<h2>2. Attack Scenarios</h2>
+<ul>
+  <li>Reset link leaked through phishing, referrer headers, or email compromise.</li>
+  <li>Attacker reuses link weeks or months later due to no expiration logic.</li>
+  <li>Account is reset without user knowledge, leading to full takeover.</li>
+</ul>
+
+<hr />
+
+<h2>3. Testing Tips</h2>
+<ul>
+  <li>Generate a reset link and attempt to use it after a few hours or days.</li>
+  <li>Check if the system enforces expiration or not.</li>
+  <li>Inspect server-side behavior and token validation logic.</li>
+</ul>
+
+<hr />
+
+<h2>4. Mitigation Techniques</h2>
+<ul>
+  <li>Use time-bound tokens with a short expiry (e.g., 10–30 minutes).</li>
+  <li>Verify expiration on the server side before allowing password changes.</li>
+  <li>Invalidate expired tokens and return clear error messages.</li>
+  <li>Log all reset link generation and usage events for auditing.</li>
+</ul>
+
+<hr />
+
+<h2>5. Flask Example with Expiring Token</h2>
+<pre>
+from flask import Flask, request, jsonify
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
+app = Flask(__name__)
+s = URLSafeTimedSerializer(app.secret_key)
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    email = request.form.get('email')
+    token = s.dumps(email)
+    return jsonify({"token": token})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    token = request.form.get('token')
+    try:
+        email = s.loads(token, max_age=600)  # 10 minutes
+    except SignatureExpired:
+        return jsonify({"error": "Token expired"}), 403
+
+    return jsonify({"success": f"Password reset allowed for {email}"})
+
+if __name__ == '__main__':
+    app.secret_key = 'supersecret'
+    app.run()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Reset links without expiration are a major security risk.</li>
+  <li>Always enforce server-side expiration validation.</li>
+  <li>Combine with rate limiting and monitoring for best protection.</li>
+</ul>
+
+<p>Reset once, expire fast! 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
