@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Session Fixation</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔒 Session Fixation</h1>
+
+<p>This guide explains the session fixation vulnerability where attackers fix a user's session ID before login, enabling them to hijack the session after authentication.</p>
+
+<hr />
+
+<h2>1. What Is Session Fixation?</h2>
+<p>Session fixation occurs when an attacker sets or predicts a valid session ID (session token) and tricks the user into authenticating with that session ID. If the server does not issue a new session ID upon login, the attacker can reuse the same session ID to hijack the authenticated session.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to victim accounts.</li>
+  <li>Data theft, privilege escalation, or transaction manipulation.</li>
+  <li>Loss of user trust and potential regulatory penalties.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Try setting a session ID manually (via cookie or URL) before login.</li>
+  <li>Log in using the fixed session ID.</li>
+  <li>Check if the session ID remains the same after authentication.</li>
+  <li>If yes, the application is vulnerable.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Regenerate a new session ID immediately after login.</li>
+  <li>Invalidate old session IDs on login and logout.</li>
+  <li>Use secure, HttpOnly, and SameSite cookie flags.</li>
+  <li>Implement short session lifetimes and inactivity timeouts.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Regenerate Session ID in Flask</h2>
+<pre>
+from flask import session
+from flask_login import login_user
+
+def login(user):
+    login_user(user)
+    session.regenerate()  # Pseudocode; use flask_session or similar to regenerate session ID
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Session fixation is a critical security flaw allowing attackers to hijack sessions.</li>
+  <li>Always regenerate session IDs after authentication to prevent fixation.</li>
+  <li>Use secure cookie attributes and monitor session activity.</li>
+</ul>
+
+<p>Keep your sessions fresh and safe! 🔐🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

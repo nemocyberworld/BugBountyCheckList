@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weak Password Policy</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Weak Password Policy</h1>
+
+<p>This guide discusses the risks and impacts of weak password policies that allow easily guessable or common passwords, putting user accounts and systems at risk.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Weak password policies permit users to set passwords that are short, simple, or commonly used (e.g., <code>123456</code>, <code>password</code>, or dictionary words). Such passwords can be cracked quickly by attackers through brute force or credential stuffing.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Easy compromise of user accounts.</li>
+  <li>Increased chances of mass account breaches using leaked credentials.</li>
+  <li>Reputational damage and regulatory non-compliance.</li>
+  <li>Potential lateral movement if users reuse passwords across services.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Attempt to register or change password with simple or common passwords.</li>
+  <li>Check if the system enforces length, complexity, or blacklists known weak passwords.</li>
+  <li>Test using password lists like <code>rockyou.txt</code> or common password lists.</li>
+</ul>
+
+<hr />
+
+<h2>4. Best Practices for Strong Password Policies</h2>
+<ul>
+  <li>Enforce minimum password length (at least 8 characters, preferably more).</li>
+  <li>Require a mix of uppercase, lowercase, digits, and special characters.</li>
+  <li>Use password blacklist checks to block common and compromised passwords.</li>
+  <li>Encourage or enforce multi-factor authentication (MFA).</li>
+  <li>Provide password strength feedback to users during registration or change.</li>
+  <li>Implement rate limiting and account lockouts to prevent brute force attacks.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Simple Password Validation in Python</h2>
+<pre>
+import re
+
+def is_strong_password(password):
+    if len(password) &lt; 8:
+        return False
+    if not re.search(r'[A-Z]', password):
+        return False
+    if not re.search(r'[a-z]', password):
+        return False
+    if not re.search(r'\d', password):
+        return False
+    if not re.search(r'[^A-Za-z0-9]', password):
+        return False
+    common_passwords = {'password', '123456', 'qwerty', 'letmein', 'admin'}
+    if password.lower() in common_passwords:
+        return False
+    return True
+
+# Example usage:
+print(is_strong_password('Password123!'))  # True
+print(is_strong_password('password'))      # False
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Weak password policies significantly increase security risks.</li>
+  <li>Implement robust complexity and blacklist checks.</li>
+  <li>Encourage MFA to add a strong second layer of defense.</li>
+  <li>Regularly educate users on creating strong, unique passwords.</li>
+</ul>
+
+<p>Strong passwords save accounts! 🔐💪</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

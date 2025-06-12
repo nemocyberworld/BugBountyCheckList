@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Session Not Invalidated After Password Change</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔒 Session Not Invalidated After Password Change</h1>
+
+<p>This guide covers the security risk when user sessions remain active after a password change, potentially allowing unauthorized access if a session is compromised.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When a user changes their password, active sessions (e.g., logged-in devices or browser sessions) may not be invalidated, allowing attackers with stolen session tokens to maintain access despite the password update.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Attackers keep access using old session tokens.</li>
+  <li>Compromised accounts remain vulnerable despite password reset.</li>
+  <li>Reduces the effectiveness of password changes as a security control.</li>
+  <li>Potential for data theft, privilege escalation, or further compromise.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Log in from multiple devices or browsers.</li>
+  <li>Change the password in one session.</li>
+  <li>Check if other sessions remain active or require re-authentication.</li>
+</ul>
+
+<hr />
+
+<h2>4. Best Practices</h2>
+<ul>
+  <li>Invalidate all active sessions immediately after password change.</li>
+  <li>Revoke or refresh authentication tokens (cookies, JWTs, etc.).</li>
+  <li>Notify users about active sessions and recent password changes.</li>
+  <li>Use short session lifetimes and require re-authentication for sensitive actions.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Flask Session Invalidation on Password Change</h2>
+<pre>
+from flask import session
+
+def change_password(user, new_password):
+    user.set_password(new_password)
+    user.save()
+    
+    # Invalidate sessions by clearing session data
+    session.clear()
+    
+    # Optionally, revoke other session tokens in DB or cache
+    revoke_user_sessions(user.id)
+    
+    return "Password changed and sessions invalidated"
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Session invalidation after password changes is critical to prevent unauthorized access.</li>
+  <li>Proper token revocation and user notification improve security and trust.</li>
+  <li>Regularly review session management policies and implement strong controls.</li>
+</ul>
+
+<p>Protect your sessions as strongly as your passwords! 🔐🔑</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

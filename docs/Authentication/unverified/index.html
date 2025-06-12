@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login Allowed with Unverified Email</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📧 Login Allowed with Unverified Email</h1>
+
+<p>This guide covers the security risk of allowing users to log in before verifying their email addresses.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Allowing login without verifying the email address can lead to unauthorized access, impersonation, and fraudulent account creation.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Attackers can create accounts with fake or stolen emails and access the application.</li>
+  <li>Potential for phishing and spam through unverified accounts.</li>
+  <li>Compromise of trust in the user base and application integrity.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Register a new account with a valid but unverified email.</li>
+  <li>Attempt to log in without clicking on the verification link.</li>
+  <li>Check if access is granted or restricted.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Require email verification before allowing login.</li>
+  <li>Send verification emails with unique, time-limited tokens.</li>
+  <li>Implement checks in the authentication flow to enforce verification status.</li>
+  <li>Provide clear user feedback on verification status.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Email Verification Check (Python)</h2>
+<pre>
+def login(user_email, password):
+    user = find_user_by_email(user_email)
+    if not user:
+        return False
+    if not user.email_verified:
+        return "Email not verified", 403
+    if verify_password(user, password):
+        return True
+    return False
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Prevent login before email verification to ensure user authenticity.</li>
+  <li>Use robust email verification mechanisms with token expiry.</li>
+  <li>Test your app for this flaw to protect users and data.</li>
+</ul>
+
+<p>Keep your user base trustworthy with verified emails! ✔️📬</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

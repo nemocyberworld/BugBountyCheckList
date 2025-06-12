@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Public Registration for Internal Application</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>⚠️ Public Registration for Internal Application</h1>
+
+<p>This guide discusses the risks and mitigation of allowing public registration on applications intended for internal use only.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Public registration on an internal application enables anyone on the internet to create accounts, potentially gaining access to sensitive internal resources and data.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to internal systems and data leaks.</li>
+  <li>Increased attack surface for phishing, malware, and insider threats.</li>
+  <li>Compliance and regulatory violations.</li>
+  <li>Potential disruption of internal workflows and trust.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Attempt to register a new account without internal network access.</li>
+  <li>Verify if registration is open publicly or restricted.</li>
+  <li>Check for any user onboarding controls such as invitations or approvals.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Restrict registration to authorized personnel only (e.g., via invite-only or corporate SSO).</li>
+  <li>Implement IP whitelisting or VPN requirements.</li>
+  <li>Use Multi-Factor Authentication (MFA) and strong access controls.</li>
+  <li>Audit user accounts regularly for unauthorized registrations.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Restricted Registration Flow</h2>
+<pre>
+def register_user(request):
+    if not request.is_internal_network():
+        return "Registration not allowed from outside network", 403
+    # Proceed with registration
+    create_user_account(request.data)
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Internal applications should not allow public registrations.</li>
+  <li>Use network and identity controls to enforce registration restrictions.</li>
+  <li>Regularly review access policies to maintain security.</li>
+</ul>
+
+<p>Keep your internal apps private and secure! 🔐🏢</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Insecure "Remember Me" Token</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Insecure "Remember Me" Token</h1>
+
+<p>This guide explains the risks and mitigation strategies related to insecure "Remember Me" tokens used for persistent user authentication.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>The "Remember Me" feature allows users to stay logged in across browser sessions by storing a token. If this token is predictable, insufficiently protected, or not properly invalidated, attackers can hijack user accounts.</p>
+
+<hr />
+
+<h2>2. Common Vulnerabilities</h2>
+<ul>
+  <li><strong>Predictable tokens:</strong> Using sequential or easily guessable tokens.</li>
+  <li><strong>Lack of token expiration:</strong> Tokens never expire or have very long lifetimes.</li>
+  <li><strong>Missing token invalidation:</strong> Tokens remain valid after logout or password changes.</li>
+  <li><strong>Stored in insecure cookies:</strong> Missing Secure, HttpOnly, or SameSite flags.</li>
+</ul>
+
+<hr />
+
+<h2>3. Attack Scenarios</h2>
+<ul>
+  <li>Stealing tokens via XSS or network interception.</li>
+  <li>Using stolen tokens to impersonate users without passwords.</li>
+  <li>Brute forcing predictable tokens to hijack accounts.</li>
+  <li>Reusing tokens after password resets or logout due to missing invalidation.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Inspect the "Remember Me" token value for randomness and length.</li>
+  <li>Check token expiration and invalidation behavior.</li>
+  <li>Verify cookie security flags (Secure, HttpOnly, SameSite).</li>
+  <li>Test logout and password change flows for token revocation.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Strategies</h2>
+<ul>
+  <li>Use cryptographically secure, random tokens.</li>
+  <li>Implement token expiration and rotation policies.</li>
+  <li>Invalidate tokens on logout and password changes.</li>
+  <li>Store tokens in cookies with Secure, HttpOnly, and SameSite flags.</li>
+  <li>Consider using refresh tokens and short-lived access tokens.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example: Generating Secure "Remember Me" Tokens (Python)</h2>
+<pre>
+import os
+import hashlib
+
+def generate_remember_me_token():
+    raw_token = os.urandom(32)
+    token_hash = hashlib.sha256(raw_token).hexdigest()
+    return token_hash
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Secure "Remember Me" tokens prevent unauthorized persistent access.</li>
+  <li>Proper token lifecycle management reduces risks of account hijacking.</li>
+  <li>Always use secure cookie settings and strong token generation methods.</li>
+</ul>
+
+<p>Keep your persistent logins safe and sound! 🔒✨</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

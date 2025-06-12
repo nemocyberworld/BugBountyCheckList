@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reset Token Leaked in Referer Header</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 Reset Token Leaked in Referer Header</h1>
+
+<p>This guide explains the security risk of password reset tokens leaking through the HTTP Referer header during navigation.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Password reset tokens are often included in URLs. When a user clicks a link or loads resources on external sites, the browser may send the full URL—including the reset token—in the <code>Referer</code> header, potentially exposing the token to third parties.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Attackers monitoring network traffic or external sites can steal reset tokens.</li>
+  <li>Unauthorized password resets leading to account takeover.</li>
+  <li>Compromise of sensitive user accounts and data.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Trigger a password reset and observe URLs containing tokens.</li>
+  <li>Navigate to external resources and check network traffic for Referer leaks.</li>
+  <li>Use browser developer tools or proxy tools (e.g., Burp Suite) to inspect Referer headers.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Use POST requests or store tokens in HTTP-only cookies instead of URL parameters.</li>
+  <li>Remove or obfuscate tokens from URLs after use.</li>
+  <li>Implement <code>Referrer-Policy</code> headers to restrict Referer information sent to other domains, e.g., <code>no-referrer</code> or <code>same-origin</code>.</li>
+  <li>Use short-lived, single-use reset tokens with immediate invalidation after use.</li>
+  <li>Educate users to avoid clicking suspicious external links during reset.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Setting Referrer-Policy Header</h2>
+<pre>
+# Example HTTP header configuration to restrict Referer
+Referrer-Policy: no-referrer
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Reset tokens in URLs can leak via Referer headers to third parties.</li>
+  <li>Implement strict referrer policies and secure token handling.</li>
+  <li>Test and monitor for such leaks to protect user accounts.</li>
+</ul>
+
+<p>Keep your password reset flows leak-proof! 🔒🚫</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

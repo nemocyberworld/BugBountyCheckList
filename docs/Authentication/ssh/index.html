@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fallback Login Method Enabled (e.g., SSH)</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔄 Fallback Login Method Enabled (e.g., SSH)</h1>
+
+<p>This guide covers the risks of fallback login methods such as SSH access enabled alongside web login, which may bypass primary authentication controls.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When fallback login methods like SSH are enabled without strict controls, attackers can bypass web authentication by directly accessing backend systems.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to internal servers and sensitive data.</li>
+  <li>Bypass of web application security mechanisms (e.g., 2FA).</li>
+  <li>Potential for lateral movement and privilege escalation.</li>
+  <li>Increased attack surface and compliance failures.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Scan for open SSH ports on target systems.</li>
+  <li>Attempt to connect using valid or default credentials.</li>
+  <li>Check if SSH access is restricted to authorized users and IPs.</li>
+  <li>Verify if SSH keys are managed securely and regularly rotated.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Disable SSH access where not required, especially on public-facing systems.</li>
+  <li>Restrict SSH access using firewall rules and IP whitelisting.</li>
+  <li>Use strong authentication methods like key-based SSH login with passphrases.</li>
+  <li>Enforce logging, monitoring, and alerting on SSH logins.</li>
+  <li>Separate admin access from regular user accounts.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Restrict SSH Access (Linux Firewall)</h2>
+<pre>
+# Allow SSH only from trusted IP
+sudo ufw allow from 192.168.1.100 to any port 22
+sudo ufw deny 22
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Fallback login methods like SSH can undermine application security if not tightly controlled.</li>
+  <li>Audit and restrict all alternative login paths rigorously.</li>
+  <li>Implement layered security controls to minimize risks.</li>
+</ul>
+
+<p>Don’t let fallback doors open your system! 🚪🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OAuth Login Without Reauthentication</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔑 OAuth Login Without Reauthentication</h1>
+
+<p>This guide explains the security concerns when OAuth login flows skip reauthentication for sensitive actions, potentially allowing unauthorized access.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>OAuth login without reauthentication means that once a user is logged in via OAuth (e.g., Google, Facebook), the application does not require the user to reauthenticate before performing sensitive operations. This can lead to unauthorized actions if the session is hijacked or left unattended.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Attackers can exploit active OAuth sessions to perform sensitive tasks.</li>
+  <li>Lack of reauthentication weakens security controls on critical operations.</li>
+  <li>Potential for unauthorized data access or changes without explicit user consent.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Log in using OAuth provider.</li>
+  <li>Attempt sensitive actions without reentering credentials or 2FA.</li>
+  <li>Verify if the application requests reauthentication or confirmation.</li>
+</ul>
+
+<hr />
+
+<h2>4. Best Practices</h2>
+<ul>
+  <li>Require reauthentication or secondary verification for sensitive operations.</li>
+  <li>Implement session timeouts and step-up authentication flows.</li>
+  <li>Use OAuth tokens with appropriate scopes and expiration.</li>
+  <li>Inform users about session status and critical action confirmations.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Step-up Authentication Flow</h2>
+<pre>
+def perform_sensitive_action(user):
+    if not user.is_recently_authenticated():
+        # Force reauthentication, e.g., OAuth token refresh or password prompt
+        return redirect('/reauthenticate')
+    # Proceed with sensitive action
+    process_action()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>OAuth login convenience should not bypass security for sensitive actions.</li>
+  <li>Reauthentication reduces risk of unauthorized access during active sessions.</li>
+  <li>Implement session management and user prompts to enhance security.</li>
+</ul>
+
+<p>Balance convenience and security with smart reauthentication! 🔐⚖️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

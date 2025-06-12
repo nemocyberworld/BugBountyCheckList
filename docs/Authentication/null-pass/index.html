@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bypassing Login with Null/Empty Password</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🚪 Bypassing Login with Null/Empty Password</h1>
+
+<p>This guide explains the security flaw where login systems accept null or empty passwords, allowing unauthorized access.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Some login implementations incorrectly allow authentication if the password field is left empty or null, bypassing proper verification.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized user access without valid credentials.</li>
+  <li>Complete account compromise, including privileged accounts.</li>
+  <li>Potential for automated mass exploitation.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Attempt login with valid usernames and empty password fields.</li>
+  <li>Test null, empty strings, whitespace, or unusual encodings.</li>
+  <li>Observe if access is granted or error messages reveal flawed handling.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Always validate inputs and reject empty or null passwords before authentication.</li>
+  <li>Enforce strong password policies and input sanitation.</li>
+  <li>Use secure authentication libraries that correctly handle empty inputs.</li>
+  <li>Implement logging and monitoring for suspicious login attempts.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Secure Password Check (Python)</h2>
+<pre>
+def authenticate(username, password):
+    if not password:
+        return False  # Reject empty/null passwords
+    user = find_user(username)
+    if user and verify_password(user, password):
+        return True
+    return False
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Empty or null password acceptance is a critical vulnerability.</li>
+  <li>Always sanitize and validate authentication inputs strictly.</li>
+  <li>Test your login flows rigorously against such bypass attempts.</li>
+</ul>
+
+<p>Don’t leave your doors open with empty passwords! 🔐🚫</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

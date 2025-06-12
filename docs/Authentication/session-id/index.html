@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Session ID Exposed in URL</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔑 Session ID Exposed in URL</h1>
+
+<p>This guide explains the security risk of exposing session IDs in URLs and best practices to mitigate this vulnerability.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When session identifiers (session IDs) are included in URLs (query parameters or path segments), they can be exposed unintentionally through browser history, referer headers, logs, or shared links.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Attackers may steal session IDs from browser history, network logs, or referer headers.</li>
+  <li>Session hijacking leading to unauthorized account access.</li>
+  <li>Increased attack surface and easier exploitation of session fixation attacks.</li>
+  <li>Compromised user privacy and data integrity.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Check URLs for session ID parameters (e.g., <code>sessionid=</code>, <code>PHPSESSID=</code>, <code>JSESSIONID=</code>).</li>
+  <li>Observe application behavior during login or session initiation.</li>
+  <li>Use browser developer tools or proxy tools to inspect URLs and headers.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Use cookies to store session identifiers instead of URLs.</li>
+  <li>Set cookies with <code>HttpOnly</code> and <code>Secure</code> flags to reduce theft risk.</li>
+  <li>Avoid embedding session tokens in URLs or form parameters.</li>
+  <li>Implement proper session management and regeneration after login.</li>
+  <li>Use short session lifetimes and invalidate sessions on logout.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Setting Secure Cookie Flags (HTTP header)</h2>
+<pre>
+Set-Cookie: sessionid=abc123; HttpOnly; Secure; SameSite=Strict
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never expose session IDs in URLs to prevent easy interception.</li>
+  <li>Store session tokens securely in cookies with appropriate flags.</li>
+  <li>Regularly review session management practices to ensure security.</li>
+</ul>
+
+<p>Protect sessions to keep your users safe! 🔒🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

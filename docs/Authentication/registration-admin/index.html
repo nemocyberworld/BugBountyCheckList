@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Open Registration to Admin Role</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>⚠️ Open Registration to Admin Role</h1>
+
+<p>This guide highlights the severe security risk when user registration allows assigning the <code>admin</code> role without proper controls.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Open registration to the admin role means anyone can create an account and gain administrative privileges immediately or with minimal restrictions, compromising the entire system.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Full system compromise by unauthorized users.</li>
+  <li>Data theft, deletion, or modification.</li>
+  <li>Loss of user trust and potential legal consequences.</li>
+  <li>Difficulty in detecting malicious admin accounts.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Attempt to register an account and assign the admin role.</li>
+  <li>Check for form fields, API requests, or parameters controlling role assignment.</li>
+  <li>Verify if admin privileges are granted without additional approval.</li>
+</ul>
+
+<hr />
+
+<h2>4. Prevention Strategies</h2>
+<ul>
+  <li>Disable role selection during open registration.</li>
+  <li>Assign default user role on registration.</li>
+  <li>Implement strict admin onboarding processes with manual approval.</li>
+  <li>Audit role assignments regularly.</li>
+  <li>Use Role-Based Access Control (RBAC) with least privilege principles.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Secure Registration Flow</h2>
+<pre>
+def register_user(form_data):
+    # Always assign default user role
+    user = User(username=form_data['username'], role='user')
+    save_user(user)
+    # Admin role requires manual upgrade
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never allow open registration to admin or privileged roles.</li>
+  <li>Ensure roles are assigned securely with proper validation.</li>
+  <li>Protect your system by enforcing strict access controls.</li>
+</ul>
+
+<p>Keep your admin roles guarded and your system secure! 🔐🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

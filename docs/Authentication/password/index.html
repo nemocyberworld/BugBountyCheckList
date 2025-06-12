@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Predictable Password Reset Tokens</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔑 Predictable Password Reset Tokens</h1>
+
+<p>This guide explains the security risks of predictable password reset tokens and how to generate secure tokens to protect user accounts.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Predictable password reset tokens are tokens generated in a way that attackers can guess or predict, allowing them to reset users' passwords without authorization.</p>
+
+<hr />
+
+<h2>2. Risks and Impacts</h2>
+<ul>
+  <li>Account takeover by unauthorized attackers.</li>
+  <li>Loss of user data confidentiality and integrity.</li>
+  <li>Damage to service reputation and potential legal liabilities.</li>
+</ul>
+
+<hr />
+
+<h2>3. How to Test</h2>
+<ul>
+  <li>Analyze the token format and entropy.</li>
+  <li>Attempt to predict tokens by analyzing multiple reset requests.</li>
+  <li>Check if tokens are sequential, incremental, or otherwise guessable.</li>
+</ul>
+
+<hr />
+
+<h2>4. Best Practices</h2>
+<ul>
+  <li>Generate tokens using cryptographically secure random generators.</li>
+  <li>Use sufficiently long tokens with high entropy (e.g., 128 bits or more).</li>
+  <li>Set token expiration time and invalidate after use.</li>
+  <li>Store tokens securely, ideally hashed in the database.</li>
+</ul>
+
+<hr />
+
+<h2>5. Example: Secure Token Generation (Python)</h2>
+<pre>
+import secrets
+
+def generate_secure_token():
+    # Generate a URL-safe secure token of 32 bytes (~256 bits)
+    return secrets.token_urlsafe(32)
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never use predictable tokens for password resets.</li>
+  <li>Secure token generation and lifecycle management prevent account hijacking.</li>
+  <li>Always implement expiration and invalidation for reset tokens.</li>
+</ul>
+
+<p>Keep your password reset tokens unpredictable and secure! 🔒✨</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
