@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>No Access Control on Sensitive Endpoints</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🚫 No Access Control on Sensitive Endpoints</h1>
+
+<p>This vulnerability occurs when backend endpoints perform sensitive actions (like user management or system configuration) without verifying the requester’s authentication or role.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When an application exposes admin or user-specific endpoints without enforcing proper access control, attackers can directly access those URLs and perform unauthorized actions such as changing roles, deleting data, or accessing confidential information.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>An admin endpoint is accessible without checking if the user is authenticated or authorized:</p>
+<pre>GET /admin/export-logs</pre>
+
+<p>If a normal user or even an unauthenticated user accesses this URL and it returns system logs:</p>
+<pre>
+HTTP/1.1 200 OK
+Content-Type: text/plain
+
+[2024-05-01 11:02:13] User logged in...
+[2024-05-01 11:05:27] Database error occurred...
+</pre>
+
+<p>— it indicates missing access control.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to admin or internal functionality.</li>
+  <li>Data breaches, user impersonation, or privilege escalation.</li>
+  <li>Loss of system integrity or service disruption.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Browse the application structure and API endpoints.</li>
+  <li>Try accessing sensitive actions (e.g., <code>/admin/*</code>, <code>/internal/*</code>, <code>/config/*</code>) as a guest or a low-privileged user.</li>
+  <li>Use tools like Burp Suite to bypass client-side restrictions.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>All sensitive endpoints must require authentication and role-based authorization.</li>
+  <li>Never rely on client-side checks or hidden links to protect endpoints.</li>
+  <li>Implement a centralized access control mechanism for consistent enforcement.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+@app.route("/admin/delete-user")
+def delete_user():
+    user_id = request.args.get("id")
+    db.delete_user(user_id)
+    return "User deleted"
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route("/admin/delete-user")
+@login_required
+def delete_user():
+    if not current_user.is_admin:
+        abort(403)
+    user_id = request.args.get("id")
+    db.delete_user(user_id)
+    return "User deleted"
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never expose backend functionality without verifying the requester’s rights.</li>
+  <li>Missing access controls can lead to unauthorized access and severe consequences.</li>
+  <li>Always enforce strict role checks on sensitive routes and use server-side validation only.</li>
+</ul>
+
+<p>Security isn’t optional — protect every sensitive route like it’s under attack. 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

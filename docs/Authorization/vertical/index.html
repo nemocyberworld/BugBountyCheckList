@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vertical Privilege Escalation</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔼 Vertical Privilege Escalation</h1>
+
+<p>Vertical privilege escalation occurs when a low-privileged user gains access to functions or data meant for higher-privileged users (e.g., admin-only features).</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When access controls are missing or weak, a regular user can perform unauthorized actions by directly accessing admin endpoints or modifying client-side data (e.g., role in cookies or API parameters).</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Suppose there’s an admin-only endpoint like:</p>
+<pre>GET /admin/dashboard</pre>
+
+<p>If a regular user directly accesses this endpoint and gains access without being authorized:</p>
+<pre>GET /admin/dashboard</pre>
+
+<p>It’s a clear vertical privilege escalation.</p>
+
+<p>Another common example: Changing role in a request payload:</p>
+<pre>
+POST /api/update-profile
+{
+  "username": "user1",
+  "role": "admin"
+}
+</pre>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to sensitive administrative functions.</li>
+  <li>Data manipulation, deletion, or configuration changes.</li>
+  <li>System compromise or exposure of critical settings.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Review endpoints and identify features only available to privileged roles (admin, manager, etc.).</li>
+  <li>Access them as a low-privileged user and observe behavior or responses.</li>
+  <li>Test role manipulation in request headers, cookies, or API payloads.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Enforce strict server-side role checks on all sensitive actions and endpoints.</li>
+  <li>Do not trust client-side input for role or privilege enforcement.</li>
+  <li>Design a centralized permission system and validate roles before executing any action.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+@app.route("/admin/users")
+def view_users():
+    if request.args.get("role") == "admin":
+        return db.get_all_users()
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route("/admin/users")
+@login_required
+def view_users():
+    if not current_user.is_admin:
+        abort(403)
+    return db.get_all_users()
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Vertical privilege escalation lets users act above their authorization level.</li>
+  <li>It’s often caused by poor or absent role validation on the server side.</li>
+  <li>Fix it with robust role checks and zero trust in client-provided data.</li>
+</ul>
+
+<p>Never trust the client to tell you who they are — always verify on the server! 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

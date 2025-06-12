@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin-only Feature Accessible by Normal Users</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔓 Admin-only Feature Accessible by Normal Users</h1>
+
+<p>This vulnerability arises when critical admin-level features or endpoints are accessible to authenticated users who are not authorized (i.e., normal users).</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Applications may incorrectly assume that being logged in is enough to grant access to high-privilege functionality. As a result, non-admin users may be able to trigger administrative actions, such as viewing system logs, modifying roles, or deleting user accounts.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Suppose there's an admin panel endpoint:</p>
+<pre>GET /admin/settings</pre>
+
+<p>A normal user accesses it and is able to view or modify critical system settings because the server doesn’t check user roles:</p>
+<pre>
+HTTP/1.1 200 OK
+{
+  "site_mode": "maintenance",
+  "debug": true
+}
+</pre>
+
+<p>Or, another endpoint:</p>
+<pre>POST /admin/update-role?user_id=123&role=admin</pre>
+
+<p>— accessible and executable by a normal user.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Privilege escalation by unauthorized users.</li>
+  <li>Complete compromise of system configuration and user management.</li>
+  <li>Potential data leakage, destruction, or loss of service.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Map out known admin functionalities and endpoints.</li>
+  <li>Access them using a non-admin or low-privileged account.</li>
+  <li>Use tools like Burp Suite to bypass frontend restrictions (e.g., hidden buttons, disabled fields).</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Perform strict role checks server-side for all admin routes and functions.</li>
+  <li>Use middleware or decorators to enforce role-based access control globally.</li>
+  <li>Log and monitor all access to admin endpoints.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+@app.route("/admin/delete-user")
+@login_required
+def delete_user():
+    user_id = request.args.get("id")
+    db.delete_user(user_id)
+    return "User deleted"
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route("/admin/delete-user")
+@login_required
+def delete_user():
+    if not current_user.is_admin:
+        abort(403)
+    user_id = request.args.get("id")
+    db.delete_user(user_id)
+    return "User deleted"
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Admin features must only be accessible to users with proper admin roles.</li>
+  <li>Client-side controls (hiding UI) are not enough — enforce server-side validation.</li>
+  <li>Access control failures can lead to full system compromise.</li>
+</ul>
+
+<p>Least privilege is the rule — enforce it consistently. 👮‍♂️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
