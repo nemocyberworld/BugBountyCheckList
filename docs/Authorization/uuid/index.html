@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accessing Others’ Data via UUID Guessing</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧩 Accessing Others’ Data via UUID Guessing</h1>
+
+<p>Using UUIDs for object references in URLs or APIs may seem secure, but if not implemented carefully, attackers can guess or enumerate them to access unauthorized resources.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Applications sometimes expose UUIDs (Universally Unique Identifiers) in URLs or API endpoints. If these UUIDs are predictable, not truly random, or insufficiently protected by access controls, an attacker can enumerate or guess them to access other users' data.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Assume the following endpoint is used to fetch user invoices:</p>
+<pre>GET /invoices/9b7c2df0-3e8a-11ee-be56-0242ac120002</pre>
+
+<p>If the UUIDs are sequential or weakly generated (e.g., using UUIDv1 or predictable UUIDv4 patterns), an attacker could brute-force or iterate through values like:</p>
+<pre>
+GET /invoices/9b7c2df0-3e8a-11ee-be56-0242ac120003  
+GET /invoices/9b7c2df0-3e8a-11ee-be56-0242ac120004
+</pre>
+
+<p>If proper authorization checks are not in place, this reveals other users' private invoices.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to sensitive business or personal information.</li>
+  <li>Violation of privacy policies and data protection regulations.</li>
+  <li>Potential for full account compromise or financial data leakage.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Identify API endpoints or URLs that use UUIDs as object references.</li>
+  <li>Change UUIDs systematically or randomly to test for unauthorized access.</li>
+  <li>Use scripts to automate brute-force attempts with common UUIDv1/v4 patterns.</li>
+  <li>Observe if the server returns data from other accounts.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Enforce strict authorization checks on every resource access, regardless of identifier format.</li>
+  <li>Do not rely solely on UUIDs for security — they are not secrets.</li>
+  <li>Use access tokens or internal references hidden from users if necessary.</li>
+  <li>Prefer UUIDv4 (random-based) over UUIDv1 (timestamp/MAC-based).</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure (No Auth Check):</strong></p>
+<pre>
+@app.route("/invoice/&lt;uuid:invoice_id&gt;")
+def get_invoice(invoice_id):
+    return db.get_invoice(invoice_id)  # Anyone can access if they guess
+</pre>
+
+<p><strong>✅ Secure (Auth Check):</strong></p>
+<pre>
+@app.route("/invoice/&lt;uuid:invoice_id&gt;")
+@login_required
+def get_invoice(invoice_id):
+    invoice = db.get_invoice(invoice_id)
+    if invoice.user_id != current_user.id:
+        abort(403)  # Forbidden
+    return invoice
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>UUIDs are not a replacement for proper access control.</li>
+  <li>Even long identifiers can be guessed or brute-forced if exposed carelessly.</li>
+  <li>Always validate object ownership on the backend before returning sensitive data.</li>
+</ul>
+
+<p>Security is not in the obscurity of identifiers — always verify, never trust! 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

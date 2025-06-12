@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IDOR (Insecure Direct Object Reference)</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔓 IDOR (Insecure Direct Object Reference)</h1>
+
+<p>IDOR is a common web vulnerability that allows attackers to access unauthorized resources by manipulating direct object references (such as user IDs, file names, or record numbers) in requests.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>IDOR occurs when an application exposes a reference to an internal object (e.g., database record) and fails to validate whether the current user is authorized to access it. Attackers can exploit this by modifying identifiers in the request.</p>
+
+<hr />
+
+<h2>2. Realistic Example</h2>
+<p>Suppose a user views their profile at:</p>
+<pre>GET /user/profile?user_id=102</pre>
+
+<p>Changing the ID parameter to:</p>
+<pre>GET /user/profile?user_id=101</pre>
+
+<p>may return another user's profile if access control is missing.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to sensitive data (e.g., PII, payment details, internal records).</li>
+  <li>Privilege escalation or impersonation of other users.</li>
+  <li>Regulatory non-compliance (e.g., GDPR, HIPAA).</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Identify endpoints with parameters referencing objects (e.g., <code>id=</code>, <code>order_id=</code>, <code>filename=</code>).</li>
+  <li>Change values to those belonging to other users and observe if data is exposed.</li>
+  <li>Use Burp Suite or other intercepting proxy tools to automate testing.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Strategies</h2>
+<ul>
+  <li>Implement proper access control checks on the server side for every resource.</li>
+  <li>Use indirect references (e.g., UUIDs or hashes) instead of predictable numeric IDs.</li>
+  <li>Never trust user input for authorization decisions.</li>
+  <li>Log and monitor abnormal access patterns.</li>
+</ul>
+
+<hr />
+
+<h2>6. Bonus: Python Flask Code with and without IDOR Protection</h2>
+
+<p><strong>❌ Vulnerable:</strong></p>
+<pre>
+@app.route("/user/profile")
+def profile():
+    user_id = request.args.get("user_id")
+    return db.get_user(user_id)  # No auth check!
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route("/user/profile")
+@login_required
+def profile():
+    current_user_id = session["user_id"]
+    return db.get_user(current_user_id)  # Uses session, not URL param
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>IDOR flaws occur when object references are exposed without proper authorization.</li>
+  <li>Always enforce access control server-side based on user identity.</li>
+  <li>Test for IDOR by manipulating identifiers in URLs, forms, or APIs.</li>
+</ul>
+
+<p>Validate every request — protect every object! 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

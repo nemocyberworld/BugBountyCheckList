@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Horizontal Privilege Escalation</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧍 Horizontal Privilege Escalation</h1>
+
+<p>Horizontal privilege escalation occurs when a user accesses resources or functions of another user with the same privilege level by manipulating requests or identifiers.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>This vulnerability allows a regular user to perform actions or view data of another regular user, such as accessing their profile, messages, or orders. The application fails to enforce proper authorization at the object level.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+<p>Assume a logged-in user is accessing their profile via:</p>
+<pre>GET /user/profile?id=325</pre>
+
+<p>If the user changes the ID to another value like:</p>
+<pre>GET /user/profile?id=326</pre>
+
+<p>and successfully views another user's profile, the application is vulnerable to horizontal privilege escalation.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Exposure of other users’ sensitive data.</li>
+  <li>Ability to perform unauthorized actions on behalf of other users.</li>
+  <li>Reputation damage and potential legal liabilities due to privacy violations.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Identify endpoints using user IDs, email addresses, or usernames in requests.</li>
+  <li>Attempt to change these identifiers and see if the server returns or performs actions for other users.</li>
+  <li>Use tools like Burp Suite to intercept and manipulate requests during authenticated sessions.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Always validate user authorization server-side based on the authenticated session.</li>
+  <li>Use session-based identifiers rather than user-controlled input to fetch sensitive data.</li>
+  <li>Never rely on hidden fields or client-side enforcement for security.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+@app.route("/user/profile")
+def profile():
+    user_id = request.args.get("id")
+    return db.get_user(user_id)  # No session-based check!
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route("/user/profile")
+@login_required
+def profile():
+    user_id = session["user_id"]
+    return db.get_user(user_id)  # Fetches only logged-in user's data
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Horizontal privilege escalation lets users act as or access data from other same-level users.</li>
+  <li>This happens due to missing or improper authorization checks.</li>
+  <li>Fix it by tightly coupling data access with session identity and server-side validation.</li>
+</ul>
+
+<p>Same role ≠ same access. Always enforce strict user boundaries! 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
