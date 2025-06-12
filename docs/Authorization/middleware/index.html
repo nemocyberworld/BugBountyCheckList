@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Misconfigured Middleware (e.g., No Auth Check)</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧱 Misconfigured Middleware (e.g., No Auth Check)</h1>
+
+<p>This vulnerability occurs when a route or endpoint is not protected by the proper middleware—such as authentication or authorization layers. It’s a common misconfiguration that leads to unauthorized access to protected resources or actions.</p>
+
+<hr />
+
+<h2>1. What Is Middleware?</h2>
+<p>Middleware is code that runs before your main route logic and can perform tasks like verifying sessions, checking permissions, or parsing requests. If you forget to apply the right middleware, users may skip security checks.</p>
+
+<hr />
+
+<h2>2. Example of Misconfiguration</h2>
+
+<p><strong>Expected setup:</strong></p>
+<pre>
+// Secure route
+app.get("/admin/dashboard", authMiddleware, isAdmin, (req, res) => {
+  res.send("Admin dashboard");
+});
+</pre>
+
+<p><strong>Misconfigured (missing auth):</strong></p>
+<pre>
+// 🚨 No middleware here!
+app.get("/admin/dashboard", (req, res) => {
+  res.send("Admin dashboard");
+});
+</pre>
+
+<p>Anyone—even unauthenticated users—can now access the admin dashboard just by visiting the URL.</p>
+
+<hr />
+
+<h2>3. Real-World Risks</h2>
+<ul>
+  <li>Unauthenticated access to sensitive areas (admin panels, settings).</li>
+  <li>Bypassing role-based restrictions.</li>
+  <li>Abuse of functionality (creating users, deleting data, etc.).</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Try accessing sensitive endpoints without logging in.</li>
+  <li>Use tools like Burp Suite or curl to skip token/session headers.</li>
+  <li>Check source code (if available) to see if middleware is properly applied.</li>
+  <li>Compare routes protected by middleware with those that are not.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Prevent</h2>
+<ul>
+  <li>Apply authentication and role middleware consistently on all protected routes.</li>
+  <li>Use global route guards where possible.</li>
+  <li>Log all unauthenticated access attempts to sensitive endpoints.</li>
+  <li>Write automated tests to ensure protected routes cannot be accessed anonymously.</li>
+</ul>
+
+<hr />
+
+<h2>6. Secure Pattern</h2>
+
+<p><strong>✅ Good:</strong></p>
+<pre>
+app.use("/admin", authMiddleware, isAdmin);
+app.get("/admin/dashboard", (req, res) => {
+  res.send("Admin dashboard");
+});
+</pre>
+
+<p><strong>❌ Bad:</strong></p>
+<pre>
+app.get("/admin/dashboard", (req, res) => {
+  res.send("Admin dashboard"); // No auth or role checks!
+});
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Always apply authentication and authorization middleware to every protected route.</li>
+  <li>Review route definitions and verify security layers are not skipped.</li>
+  <li>Automate route protection tests where possible.</li>
+</ul>
+
+<p>Middleware is the gatekeeper—don’t forget to lock the gate. 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

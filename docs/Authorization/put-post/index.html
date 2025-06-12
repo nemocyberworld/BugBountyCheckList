@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Changing Roles via PUT/POST Body</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🛂 Changing Roles via PUT/POST Body</h1>
+
+<p>This vulnerability occurs when users are able to change their own or others’ roles (e.g., from <code>user</code> to <code>admin</code>) by modifying the body of an HTTP request sent to the server.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>When backend logic fails to validate or restrict which fields users are allowed to modify, attackers can directly include unauthorized fields (like <code>role</code>) in PUT or POST requests to escalate privileges.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Attacker sends the following request to update their profile:</p>
+<pre>
+PUT /api/users/me
+Content-Type: application/json
+
+{
+  "name": "attacker",
+  "email": "evil@user.com",
+  "role": "admin"
+}
+</pre>
+
+<p>If the server blindly accepts the data and updates the user model, the attacker becomes an admin.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Privilege escalation to admin or higher roles.</li>
+  <li>Unauthorized access to admin-only functionality.</li>
+  <li>Compromise of data, system settings, and other user accounts.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Intercept PUT/POST requests with Burp Suite.</li>
+  <li>Inject role-related fields like <code>"role": "admin"</code> or <code>"is_admin": true</code>.</li>
+  <li>Observe server response and resulting user privileges.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Implement allowlist-based field validation on the server.</li>
+  <li>Ignore or reject any request fields not explicitly permitted for modification.</li>
+  <li>Enforce role changes only via protected admin interfaces, not user-editable endpoints.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    data = request.json
+    user.update(data)  # 🚨 Unfiltered update!
+    db.session.commit()
+    return jsonify({"message": "Updated"})
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    data = request.json
+    allowed_fields = ["name", "email", "bio"]
+    for key in list(data.keys()):
+        if key not in allowed_fields:
+            del data[key]
+    user.update(data)
+    db.session.commit()
+    return jsonify({"message": "Updated"})
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never trust user input for access control fields like <code>role</code>.</li>
+  <li>Only permit explicitly allowed fields in update endpoints.</li>
+  <li>Changes to roles or permissions should only be done by admins through secure paths.</li>
+</ul>
+
+<p>Just because it's in the request body doesn't mean it should be trusted. 🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

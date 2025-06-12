@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JWT with Upgradable Role Claims</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔐 JWT with Upgradable Role Claims</h1>
+
+<p>This issue occurs when a JSON Web Token (JWT) includes a user’s role (e.g., <code>"role": "user"</code>) in the payload, and the token is either unsigned, weakly signed, or decoded/modified client-side without revalidation—allowing role escalation.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>If role claims are stored in a JWT and the server does not properly validate the token’s signature or re-check roles server-side, an attacker can tamper with the token to elevate their role (e.g., from <code>user</code> to <code>admin</code>).</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Legitimate JWT payload:</p>
+<pre>
+{
+  "user_id": "123",
+  "role": "user",
+  "iat": 1718200000
+}
+</pre>
+
+<p>Attacker modifies and re-signs (or uses none algorithm):</p>
+<pre>
+{
+  "user_id": "123",
+  "role": "admin",
+  "iat": 1718200000
+}
+</pre>
+
+<p>If the server trusts the tampered token or ignores signature validation, the attacker gains unauthorized privileges.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Privilege escalation to admin-level functionality.</li>
+  <li>Bypass of access control and user restrictions.</li>
+  <li>Complete compromise of application data and admin panels.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Decode JWT using tools like <a href="https://jwt.io">jwt.io</a>.</li>
+  <li>Modify the <code>role</code> claim from <code>user</code> to <code>admin</code>.</li>
+  <li>Re-sign token (try <code>alg: none</code> or weak HMAC if key is known).</li>
+  <li>Use tampered token and observe if role changes on the app.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Never trust claims in a JWT without verifying the signature.</li>
+  <li>Use strong secret keys for signing (256-bit+ HMAC or RSA).</li>
+  <li>Never allow <code>alg: none</code>; disable it explicitly.</li>
+  <li>Do not make access decisions solely based on JWT claims—always verify them against the database when necessary.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure (no signature check):</strong></p>
+<pre>
+const payload = jwt.decode(token); // ⚠️ No verification!
+if (payload.role === 'admin') {
+  grantAccess();
+}
+</pre>
+
+<p><strong>✅ Secure (verifies signature and re-checks role):</strong></p>
+<pre>
+const payload = jwt.verify(token, SECRET);
+const user = db.users.findById(payload.user_id);
+if (user.role === 'admin') {
+  grantAccess();
+}
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>JWTs should be treated as untrusted input until verified.</li>
+  <li>Do not store critical role/permission logic in tamperable tokens.</li>
+  <li>Access control must always be server-enforced and validated in real time.</li>
+</ul>
+
+<p>Never trust the token—always verify it. 🔍</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Misconfigured Feature Toggles</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🎛️ Misconfigured Feature Toggles</h1>
+
+<p>Feature toggles (feature flags) are often used to enable or disable certain functionality in production. However, when these are improperly configured, attackers may gain access to incomplete, untested, or restricted features.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>If feature toggles are client-side controlled or lack access restrictions, users can enable hidden or experimental features by manipulating requests, cookies, headers, or parameters — even if the UI doesn’t expose them.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Consider a beta dashboard feature:</p>
+<pre>GET /dashboard?beta=true</pre>
+
+<p>Although this was intended for internal testers, any user appending <code>?beta=true</code> gains access. Worse, some toggles might be stored in localStorage or cookies:</p>
+<pre>
+localStorage.setItem("enableNewCheckout", "true");
+</pre>
+
+<p>This could activate unfinished or insecure functionality for unauthorized users.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Exposure of sensitive or incomplete features.</li>
+  <li>Bypassing intended access or release controls.</li>
+  <li>Security issues due to untested or non-hardened code paths.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Analyze JavaScript files and localStorage/cookies for toggle flags.</li>
+  <li>Try adding URL parameters like <code>?debug=true</code>, <code>?admin=true</code>, <code>?beta=1</code>.</li>
+  <li>Monitor server responses for hidden features or changed behavior.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Enforce all feature toggles on the server-side.</li>
+  <li>Avoid client-controlled toggles for sensitive or role-restricted features.</li>
+  <li>Integrate toggles with proper authentication and authorization checks.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure (Client-Side Control):</strong></p>
+<pre>
+// client.js
+if (localStorage.getItem("newFeature") === "true") {
+  enableNewFeatureUI();
+}
+</pre>
+
+<p><strong>✅ Secure (Server-Side Control):</strong></p>
+<pre>
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    if current_user.beta_access:
+        return render_template("dashboard_beta.html")
+    return render_template("dashboard.html")
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Misconfigured feature toggles can leak or expose features unintentionally.</li>
+  <li>Never trust client-controlled toggles for access decisions.</li>
+  <li>Always validate toggles and roles on the backend securely.</li>
+</ul>
+
+<p>Control features like you control access — precisely and securely. 🧪🚧</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

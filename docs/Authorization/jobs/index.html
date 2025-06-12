@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Authorization Missing in Async Jobs</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🌀 Authorization Missing in Async Jobs</h1>
+
+<p>Background or asynchronous jobs (like workers, queues, or cron tasks) often run with elevated privileges. If these jobs act on behalf of a user but fail to verify that user’s permissions, it opens a path for privilege escalation or unauthorized actions.</p>
+
+<hr />
+
+<h2>1. What’s the Problem?</h2>
+<p>Asynchronous jobs sometimes skip proper checks because they run server-side, out of user view. If user context or authorization validation is not passed and verified inside the job, it may execute unauthorized actions.</p>
+
+<hr />
+
+<h2>2. Real-World Scenario</h2>
+
+<p><strong>Example:</strong> A user schedules an export job for their own team’s data. The frontend submits:</p>
+<pre>
+POST /export
+{
+  "team_id": "5",
+  "format": "csv"
+}
+</pre>
+
+<p>This job is queued in Redis or a similar system. In the worker process:</p>
+<pre>
+function exportDataJob(data) {
+  const teamData = db.query("SELECT * FROM records WHERE team_id = ?", [data.team_id]);
+  sendExportToUser(teamData, data.userEmail); // 🚨 No check if user belongs to team_id!
+}
+</pre>
+
+<p>If the attacker changes <code>team_id</code> before submission, and the async job doesn't validate it, they get unauthorized data.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Accessing records from teams or organizations the user doesn’t belong to.</li>
+  <li>Modifying or deleting resources across tenants.</li>
+  <li>Privilege escalation by injecting arbitrary job inputs.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Look at job enqueuing logic and job handler code.</li>
+  <li>Check if user context (user ID, roles, team ID) is passed and enforced.</li>
+  <li>Modify job input data and observe whether restrictions are enforced on execution.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Strategies</h2>
+<ul>
+  <li>Always validate authorization in the async job worker, not just at enqueue time.</li>
+  <li>Pass minimal necessary context—e.g., <code>user_id</code>—not editable foreign keys like <code>team_id</code>.</li>
+  <li>Double-check authorization server-side using the latest user state.</li>
+</ul>
+
+<hr />
+
+<h2>6. Secure Job Handling</h2>
+
+<p><strong>✅ Secure Pattern:</strong></p>
+<pre>
+function exportDataJob(data) {
+  const userTeams = db.getTeamsForUser(data.user_id);
+  if (!userTeams.includes(data.team_id)) {
+    throw new Error("Unauthorized export attempt");
+  }
+
+  const teamData = db.query("SELECT * FROM records WHERE team_id = ?", [data.team_id]);
+  sendExportToUser(teamData, data.userEmail);
+}
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Async workers must enforce the same authorization rules as regular routes.</li>
+  <li>Never trust client-passed parameters in job payloads without server-side validation.</li>
+  <li>Jobs should never run blindly based on unchecked input.</li>
+</ul>
+
+<p>Jobs run in the background—but attackers are watching. 🛠️👁️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

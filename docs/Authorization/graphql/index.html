@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accessing Data by Changing GraphQL ID</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧬 Accessing Data by Changing GraphQL ID</h1>
+
+<p>GraphQL APIs are structured and flexible, but if access control isn’t properly enforced on object resolvers, attackers can retrieve unauthorized data simply by modifying ID values in queries.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>GraphQL queries often include object IDs. If the server does not verify that the requester has permission to access the specified object ID, this leads to insecure direct object reference (IDOR)-like issues.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Normal user retrieves their own profile:</p>
+<pre>
+POST /graphql
+{
+  "query": "query { user(id: \"123\") { id, email, role } }"
+}
+</pre>
+
+<p>Attacker changes the ID to another user's:</p>
+<pre>
+POST /graphql
+{
+  "query": "query { user(id: \"124\") { id, email, role } }"
+}
+</pre>
+
+<p>If no access check is in place, the attacker can view other users’ private information.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Exposure of sensitive user data (emails, addresses, roles).</li>
+  <li>Enumeration of internal IDs and relationships.</li>
+  <li>Potential stepping stone to account takeover or privilege escalation.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Observe GraphQL queries and identify ID fields.</li>
+  <li>Modify IDs manually and look for unauthorized access to data.</li>
+  <li>Check for encoded IDs (e.g., base64) and decode/guess sequentially.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Enforce object-level authorization in every resolver.</li>
+  <li>Do not rely solely on obscurity (like base64 or UUIDs) for protection.</li>
+  <li>Apply centralized permission checks in GraphQL middleware or decorators.</li>
+</ul>
+
+<hr />
+
+<h2>6. Example Code: Insecure vs Secure</h2>
+
+<p><strong>❌ Insecure Resolver:</strong></p>
+<pre>
+const resolvers = {
+  Query: {
+    user: (_, { id }) => db.users.findById(id) // 🚨 No access check!
+  }
+};
+</pre>
+
+<p><strong>✅ Secure Resolver with Auth Check:</strong></p>
+<pre>
+const resolvers = {
+  Query: {
+    user: (_, { id }, context) => {
+      if (context.user.id !== id && !context.user.isAdmin) {
+        throw new Error("Unauthorized");
+      }
+      return db.users.findById(id);
+    }
+  }
+};
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>GraphQL is flexible, but flexibility without security leads to exposure.</li>
+  <li>Changing IDs in GraphQL queries is a common IDOR vector.</li>
+  <li>Always validate object-level permissions in resolvers or middleware.</li>
+</ul>
+
+<p>Don't let a single parameter unlock the whole dataset. 🔓</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

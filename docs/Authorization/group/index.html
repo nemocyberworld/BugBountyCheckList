@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tampering Group ID to Escalate Privileges</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📛 Tampering Group ID to Escalate Privileges</h1>
+
+<p>This vulnerability arises when user roles or access permissions are tied to group IDs (e.g., <code>group_id</code> or <code>team_id</code>) sent from the client, and the server fails to validate the group membership properly. Attackers can escalate their privileges by submitting different group IDs in API requests or tokens.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>If the client controls a <code>group_id</code> parameter and the backend doesn't confirm if the user truly belongs to that group, it may allow unauthorized actions such as accessing internal data or performing admin-level operations in other groups.</p>
+
+<hr />
+
+<h2>2. Real-World Example</h2>
+
+<p>Legitimate request for user’s own group:</p>
+<pre>
+POST /api/projects
+{
+  "group_id": "301",
+  "name": "Quarterly Roadmap"
+}
+</pre>
+
+<p>Attacker tampers <code>group_id</code> to target another group:</p>
+<pre>
+POST /api/projects
+{
+  "group_id": "1",   // Admin or executive group
+  "name": "Exploit Test"
+}
+</pre>
+
+<p>If the backend doesn't validate ownership or group membership, the attacker may create or access content in privileged contexts.</p>
+
+<hr />
+
+<h2>3. Risks and Impacts</h2>
+<ul>
+  <li>Horizontal or vertical privilege escalation.</li>
+  <li>Unauthorized access to sensitive internal data.</li>
+  <li>Tampering with configuration or content of other user groups or departments.</li>
+</ul>
+
+<hr />
+
+<h2>4. How to Test</h2>
+<ul>
+  <li>Intercept requests containing <code>group_id</code>, <code>team_id</code>, or similar.</li>
+  <li>Modify the ID to another known or guessed value.</li>
+  <li>Observe whether the server permits the operation or data access.</li>
+  <li>Look for object references in URLs, JSON bodies, or JWT payloads.</li>
+</ul>
+
+<hr />
+
+<h2>5. Mitigation Techniques</h2>
+<ul>
+  <li>Enforce backend-side ownership checks for any group-based action.</li>
+  <li>Do not rely on client-submitted group IDs for authorization.</li>
+  <li>Map groups server-side based on authenticated user session or token.</li>
+  <li>Log suspicious cross-group operations and alert admins.</li>
+</ul>
+
+<hr />
+
+<h2>6. Secure vs Insecure Example</h2>
+
+<p><strong>❌ Insecure:</strong></p>
+<pre>
+const groupId = req.body.group_id;
+db.groups[groupId].addProject(req.body.name); // 🚨 No membership check!
+</pre>
+
+<p><strong>✅ Secure:</strong></p>
+<pre>
+const userGroups = db.getUserGroups(req.user.id);
+if (!userGroups.includes(req.body.group_id)) {
+  return res.status(403).send("Unauthorized group access");
+}
+db.groups[req.body.group_id].addProject(req.body.name);
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Never trust user-supplied group or organization IDs.</li>
+  <li>Always confirm group ownership server-side before processing any request.</li>
+  <li>This is a form of broken access control that’s easily exploitable.</li>
+</ul>
+
+<p>Groups define boundaries—don’t let users redraw them. 🛡️</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
