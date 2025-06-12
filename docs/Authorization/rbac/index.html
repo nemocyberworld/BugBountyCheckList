@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Local File Request Bypasses Proxy RBAC</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📂 Local File Request Bypasses Proxy RBAC</h1>
+
+<p>Proxy servers often implement Role-Based Access Control (RBAC) to restrict access to sensitive resources. However, if the backend allows local file requests that bypass proxy checks, attackers can evade RBAC enforcement and access restricted files or resources.</p>
+
+<hr />
+
+<h2>1. What Is Local File Request Bypass?</h2>
+<p>It occurs when requests to local resources (e.g., files on the server) do not pass through the proxy or RBAC enforcement layer, allowing unauthorized access.</p>
+
+<hr />
+
+<h2>2. Why Is This a Problem?</h2>
+<ul>
+  <li>Attackers can access sensitive files (configuration, credentials, logs) without proper authorization.</li>
+  <li>Bypassing proxy RBAC breaks the security model relying on centralized access control.</li>
+  <li>Leads to information disclosure, data theft, or further system compromise.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Scenario</h2>
+
+<p>A web application uses a proxy to enforce RBAC for all external HTTP requests. However, it supports fetching local files by paths like <code>file:///etc/passwd</code>. If the proxy doesn't filter or inspect these, a request like:</p>
+
+<pre>
+GET /proxy?url=file:///etc/passwd HTTP/1.1
+Host: vulnerable-app.com
+</pre>
+
+<p>Could return the contents of <code>/etc/passwd</code> without any authentication or RBAC checks.</p>
+
+<hr />
+
+<h2>4. Risks and Impacts</h2>
+<ul>
+  <li>Exposure of sensitive system files and secrets.</li>
+  <li>Privilege escalation via leaked credentials.</li>
+  <li>Information disclosure aiding further attacks.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Test</h2>
+<ul>
+  <li>Try accessing local files via URLs or requests intended to go through proxy-controlled endpoints.</li>
+  <li>Check if local file scheme or internal paths are allowed without authentication.</li>
+  <li>Use tools like curl or Burp Suite to manipulate requests and verify RBAC enforcement.</li>
+</ul>
+
+<hr />
+
+<h2>6. Mitigation Strategies</h2>
+<ul>
+  <li>Ensure all requests, including local file requests, are validated and enforced by the proxy or RBAC system.</li>
+  <li>Block or sanitize requests with <code>file://</code> or other local resource schemes.</li>
+  <li>Implement strict input validation and access controls on backend services.</li>
+  <li>Monitor logs for suspicious requests attempting local file access.</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Proxy RBAC is only effective if all requests pass through and are validated.</li>
+  <li>Local file requests can bypass RBAC if not properly handled.</li>
+  <li>Always validate and restrict access to local resources on backend side.</li>
+</ul>
+
+<p>Keep your proxy’s guard up—don’t let local file requests slip through unchecked! 🔐🚫</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

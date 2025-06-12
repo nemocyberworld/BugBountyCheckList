@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Disclosure of Access Control Matrix</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🔓 Disclosure of Access Control Matrix</h1>
+
+<p>The access control matrix defines who can access which resources and perform which actions in a system. Disclosure of this matrix can expose the full set of permissions and user roles, enabling attackers to map out privileges and identify attack vectors.</p>
+
+<hr />
+
+<h2>1. What Is the Access Control Matrix?</h2>
+<p>It is a conceptual model representing permissions assigned to users or roles across all resources. It can include data like:</p>
+<ul>
+  <li>User-to-resource access rights</li>
+  <li>Role-based permissions</li>
+  <li>Allowed operations per user or role</li>
+</ul>
+
+<hr />
+
+<h2>2. Why Is Disclosure Dangerous?</h2>
+<ul>
+  <li>Attackers learn exactly which accounts have admin or elevated privileges.</li>
+  <li>It reveals sensitive structural information about the system.</li>
+  <li>Facilitates targeted attacks like privilege escalation or account takeover.</li>
+</ul>
+
+<hr />
+
+<h2>3. Common Causes</h2>
+<ul>
+  <li>Improper error messages or debug output leaking ACL details.</li>
+  <li>Exposed endpoints returning full permission matrices.</li>
+  <li>Misconfigured API responses or admin panels accessible to unauthorized users.</li>
+</ul>
+
+<hr />
+
+<h2>4. Example Scenario</h2>
+<p>An API endpoint <code>/api/permissions</code> returns a JSON object like this to an authenticated user:</p>
+
+<pre>
+{
+  "users": {
+    "alice": ["read", "write", "admin"],
+    "bob": ["read", "write"],
+    "eve": ["read"]
+  }
+}
+</pre>
+
+<p>If this endpoint is accessible by low-privilege users or publicly, attackers can map permissions and find targets with elevated rights.</p>
+
+<hr />
+
+<h2>5. Risks and Impacts</h2>
+<ul>
+  <li>Targeted social engineering or phishing on high-privilege users.</li>
+  <li>Privilege escalation by focusing attacks on admin accounts.</li>
+  <li>Reconnaissance ease leading to faster exploitation.</li>
+</ul>
+
+<hr />
+
+<h2>6. How to Test</h2>
+<ul>
+  <li>Review API responses for permission-related data leakage.</li>
+  <li>Check error messages for sensitive role or permission info.</li>
+  <li>Perform access tests to confirm permission data is restricted.</li>
+</ul>
+
+<hr />
+
+<h2>7. Mitigation Strategies</h2>
+<ul>
+  <li>Restrict access to permission data strictly to authorized admin users.</li>
+  <li>Sanitize error messages to avoid leaking ACL details.</li>
+  <li>Audit API endpoints and admin consoles for unintended data exposure.</li>
+  <li>Use role-based access control (RBAC) and principle of least privilege.</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Access control matrix disclosure aids attackers in privilege reconnaissance.</li>
+  <li>Keep permission data confidential and only accessible to trusted admins.</li>
+  <li>Test and sanitize all responses and errors to prevent leakage.</li>
+</ul>
+
+<p>Protect your access control details — it’s the map attackers want most! 🗺️🔐</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

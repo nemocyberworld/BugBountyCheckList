@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bypass Auth Using Mobile API Endpoints</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>📱 Bypass Authentication Using Mobile API Endpoints</h1>
+
+<p>Mobile applications often communicate with backend APIs using endpoints that sometimes have weaker or different authentication mechanisms than the web counterparts. Attackers can exploit these gaps to bypass authentication and gain unauthorized access.</p>
+
+<hr />
+
+<h2>1. What Is the Issue?</h2>
+<p>Some mobile API endpoints may:</p>
+<ul>
+  <li>Have insufficient or missing authentication checks.</li>
+  <li>Use tokens or API keys with weak validation.</li>
+  <li>Accept alternative authentication flows that bypass stricter web login controls.</li>
+</ul>
+
+<hr />
+
+<h2>2. Why Does This Happen?</h2>
+<ul>
+  <li>Developers prioritize web app security and overlook mobile APIs.</li>
+  <li>Mobile apps may use legacy or less secure auth mechanisms for usability.</li>
+  <li>Endpoints designed for convenience may skip certain validations.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Scenario</h2>
+
+<p>Imagine a mobile app exposes an API endpoint:</p>
+<pre>
+GET /api/mobile/user/profile?user_id=123
+Authorization: Bearer &lt;mobile_token&gt;
+</pre>
+
+<p>If the API only checks if the token is valid but <strong>does not verify if the token owner matches the <code>user_id</code> parameter</strong>, an attacker can change the <code>user_id</code> to access other users’ profiles.</p>
+
+<hr />
+
+<h2>4. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access to user data or actions.</li>
+  <li>Bypass of account lockouts or MFA enforced on web login.</li>
+  <li>Data leakage or privilege escalation.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Test</h2>
+<ul>
+  <li>Analyze mobile app traffic using tools like Burp Suite or Frida.</li>
+  <li>Identify mobile API endpoints and compare auth mechanisms with web APIs.</li>
+  <li>Attempt to manipulate tokens, user IDs, or parameters to access others’ data.</li>
+</ul>
+
+<hr />
+
+<h2>6. Mitigation Strategies</h2>
+<ul>
+  <li>Ensure consistent and strict authentication and authorization on all API endpoints.</li>
+  <li>Validate that authenticated tokens belong to the user making the request.</li>
+  <li>Use strong tokens with expiration and revocation mechanisms.</li>
+  <li>Regularly test mobile APIs for security gaps.</li>
+</ul>
+
+<hr />
+
+<h2>7. Secure API Example</h2>
+<pre>
+app.get('/api/mobile/user/profile', authenticateToken, (req, res) => {
+  if (req.user.id !== req.query.user_id) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  // Return user profile data
+});
+</pre>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Mobile APIs can expose unexpected attack surfaces.</li>
+  <li>Authorization must always verify user identity and permissions.</li>
+  <li>Do not rely on tokens alone; always check request parameters against token data.</li>
+</ul>
+
+<p>Mobile apps are convenient, but their APIs must be as secure as their web counterparts. 🔐📲</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

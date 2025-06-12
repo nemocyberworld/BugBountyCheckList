@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Access via Soft-Deleted Accounts</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🧟 Access via Soft-Deleted Accounts</h1>
+
+<p>Soft deletion is a technique where user records are flagged as deleted instead of being physically removed from the database. If not properly handled, soft-deleted accounts can still be used to log in or access data, posing a security risk.</p>
+
+<hr />
+
+<h2>1. What Is a Soft-Deleted Account?</h2>
+<p>In soft deletion, instead of deleting a user from the database, a flag (e.g., <code>deleted = true</code>) is set. This preserves data for potential restoration or auditing purposes.</p>
+
+<hr />
+
+<h2>2. Why Is This a Security Issue?</h2>
+<ul>
+  <li>Soft-deleted users may still exist in the database with active sessions or valid credentials.</li>
+  <li>Applications may fail to check the deletion status before allowing login or actions.</li>
+  <li>This allows unauthorized access by supposedly "deleted" accounts.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Scenario</h2>
+<p>A user is soft-deleted by setting <code>is_deleted = true</code>. However, the login system doesn't verify this field. The user can still authenticate and access the system:</p>
+
+<pre>
+POST /login
+{
+  "email": "user@example.com",
+  "password": "CorrectPassword123"
+}
+</pre>
+
+<p>If there's no check for <code>is_deleted</code> during login, the user gets access despite being "deleted."</p>
+
+<hr />
+
+<h2>4. Risks and Impacts</h2>
+<ul>
+  <li>Unauthorized access by deactivated or soft-deleted accounts.</li>
+  <li>Bypassing account lifecycle controls (e.g., after termination or ban).</li>
+  <li>Data leakage or misuse by accounts assumed inactive.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Test</h2>
+<ul>
+  <li>Soft-delete a test account and try logging in again.</li>
+  <li>Check if the account can access features, data, or APIs post-deletion.</li>
+  <li>Review backend logic for login and session validation for soft-deletion checks.</li>
+</ul>
+
+<hr />
+
+<h2>6. Mitigation Strategies</h2>
+<ul>
+  <li>Always validate <code>is_deleted</code> (or equivalent) in authentication and session logic.</li>
+  <li>Ensure soft-deleted accounts are excluded from authorization decisions.</li>
+  <li>Consider auto-terminating sessions on deletion.</li>
+  <li>Use physical deletion if data retention isn't required.</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Soft-deletion preserves data but must not preserve access.</li>
+  <li>Failing to check deletion flags creates backdoors into the system.</li>
+  <li>Always enforce account state during authentication and authorization.</li>
+</ul>
+
+<p>Soft-deleted shouldn’t mean half-dead access — close the door properly! 🚪🔒</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>

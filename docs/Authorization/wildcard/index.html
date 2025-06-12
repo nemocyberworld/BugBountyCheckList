@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wildcard Permissions Misused</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1, h2 { color: #2a7ae2; }
+  code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+  pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
+  ul { margin-top: 0; }
+  .tool { margin-bottom: 1.5em; }
+</style>
+</head>
+<body>
+
+<h1>🌐 Wildcard Permissions Misused</h1>
+
+<p>Wildcard permissions, such as using <code>*</code> or <code>admin.*</code>, are convenient for granting broad access quickly. However, misuse or overly permissive wildcard permissions can lead to severe security risks by unintentionally granting users more privileges than intended.</p>
+
+<hr />
+
+<h2>1. What Are Wildcard Permissions?</h2>
+<p>Wildcards allow permission patterns that match multiple resources or actions, for example:</p>
+<ul>
+  <li><code>read.*</code> – access to all read operations</li>
+  <li><code>admin.*</code> – full admin-level access</li>
+  <li><code>user.*</code> – all user-related permissions</li>
+</ul>
+
+<hr />
+
+<h2>2. Why Are Wildcards Risky?</h2>
+<ul>
+  <li>They can unintentionally grant access beyond the minimum needed.</li>
+  <li>Harder to audit and control, leading to privilege creep.</li>
+  <li>Attackers can abuse broad permissions to perform unauthorized actions.</li>
+</ul>
+
+<hr />
+
+<h2>3. Example Scenario</h2>
+<p>An application assigns the following permission to a junior staff member:</p>
+<pre>
+{
+  "permissions": ["files.read.*"]
+}
+</pre>
+<p>This unintentionally allows the user to read <em>all</em> files, including sensitive config files, because of the wildcard.</p>
+
+<p>Or an API key granted <code>api.*</code> permissions might have full API access, including write and delete, when only read access was intended.</p>
+
+<hr />
+
+<h2>4. Risks and Impacts</h2>
+<ul>
+  <li>Data leakage by reading sensitive information.</li>
+  <li>Unauthorized modification or deletion of data.</li>
+  <li>Privilege escalation within the application.</li>
+</ul>
+
+<hr />
+
+<h2>5. How to Test</h2>
+<ul>
+  <li>Review permission assignments and search for wildcards.</li>
+  <li>Check if users or roles have broader permissions than necessary.</li>
+  <li>Attempt to access resources/actions beyond the intended scope.</li>
+</ul>
+
+<hr />
+
+<h2>6. Mitigation Strategies</h2>
+<ul>
+  <li>Avoid using broad wildcards in permission definitions whenever possible.</li>
+  <li>Apply the principle of least privilege—grant only specific permissions needed.</li>
+  <li>Regularly audit permission assignments and roles for over-permission.</li>
+  <li>Use role-based access control (RBAC) with clearly defined roles.</li>
+  <li>Implement monitoring and alerting for unexpected permission use.</li>
+</ul>
+
+<hr />
+
+<h2>Summary</h2>
+<ul>
+  <li>Wildcard permissions simplify access control but can easily lead to over-permission.</li>
+  <li>Carefully design and audit permission schemes to avoid privilege escalation.</li>
+  <li>Least privilege and granular control are key to safe permission management.</li>
+</ul>
+
+<p>Use wildcards wisely — don’t let them open doors you didn’t mean to! 🔐✨</p>
+
+<div style="margin-top: 2em;">
+  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
+    &#8592; Go Back
+  </a>
+</div>
+
+</body>
+</html>
