@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WHOIS & DNS Recon for Bug Bounty</title>
+  <title>WHOIS & DNS Recon for Bug Bounty (Single Target)</title>
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+    body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 90%; margin: 2em auto; padding: 0 1em; }
     h1, h2 { color: #2a7ae2; }
     code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
     pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
@@ -42,158 +42,63 @@
 </head>
 <body>
 
-<h1>🕵️‍♂️ WHOIS & DNS Recon for Bug Bounty Hunters</h1>
+<h1>🕵️‍♂️ WHOIS & DNS Recon for Bug Bounty (Single Target)</h1>
 
-<p>Effective bug bounty reconnaissance starts with understanding your target’s online presence. WHOIS and DNS recon provide valuable insights into domain ownership, infrastructure, and attack vectors. This guide focuses on practical techniques for bug bounty hunters.</p>
-
-<hr />
-
-<h2>1. Why WHOIS & DNS Recon Matters</h2>
-<ul>
-  <li><strong>WHOIS data</strong> reveals domain registration details and contact info.</li>
-  <li><strong>DNS records</strong> expose infrastructure—servers, mail, subdomains, CDN providers.</li>
-  <li>Combining both helps find shadow IT, forgotten subdomains, and misconfigurations.</li>
-</ul>
-
-<h3>Key Record Types & Their Bug Bounty Importance</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Record Type</th>
-      <th>Importance for Bug Bounty Hunters</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td><code>WHOIS Registrant Email & Contact</code></td><td>Used for social engineering and username/email hunting.</td></tr>
-    <tr><td><code>WHOIS Registrar & Dates</code></td><td>Domain age hints at security posture and legacy issues.</td></tr>
-    <tr><td><code>Nameservers (NS)</code></td><td>DNS provider info; misconfigurations may allow takeover.</td></tr>
-    <tr><td><code>A / AAAA</code></td><td>IP addresses for scanning and identifying targets.</td></tr>
-    <tr><td><code>MX (Mail Servers)</code></td><td>Mail servers reveal phishing or interception vectors.</td></tr>
-    <tr><td><code>CNAME (Aliases)</code></td><td>Linked services that might be vulnerable or misconfigured.</td></tr>
-    <tr><td><code>TXT (SPF, DKIM, DMARC)</code></td><td>Email security; misconfigs lead to spoofing or leaks.</td></tr>
-    <tr><td><code>SOA</code></td><td>DNS zone authority info for advanced recon.</td></tr>
-  </tbody>
-</table>
+<p>This guide focuses on running <strong>WHOIS</strong> and <strong>DNS reconnaissance</strong> for a single domain target — perfect for bug bounty or penetration testing engagements.</p>
 
 <hr />
 
-<h2>2. WHOIS Recon Techniques</h2>
+<h2>1. Quick WHOIS & DNS Commands (Single Target)</h2>
+<p>Replace <code>example.com</code> with your target domain.</p>
+<pre>
+# WHOIS Lookup
+whois example.com
 
-<div class="tool">
-  <h3>Using <code>whois</code> CLI</h3>
-  <pre>whois example.com</pre>
-  <p>Shows registrar, registrant contact, dates, and nameservers.</p>
-</div>
-
-<div class="tool">
-  <h3>Online WHOIS Services</h3>
-  <ul>
-    <li><a href="https://whois.domaintools.com/" target="_blank" rel="noopener">DomainTools WHOIS Lookup</a></li>
-    <li><a href="https://www.whois.com/whois/" target="_blank" rel="noopener">Whois.com</a></li>
-  </ul>
-</div>
-
-<hr />
-
-<h2>3. DNS Recon Essentials</h2>
-<ul>
-  <li><code>A</code> — IPv4 addresses</li>
-  <li><code>AAAA</code> — IPv6 addresses</li>
-  <li><code>NS</code> — Nameservers</li>
-  <li><code>MX</code> — Mail servers</li>
-  <li><code>CNAME</code> — Aliases</li>
-  <li><code>TXT</code> — SPF, DKIM, DMARC</li>
-  <li><code>SOA</code> — Start of authority</li>
-</ul>
-
-<div class="tool">
-  <h3>Using <code>dig</code></h3>
-  <pre>dig example.com any +noall +answer
+# DNS Queries (A, MX, TXT, ANY)
+dig example.com any +noall +answer
 dig mx example.com
-dig ns example.com
-dig txt example.com</pre>
-</div>
+dig txt example.com
 
-<div class="tool">
-  <h3>Using <code>nslookup</code></h3>
-  <pre>nslookup -type=any example.com
-nslookup -type=mx example.com</pre>
-</div>
+# Nameserver Info
+dig ns example.com
+nslookup -type=ns example.com
+</pre>
 
 <hr />
 
-<h2>4. Automating WHOIS & DNS Recon</h2>
-<p>For large scopes, automate with tools like <code>amass</code>, <code>subfinder</code>, and <code>assetfinder</code>.</p>
+<h2>2. Why WHOIS & DNS Recon Matters</h2>
+<ul>
+  <li>Identify domain ownership and registration patterns.</li>
+  <li>Reveal mail servers, nameservers, and subdomains.</li>
+  <li>Detect possible misconfigurations or takeover risks.</li>
+</ul>
 
-<div class="tool">
-  <h3>Amass Example</h3>
-  <pre>amass enum -d example.com -o amass_results.txt</pre>
-</div>
-<div>
-<!-- Collapsible Python Script Toggle -->
-<button type="button" class="collapsible">🧠 View Python Script for Automation</button>
+<hr />
+
+<h2>3. Simple Automation Script (Single Target)</h2>
+<button type="button" class="collapsible">📜 View Python Script</button>
 <div class="content">
-<code>
-  #!/usr/bin/env python3
-  import os
-  import subprocess
-  import sys
-  from datetime import datetime
-  from pathlib import Path
-  from termcolor import cprint
+<pre>
+#!/usr/bin/env python3
+import os, subprocess, sys
 
-  OUTPUT_DIR = Path("recon-output")
-  OUTPUT_DIR.mkdir(exist_ok=True)
+if len(sys.argv) != 2:
+    print("Usage: python3 recon.py <domain>")
+    sys.exit(1)
 
-  def banner():
-      cprint("\n[+] WHOIS & DNS Recon Automation (BlackArch Edition)", "cyan", attrs=["bold"])
-      cprint("    by H4K2LIV3\n", "magenta")
+domain = sys.argv[1]
+commands = {
+    "WHOIS Info": f"whois {domain}",
+    "DNS ANY": f"dig {domain} any +noall +answer",
+    "DNS MX": f"dig mx {domain}",
+    "DNS TXT": f"dig txt {domain}",
+    "NSLookup ANY": f"nslookup -type=any {domain}"
+}
 
-  def run_command(command, title, output_file):
-      cprint(f"\n[&gt;] {title}", "yellow", attrs=["bold"])
-      try:
-          result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=60)
-          print(result.stdout)
-          output_file.parent.mkdir(parents=True, exist_ok=True)
-          with open(output_file, "w") as f:
-              f.write(result.stdout)
-              if result.stderr:
-                  f.write("\n[ERRORS]\n" + result.stderr)
-      except subprocess.TimeoutExpired:
-          cprint("[-] Command timed out", "red")
-      except Exception as e:
-          cprint(f"[-] Error: {str(e)}", "red")
-
-  def main(domain):
-      banner()
-      timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-      domain_dir = OUTPUT_DIR / f"{domain}_{timestamp}"
-      domain_dir.mkdir(parents=True, exist_ok=True)
-
-      tools = [
-          (f"whois {domain}", "WHOIS Info", "whois.txt"),
-          (f"amass enum -d {domain} -o -", "Amass Subdomain Enumeration", "amass.txt"),
-          (f"theharvester -d {domain} -b all", "theHarvester Emails &amp; Users", "harvester.txt"),
-          (f"dig {domain} any +noall +answer", "DIG Records (ANY)", "dig_any.txt"),
-          (f"dig mx {domain}", "DIG MX Records", "dig_mx.txt"),
-          (f"dig txt {domain}", "DIG TXT Records", "dig_txt.txt"),
-          (f"nslookup -type=any {domain}", "Nslookup ANY", "nslookup_any.txt"),
-          (f"dnsrecon -d {domain}", "DNSRecon Scan", "dnsrecon.txt"),
-          (f"PERL5OPT=-Mwarnings=NONE dnsenum {domain}", "DNSEnum Scan", "dnsenum.txt")
-      ]
-
-      for cmd, desc, fname in tools:
-          run_command(cmd, desc, domain_dir / fname)
-
-      cprint(f"\n[✓] All recon data saved in: {domain_dir}\n", "green", attrs=["bold"])
-
-  if __name__ == "__main__":
-      if len(sys.argv) != 2:
-          cprint("Usage: python3 blackarch_recon.py &lt;domain.com&gt;\n", "red", attrs=["bold"])
-          sys.exit(1)
-      main(sys.argv[1])
-  </code>
-</div>
+for title, cmd in commands.items():
+    print(f"\n[+] {title}")
+    os.system(cmd)
+</pre>
 </div>
 
 <script>
@@ -209,11 +114,41 @@ nslookup -type=mx example.com</pre>
 
 <hr />
 
-<p>Master these recon skills to enhance your bug bounty hunting success! 🔍🕵️‍♂️</p>
+<h2>4. Tools for WHOIS & DNS Recon</h2>
 
-<div style="margin-top: 2em;">
-  <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">&#8592; Go Back</a>
-</div>
+<h3>🛠 Kali Linux</h3>
+<table>
+  <thead>
+    <tr><th>Tool</th><th>Purpose</th><th>Single Target Command</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>whois</td><td>WHOIS lookup</td><td><code>whois example.com</code></td></tr>
+    <tr><td>dig</td><td>DNS queries</td><td><code>dig example.com any +noall +answer</code></td></tr>
+    <tr><td>nslookup</td><td>DNS lookup</td><td><code>nslookup example.com</code></td></tr>
+    <tr><td>dnsrecon</td><td>DNS enumeration</td><td><code>dnsrecon -d example.com</code></td></tr>
+    <tr><td>dnsenum</td><td>DNS brute-force</td><td><code>dnsenum example.com</code></td></tr>
+    <tr><td>theHarvester</td><td>Email & subdomain harvesting</td><td><code>theharvester -d example.com -b all</code></td></tr>
+    <tr><td>amass</td><td>Subdomain enumeration</td><td><code>amass enum -d example.com</code></td></tr>
+  </tbody>
+</table>
+
+<h3>🛠 BlackArch</h3>
+<table>
+  <thead>
+    <tr><th>Tool</th><th>Purpose</th><th>Single Target Command</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>fierce</td><td>DNS reconnaissance</td><td><code>fierce --domain example.com</code></td></tr>
+    <tr><td>sublist3r</td><td>Subdomain discovery</td><td><code>sublist3r -d example.com</code></td></tr>
+    <tr><td>maltego</td><td>OSINT & data correlation</td><td><em>GUI-based</em></td></tr>
+    <tr><td>recon-ng</td><td>Web reconnaissance framework</td><td><code>recon-ng</code> (then set target)</td></tr>
+    <tr><td>dnsmap</td><td>Subdomain brute-forcing</td><td><code>dnsmap example.com</code></td></tr>
+    <tr><td>dnstracer</td><td>Trace DNS delegation path</td><td><code>dnstracer example.com</code></td></tr>
+  </tbody>
+</table>
+
+<hr />
+<p>With these commands and tools, you can fully profile a target’s WHOIS & DNS footprint in minutes. Always ensure you have permission before running any recon.</p>
 
 </body>
 </html>

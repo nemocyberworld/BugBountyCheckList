@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dorks for Recon: Google, GitHub, Shodan, Censys</title>
+<title>Dorks for Recon: Google, GitHub, Shodan, Censys (Single Target)</title>
 <style>
-  body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  body { 
+    font-family: Arial, sans-serif; 
+    line-height: 1.6; 
+    max-width: 90vw;   /* Use 90% of the viewport width */
+    margin: 2em auto; 
+    padding: 0 1em; 
+  }
   h1, h2 { color: #2a7ae2; }
   code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
   pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; white-space: pre-wrap; }
@@ -21,91 +27,104 @@
     font-size: 1em;
   }
   .dork-section { margin-bottom: 2em; }
+  .note { color:#555; font-size:.95em }
 </style>
+
 </head>
 <body>
 
-<h1>🔍 Understanding Dorks for Reconnaissance</h1>
+<h1>🔍 Understanding Dorks for Reconnaissance — Single Target</h1>
 
-<p><strong>Dorks</strong> are specialized search queries designed to uncover hidden, sensitive, or valuable information from various platforms such as Google, GitHub, Shodan, and Censys. They are powerful tools used in cybersecurity, bug bounty hunting, and OSINT (Open Source Intelligence).</p>
+<p><strong>Dorks</strong> are specialized search queries to uncover hidden, sensitive, or valuable information across Google, GitHub, Shodan, and Censys. This page focuses on crafting dorks for a <strong>single target</strong> domain like <code>&lt;domain&gt;</code>.</p>
 
 <hr />
 
 <div class="dork-section">
-  <h2>1. Google Dorks</h2>
-  <p>Google dorks leverage advanced Google search operators to find sensitive data, files, login portals, and vulnerabilities indexed by Google. These dorks help identify exposed information unintentionally made public.</p>
+  <h2>1. Google Dorks (Single Target)</h2>
+  <p>Use advanced operators to find exposed files, panels, and leaks indexed for <code>&lt;domain&gt;</code>.</p>
 </div>
 
 <div class="dork-section">
-  <h2>2. GitHub Dorks</h2>
-  <p>GitHub dorks focus on searching public repositories for leaked secrets such as API keys, passwords, and configuration files. Attackers and defenders both use GitHub dorks to identify exposed sensitive information in code.</p>
+  <h2>2. GitHub Dorks (Single Target)</h2>
+  <p>Search public code for secrets, tokens, and config tied to <code>&lt;domain&gt;</code> (or orgs that own it).</p>
 </div>
 
 <div class="dork-section">
-  <h2>3. Shodan Dorks</h2>
-  <p>Shodan dorks query the Shodan search engine for internet-connected devices and services. These dorks help find exposed IoT devices, servers, databases, and vulnerable software versions based on banner data.</p>
+  <h2>3. Shodan Dorks (Single Target)</h2>
+  <p>Query Internet-exposed services/devices linked to <code>&lt;domain&gt;</code> via banners or certificates.</p>
 </div>
 
 <div class="dork-section">
-  <h2>4. Censys Dorks</h2>
-  <p>Censys dorks use the Censys search platform to discover hosts and services on the internet, including SSL certificates, open ports, and metadata. Censys dorks provide detailed technical insights useful for vulnerability research.</p>
+  <h2>4. Censys Dorks (Single Target)</h2>
+  <p>Hunt hosts/services by TLS/HTTP metadata referencing <code>&lt;domain&gt;</code>.</p>
 </div>
 
 <hr />
 
 <button onclick="toggleDorks()" aria-expanded="false" aria-controls="dorkExamples">
-  ▶ Show Sample Dork Queries
+  ▶ Show Sample Dork Queries (Single Target)
 </button>
 
 <pre id="dorkExamples" style="display:none;">
-# Google Dorks Examples:
-intitle:"index of" "admin"
-filetype:env DB_PASSWORD
-inurl:login.php
+# ───────── Google (replace <domain>)
+site:<domain> inurl:login | inurl:admin | intitle:"sign in"
+site:<domain> filetype:env | filetype:json "api_key" | "secret"
+site:<domain> ext:bak | ext:old | ext:zip | ext:sql
+site:<domain> "AWS_ACCESS_KEY_ID" | "BEGIN RSA PRIVATE KEY"
+site:pastebin.com <domain>  |  site:gist.github.com <domain>
+cache:<domain>  (check cached pages)
+inurl:/backup OR inurl:/test OR inurl:/dev site:<domain>
 
-# GitHub Dorks Examples:
-password filename:.env
-apikey language:python
-private key filename:id_rsa
+# ───────── GitHub Code Search (web UI or gh CLI)
+"<domain>" filename:.env
+"<domain>" (api_key OR "secret key" OR "Authorization: Bearer")
+org:<org> path:/ (token OR password OR "PRIVATE KEY")
+filename:config.json "<domain>"
+# gh CLI:
+gh code search -q '"<domain>" filename:.env' --limit 50
 
-# Shodan Dorks Examples:
-port:22 country:"US"
-product:"Apache" version:"2.4.1"
-has_screenshot:true
+# ───────── Shodan (CLI or web)
+ssl.cert.subject.cn:"<domain>"  OR  ssl:"<domain>"
+http.title:"<domain>"  OR  http.html:"<domain>"
+hostname:"<domain>"  port:80,443
+org:"<company>"  ssl:"<domain>"  has_screenshot:true
+# CLI:
+shodan search --fields ip_str,port,hostnames,org 'ssl:"<domain>"'
 
-# Censys Dorks Examples: "example.com"
+# ───────── Censys (Search 2.0)
+services.tls.certificates.leaf_data.subject.common_name: "<domain>"
+services.tls.certificates.leaf_data.names: "<domain>"
+services.http.response.html_title: "<domain>"
+services.dns.names: "<domain>"
+# CLI (censys):
+censys search 'services.tls.certificates.leaf_data.names: "<domain>"' --pages 1
 </pre>
 
 <hr />
 
 <h2>Summary</h2>
 <ul>
-  <li><strong>Dorks</strong> are tailored search queries targeting specific data or vulnerabilities.</li>
-  <li>Each platform has unique syntax and focus — Google for web content, GitHub for code leaks, Shodan & Censys for internet-connected devices.</li>
-  <li>Using dorks effectively can reveal hidden attack surfaces or security weaknesses.</li>
-  <li>Always use dorks ethically and with permission when performing security assessments.</li>
+  <li>Google finds indexed web content; GitHub spots code leaks; Shodan &amp; Censys map exposed services.</li>
+  <li>Anchor each query to your <code>&lt;domain&gt;</code> (and optionally the owning <code>&lt;org&gt;</code>).</li>
+  <li>Use results to seed deeper recon (directory brute-force, JS analysis, parameter fuzzing).</li>
+  <li>Operate ethically and with permission.</li>
 </ul>
 
-<p>Mastering dorks is an essential skill for any cybersecurity researcher or bug bounty hunter! 🕵️‍♀️💻</p>
+<p class="note">Tip: Pair dorks with crawlers (katana/hakrawler) and URL probers (httpx) to validate findings at scale.</p>
 
 <script>
 function toggleDorks() {
   const examples = document.getElementById('dorkExamples');
   const btn = event.target;
-  if (examples.style.display === 'none') {
-    examples.style.display = 'block';
-    btn.textContent = '▼ Hide Sample Dork Queries';
-    btn.setAttribute('aria-expanded', 'true');
-  } else {
-    examples.style.display = 'none';
-    btn.textContent = '▶ Show Sample Dork Queries';
-    btn.setAttribute('aria-expanded', 'false');
-  }
+  const hidden = examples.style.display === 'none' || examples.style.display === '';
+  examples.style.display = hidden ? 'block' : 'none';
+  btn.textContent = hidden ? '▼ Hide Sample Dork Queries (Single Target)' : '▶ Show Sample Dork Queries (Single Target)';
+  btn.setAttribute('aria-expanded', String(hidden));
 }
 </script>
 
 <h2>Try the CMP-Dorker Tool</h2>
-<p>Use the embedded CMP-Dorker tool below to experiment with powerful dork queries across multiple platforms without leaving this page.</p>
+<p>Use the embedded CMP-Dorker to experiment with your <code>&lt;domain&gt;</code> across platforms.</p>
 <iframe
   src="https://nemocyberworld.github.io/CMP-Dorker/"
   title="CMP-Dorker Tool"
@@ -117,8 +136,67 @@ function toggleDorks() {
     box-sizing: border-box;
   "
 ></iframe>
+<div style="text-align: center; margin-top: 1.5em;">
+  <a href="https://nemocyberworld.github.io/CMP-Dorker/" 
+     target="_blank" 
+     style="display: inline-block; background-color: #2a7ae2; color: white; padding: 10px 18px; 
+            border-radius: 6px; font-size: 1.1em; font-weight: bold; text-decoration: none;">
+    🔗 Open CMP-Dorker Full Tool
+  </a>
+</div>
 
+<hr />
 
+<h2>Tools in Kali Linux &amp; BlackArch for Dorking/OSINT (Single Target)</h2>
+<p class="note">Replace <code>&lt;domain&gt;</code> (and <code>&lt;org&gt;</code> when applicable). Some tools install via package manager or Python/pip.</p>
+
+<h3>Kali Linux (commonly available)</h3>
+<ul>
+  <li><strong>theHarvester</strong> — Emails/hosts from engines/APIs for one domain.<br>
+      <code>theharvester -d &lt;domain&gt; -b all -f harvester.html</code></li>
+  <li><strong>googler</strong> — Google from the terminal (craft Google dorks).<br>
+      <code>googler --np --json 'site:&lt;domain&gt; ext:sql | ext:zip | ext:env'</code></li>
+  <li><strong>shodan</strong> (CLI) — Device/service search tied to the domain/cert.<br>
+      <code>shodan search 'ssl:"&lt;domain&gt;"' --fields ip_str,port,hostnames,org</code></li>
+  <li><strong>censys</strong> (CLI) — Search hosts/services by TLS/HTTP metadata.<br>
+      <code>censys search 'services.tls.certificates.leaf_data.names:"&lt;domain&gt;"'</code></li>
+  <li><strong>github CLI (gh)</strong> — Code search for domain strings/secrets.<br>
+      <code>gh code search -q '"&lt;domain&gt;" (api_key OR token) filename:.env' --limit 100</code></li>
+  <li><strong>trufflehog</strong> — Secret detector for code dumps you pull.<br>
+      <code>trufflehog filesystem ./repos_cloned_for_&lt;domain&gt;</code></li>
+  <li><strong>gitleaks</strong> — Fast rules-based secret scan on local repos/lists.<br>
+      <code>gitleaks detect -s ./repos_cloned_for_&lt;domain&gt; -r gitleaks.json</code></li>
+  <li><strong>waybackurls</strong> — Archived URLs to pivot into dorks.<br>
+      <code>echo &lt;domain&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Aggregate URLs (Wayback/CC/URLScan) for the domain.<br>
+      <code>echo &lt;domain&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>httpx</strong> — Validate URL lists from dorks/archives (liveness/status).<br>
+      <code>httpx -l gau.txt -mc 200,301,302 -o live.txt</code></li>
+</ul>
+
+<h3>BlackArch (recon/osint categories)</h3>
+<ul>
+  <li><strong>theHarvester</strong> — One-domain OSINT aggregator (emails/hosts).<br>
+      <code>theharvester -d &lt;domain&gt; -b all -f harvester.html</code></li>
+  <li><strong>shodan</strong> (CLI) — Banner and cert search linked to domain.<br>
+      <code>shodan search 'hostname:"&lt;domain&gt;" OR ssl:"&lt;domain&gt;"'</code></li>
+  <li><strong>censys</strong> (CLI) — TLS/HTTP metadata queries for domain matches.<br>
+      <code>censys search 'services.http.response.headers: "&lt;domain&gt;"'</code></li>
+  <li><strong>github-dorkers</strong> (various) — Dork GitHub for domain strings/secrets.<br>
+      <code>gh code search -q '"&lt;domain&gt;" filename:.env OR filename:config.json'</code></li>
+  <li><strong>trufflehog</strong> — Secret scanner for cloned repos referencing domain.<br>
+      <code>trufflehog filesystem ./repos_cloned_for_&lt;domain&gt;</code></li>
+  <li><strong>gitleaks</strong> — Ruleset-based scanner for token/secret patterns.<br>
+      <code>gitleaks detect -s ./repos_cloned_for_&lt;domain&gt;</code></li>
+  <li><strong>waybackurls</strong> — Harvest URLs archived for the domain.<br>
+      <code>echo &lt;domain&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Multi-source historical URLs for the domain.<br>
+      <code>echo &lt;domain&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>httpx</strong> — Quickly verify/triage URLs from dork results.<br>
+      <code>httpx -l wayback.txt -mc 200,301,302 -o live.txt</code></li>
+</ul>
+
+<p class="note">Ethics first: Only target assets you’re authorized to test. Combine dorks with validation (httpx) and deeper probes (dirsearch/feroxbuster) for high-signal findings.</p>
 
 </body>
 </html>

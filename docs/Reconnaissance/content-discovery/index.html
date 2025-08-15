@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Content Discovery Script</title>
+<title>Content Discovery Script (Single Target)</title>
 <style>
   body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
-  h1, h2 { color: #2a7ae2; }
+  h1, h2, h3 { color: #2a7ae2; }
   code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
   pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; white-space: pre-wrap; }
   ul { margin-top: 0; }
@@ -21,110 +21,128 @@
     border-radius: 5px;
     font-size: 1em;
   }
+  .note { color:#555; font-size:.95em }
 </style>
 </head>
 <body>
 
-<h1>📚 Content Discovery Script (robots.txt & sitemap.xml)</h1>
+<h1>📚 Content Discovery Script (robots.txt &amp; sitemap.xml) — Single Target</h1>
 
-<p>This Python script helps automate content discovery on a target domain by fetching and parsing <code>robots.txt</code> and <code>sitemap.xml</code> files, checking URL statuses, and saving results. It is useful for reconnaissance in web security assessments.</p>
+<p>This Python script automates content discovery on a <strong>single target</strong> by fetching and parsing <code>robots.txt</code> and <code>sitemap.xml</code>, checking URL statuses, and saving results for recon.</p>
 
 <hr />
 
 <div class="tool">
-  <h2>Python Script: Content Discovery (robots.txt & sitemap.xml)</h2>
-  <button onclick="toggleScript()" aria-expanded="false" aria-controls="pythonScript">
+  <h2>Python Script: Content Discovery (robots.txt &amp; sitemap.xml)</h2>
+  <button onclick="toggleScript(event)" aria-expanded="false" aria-controls="pythonScript">
     ▶ Show Python Script
   </button>
   <pre id="pythonScript" style="display:none;">
 #!/usr/bin/env python3
+# Single-target content discovery for robots.txt & sitemap.xml
 
-import requests
+import requests, sys
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-from termcolor import cprint, colored
 
-def fetch_robots_txt(domain):
-    url = urljoin(domain, "/robots.txt")
-    cprint(f"\n[*] Fetching robots.txt from {url}", "cyan")
+def normalize_domain(domain: str) -> str:
+    d = domain.strip()
+    if not d.startswith(("http://", "https://")):
+        d = "https://" + d
+    return d.rstrip("/")
+
+def fetch_robots_txt(base):
+    url = urljoin(base, "/robots.txt")
+    print(f"\n[*] Fetching robots.txt from {url}")
     try:
-        response = requests.get(url, timeout=10)
-        if response.status_code != 200:
-            cprint(f"[-] robots.txt not found (status {response.status_code})", "yellow")
+        r = requests.get(url, timeout=12)
+        if r.status_code != 200:
+            print(f"[-] robots.txt not found (status {r.status_code})")
             return []
         paths = []
-        for line in response.text.splitlines():
+        for line in r.text.splitlines():
+            line = line.split("#", 1)[0].strip()
             if line.lower().startswith("disallow:"):
-                path = line.split(":")[1].strip()
-                if path:
+                _, val = line.split(":", 1)
+                path = val.strip()
+                if path and path != "/":
                     paths.append(path)
         return paths
     except Exception as e:
-        cprint(f"[-] Error fetching robots.txt: {e}", "red")
+        print(f"[-] Error fetching robots.txt: {e}")
         return []
 
-def fetch_sitemap_urls(domain):
-    url = urljoin(domain, "/sitemap.xml")
-    cprint(f"\n[*] Fetching sitemap.xml from {url}", "cyan")
-    try:
-        response = requests.get(url, timeout=10)
-        if response.status_code != 200:
-            cprint(f"[-] sitemap.xml not found (status {response.status_code})", "yellow")
-            return []
-        soup = BeautifulSoup(response.text, "xml")
-        return [loc.text.strip() for loc in soup.find_all("loc")]
-    except Exception as e:
-        cprint(f"[-] Error fetching sitemap.xml: {e}", "red")
-        return []
+def fetch_sitemap_urls(base):
+    candidates = ["/sitemap.xml", "/sitemap_index.xml"]
+    urls = set()
+    for cand in candidates:
+        url = urljoin(base, cand)
+        print(f"[*] Trying sitemap at {url}")
+        try:
+            r = requests.get(url, timeout=12)
+            if r.status_code != 200:
+                print(f"[-] Not found (status {r.status_code}) at {url}")
+                continue
+            soup = BeautifulSoup(r.text, "xml")
+            locs = [loc.text.strip() for loc in soup.find_all("loc")]
+            for loc in locs:
+                urls.add(loc)
+        except Exception as e:
+            print(f"[-] Error fetching {url}: {e}")
+    return sorted(urls)
 
-def check_url_status(full_url):
+def check_url_status(u):
     try:
-        response = requests.head(full_url, timeout=10, allow_redirects=True)
-        return response.status_code
+        r = requests.head(u, timeout=10, allow_redirects=True)
+        return r.status_code
     except Exception:
-        return "Error"
+        try:
+            r = requests.get(u, timeout=12, allow_redirects=True)
+            return r.status_code
+        except Exception:
+            return "Error"
 
 def main():
-    cprint("\n=== 🔍 Content Discovery (robots.txt & sitemap.xml) ===", "green", attrs=["bold"])
-    domain = input("\n🌐 Enter the target domain (e.g., https://example.com): ").strip()
-    if not domain.startswith("http"):
-        domain = "https://" + domain
+    print("\n=== 🔍 Content Discovery (robots.txt & sitemap.xml) — Single Target ===")
+    if len(sys.argv) > 1:
+        domain = sys.argv[1]
+    else:
+        domain = input("\n🌐 Enter the target (e.g., example.com or https://example.com): ").strip()
+    base = normalize_domain(domain)
 
-    discovered_urls = []
+    discovered = []
 
-    # Robots.txt
-    robots_paths = fetch_robots_txt(domain)
+    # robots.txt
+    robots_paths = fetch_robots_txt(base)
     if robots_paths:
-        cprint(f"\n[+] Found {len(robots_paths)} disallowed paths in robots.txt:", "green")
-        for path in robots_paths:
-            full_url = urljoin(domain, path)
-            status = check_url_status(full_url)
-            color = "green" if status == 200 else "yellow" if status == 403 else "red"
-            cprint(f"  [ {status} ] {full_url}", color)
-            discovered_urls.append((full_url, status))
+        print(f"\n[+] Found {len(robots_paths)} disallowed paths:")
+        for p in robots_paths:
+            full = urljoin(base, p)
+            status = check_url_status(full)
+            print(f"  [ {status} ] {full}")
+            discovered.append((full, status))
     else:
-        cprint("[-] No disallowed paths found in robots.txt.", "yellow")
+        print("[-] No disallowed paths in robots.txt.")
 
-    # Sitemap.xml
-    sitemap_urls = fetch_sitemap_urls(domain)
-    if sitemap_urls:
-        cprint(f"\n[+] Found {len(sitemap_urls)} URLs in sitemap.xml:", "green")
-        for url in sitemap_urls:
-            status = check_url_status(url)
-            color = "green" if status == 200 else "yellow" if status == 403 else "red"
-            cprint(f"  [ {status} ] {url}", color)
-            discovered_urls.append((url, status))
+    # sitemap(s)
+    sm_urls = fetch_sitemap_urls(base)
+    if sm_urls:
+        print(f"\n[+] Found {len(sm_urls)} URLs in sitemap(s):")
+        for u in sm_urls:
+            status = check_url_status(u)
+            print(f"  [ {status} ] {u}")
+            discovered.append((u, status))
     else:
-        cprint("[-] No URLs found in sitemap.xml.", "yellow")
+        print("[-] No URLs found in sitemap(s).")
 
-    # Save results
-    if discovered_urls:
+    # save results
+    if discovered:
         with open("discovered_content.txt", "w") as f:
-            for url, status in discovered_urls:
-                f.write(f"{status} {url}\n")
-        cprint(f"\n📁 Results saved to discovered_content.txt\n", "cyan")
+            for u, s in discovered:
+                f.write(f"{s} {u}\n")
+        print("\n📁 Results saved to discovered_content.txt\n")
     else:
-        cprint("\n[!] No URLs discovered to save.\n", "yellow")
+        print("\n[!] No URLs discovered to save.\n")
 
 if __name__ == "__main__":
     main()
@@ -132,18 +150,13 @@ if __name__ == "__main__":
 </div>
 
 <script>
-function toggleScript() {
+function toggleScript(event) {
   const scriptBlock = document.getElementById('pythonScript');
   const btn = event.target;
-  if (scriptBlock.style.display === 'none') {
-    scriptBlock.style.display = 'block';
-    btn.textContent = '▼ Hide Python Script';
-    btn.setAttribute('aria-expanded', 'true');
-  } else {
-    scriptBlock.style.display = 'none';
-    btn.textContent = '▶ Show Python Script';
-    btn.setAttribute('aria-expanded', 'false');
-  }
+  const isHidden = scriptBlock.style.display === 'none' || scriptBlock.style.display === '';
+  scriptBlock.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '▼ Hide Python Script' : '▶ Show Python Script';
+  btn.setAttribute('aria-expanded', String(isHidden));
 }
 </script>
 
@@ -151,14 +164,54 @@ function toggleScript() {
 
 <h2>Summary</h2>
 <ul>
-  <li>Fetch and parse <code>robots.txt</code> to find disallowed paths.</li>
-  <li>Parse <code>sitemap.xml</code> to extract site URLs.</li>
-  <li>Check HTTP status codes for discovered URLs to verify availability.</li>
-  <li>Save all discovered URLs and statuses to <code>discovered_content.txt</code> for later analysis.</li>
-  <li>Use this script during reconnaissance to uncover hidden or important content on target websites.</li>
+  <li>Fetch &amp; parse <code>robots.txt</code> (disallowed paths often hint at sensitive areas).</li>
+  <li>Parse <code>sitemap.xml</code>/<code>sitemap_index.xml</code> to enumerate URLs.</li>
+  <li>Verify with HTTP status codes; persist to <code>discovered_content.txt</code>.</li>
+  <li>Use results to seed directory bruteforcers and crawlers for deeper discovery.</li>
 </ul>
 
-<p>Happy content hunting! 🕵️‍♂️🔍</p>
+<hr />
+
+<h2>Tools in Kali Linux &amp; BlackArch for Content Discovery (Single Target)</h2>
+<p class="note">These are widely used for robots/sitemap parsing and broader content discovery. Replace <code>&lt;target&gt;</code> with a host or base URL. Availability can vary by image/version.</p>
+
+<h3>Kali Linux</h3>
+<ul>
+  <li><strong>curl</strong> — Quick fetch of robots/sitemaps.<br><code>curl -s https://&lt;target&gt;/robots.txt</code> &nbsp; <code>curl -s https://&lt;target&gt;/sitemap.xml</code></li>
+  <li><strong>httpx</strong> — Probe URL lists for status/tech.<br><code>httpx -l urls.txt -mc 200,301,302 -o live.txt</code></li>
+  <li><strong>gobuster (dir)</strong> — Wordlist discovery to expand from robots hints.<br><code>gobuster dir -u https://&lt;target&gt; -w wordlist.txt -x php,txt,bak</code></li>
+  <li><strong>ffuf</strong> — Fast fuzzer for paths/params (seed with sitemap).<br><code>ffuf -u https://&lt;target&gt;/FUZZ -w wordlist.txt -mc 200,204,301,302,403</code></li>
+  <li><strong>dirsearch</strong> — Recursive content discovery.<br><code>dirsearch -u https://&lt;target&gt; -w wordlist.txt -e php,txt,bak -o out.txt</code></li>
+  <li><strong>feroxbuster</strong> — Rust-based fast directory/file discovery.<br><code>feroxbuster -u https://&lt;target&gt; -w wordlist.txt -r</code></li>
+  <li><strong>dirb</strong> — Classic dir brute-force with bundled lists.<br><code>dirb https://&lt;target&gt; /usr/share/dirb/wordlists/common.txt</code></li>
+  <li><strong>katana</strong> — High-speed crawler to enrich URLs beyond sitemap.<br><code>katana -u https://&lt;target&gt; -o katana.txt</code></li>
+  <li><strong>hakrawler</strong> — Lightweight crawler to pull paths from HTML/JS.<br><code>echo https://&lt;target&gt; | hakrawler -d 2 -u &gt; hakrawler.txt</code></li>
+  <li><strong>waybackurls</strong> — Archived URLs to complement sitemap results.<br><code>echo &lt;target&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Pull URLs from Wayback/CC/URLScan for one domain.<br><code>echo &lt;target&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>unfurl</strong> — Extract paths/params from URL lists.<br><code>cat urls.txt | unfurl -u paths &gt; paths.txt</code></li>
+  <li><strong>uro</strong> — Normalize/dedupe noisy URL lists.<br><code>cat urls.txt | uro &gt; urls_clean.txt</code></li>
+</ul>
+
+<h3>BlackArch</h3>
+<ul>
+  <li><strong>curl</strong> — Fetch robots/sitemaps quickly.<br><code>curl -s https://&lt;target&gt;/robots.txt</code> &nbsp; <code>curl -s https://&lt;target&gt;/sitemap.xml</code></li>
+  <li><strong>httpx</strong> — Liveness and status probing at scale.<br><code>httpx -l urls.txt -mc 200,301,302 -o live.txt</code></li>
+  <li><strong>gobuster</strong> — Directory discovery with extensions.<br><code>gobuster dir -u https://&lt;target&gt; -w wordlist.txt -x php,txt</code></li>
+  <li><strong>ffuf</strong> — Rapid path/param fuzzing.<br><code>ffuf -u https://&lt;target&gt;/FUZZ -w wordlist.txt</code></li>
+  <li><strong>dirsearch</strong> — Python-based recursive discovery.<br><code>dirsearch -u https://&lt;target&gt; -w wordlist.txt -o out.txt</code></li>
+  <li><strong>feroxbuster</strong> — Fast Rust-based recursion.<br><code>feroxbuster -u https://&lt;target&gt; -w wordlist.txt -r</code></li>
+  <li><strong>dirb</strong> — Legacy but useful baseline scans.<br><code>dirb https://&lt;target&gt; /usr/share/dirb/wordlists/common.txt</code></li>
+  <li><strong>katana</strong> — Speedy crawler for target URL discovery.<br><code>katana -u https://&lt;target&gt; -o katana.txt</code></li>
+  <li><strong>hakrawler</strong> — Crawl to uncover links/assets quickly.<br><code>echo https://&lt;target&gt; | hakrawler -d 2 -u &gt; hakrawler.txt</code></li>
+  <li><strong>waybackurls</strong> — Get archived URLs for a domain.<br><code>echo &lt;target&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Multi-source archive URL gatherer.<br><code>echo &lt;target&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>unfurl</strong> — Parse URL components at scale.<br><code>cat urls.txt | unfurl -u keys &gt; keys.txt</code></li>
+  <li><strong>uro</strong> — Clean/dedupe URL lists for scanning.<br><code>cat urls.txt | uro &gt; urls_clean.txt</code></li>
+</ul>
+
+<p class="note">Tip: Use <code>robots.txt</code> disallowed paths as seeds for <em>ffuf/feroxbuster/dirsearch</em>. Use <em>sitemap.xml</em> to prioritize likely valid content first.</p>
+
+<hr />
 
 <div style="margin-top: 2em;">
   <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">

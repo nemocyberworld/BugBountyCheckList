@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Port Scanner Notes (BlackArch)</title>
+  <title>Port Scanner Notes (BlackArch) — Single Target</title>
   <style>
     body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
     h1, h2 { color: #2a7ae2; }
@@ -17,56 +17,73 @@
 </head>
 <body>
 
-<h1>📚 Port Scanner Notes (BlackArch)</h1>
+<h1>📚 Port Scanner Notes (BlackArch) — Single Target</h1>
 
-<p>This guide lists and explains popular <strong>Port Scanners</strong> available in <code>BlackArch Linux</code>. These tools help identify open ports, running services, and firewall configurations during reconnaissance or vulnerability assessments.</p>
+<p>This guide lists and explains popular <strong>Port Scanners</strong> available in <code>BlackArch Linux</code>, focused on scanning a <em>single</em> host (IP or domain). These tools help identify open ports, running services, and firewall configurations during reconnaissance or vulnerability assessments.</p>
 
 <hr />
 
-<h2>1. Popular Port Scanners</h2>
+<h2>1. Popular Port Scanners (Single Target)</h2>
 
 <div class="tool">
   <h3>⚡ Nmap</h3>
   <p>The gold standard in port scanning and network mapping.</p>
   <pre>sudo nmap -A &lt;target&gt; -T4 -Pn</pre>
+  <p><small>Examples: <code>sudo nmap -p 1-65535 -T4 -Pn &lt;target&gt;</code> (full TCP range), <code>sudo nmap -sU -T4 -Pn &lt;target&gt;</code> (UDP)</small></p>
 </div>
 
 <div class="tool">
-  <h3>RustScan</h3>
+  <h3>🚀 RustScan</h3>
   <p>Blazingly fast port scanner written in Rust. Integrates with Nmap.</p>
-  <pre>rustscan -a &lt;target&gt; -- -A</pre>
+  <pre>rustscan -a &lt;target&gt; --ulimit 5000 -- -A</pre>
+  <p><small>RustScan finds open ports fast, then hands them to Nmap for deep service detection.</small></p>
 </div>
 
 <div class="tool">
-  <h3>Masscan</h3>
-  <p>High-speed port scanner. Can scan the entire Internet in minutes.</p>
-  <pre>masscan -p22 --rate=1000 -iL targets.txt</pre>
+  <h3>⚙️ Masscan</h3>
+  <p>High-speed port scanner. Use carefully on a single host.</p>
+  <pre>sudo masscan &lt;target&gt; -p1-65535 --rate 1000</pre>
+  <p><small>Add interface/gateway if needed: <code>--router-ip &lt;gw&gt; -e &lt;iface&gt;</code></small></p>
 </div>
 
 <div class="tool">
-  <h3>forkingportscanner</h3>
-  <p>Simple Forking port scanner By: magikh0e</p>
+  <h3>🔧 forkingportscanner</h3>
+  <p>Simple forking port scanner by <code>magikh0e</code>.</p>
   <pre>forkingportscanner -t &lt;target&gt; -p tcp -s 1 -e 65535</pre>
 </div>
 
 <!-- 🔽 Toggleable Custom Python Tool Section -->
 <details>
-  <summary>🛠️ Custom Stealth Port Scanner (Python)</summary>
-  <p>Requires <code>scapy</code>, root privileges, and Python 3.</p>
+  <summary>🛠️ Custom Stealth Port Scanner (Python, Single Target)</summary>
+  <p>Requires <code>scapy</code>, root privileges, and Python 3. Scans one host only.</p>
   <pre><code>
+#!/usr/bin/env python3
 import sys
 import socket
+import argparse
 import threading
-from scapy.all import IP, TCP, sr1, conf
 from queue import Queue
-import time
+from time import time
+from scapy.all import IP, TCP, sr1, send, conf
 import os
 
-conf.verb = 0  # Disable Scapy output
-THREAD_COUNT = 100
-START_PORT = 1
-END_PORT = 65535
-port_queue = Queue()
+conf.verb = 0  # silence scapy
+DEFAULT_THREADS = 200
+DEFAULT_PORTS = "1-1024"
+
+def parse_ports(ports_str):
+    ports = set()
+    for part in ports_str.split(","):
+        part = part.strip()
+        if "-" in part:
+            a, b = part.split("-", 1)
+            a, b = int(a), int(b)
+            if a > b:
+                a, b = b, a
+            ports.update(range(a, b + 1))
+        else:
+            ports.add(int(part))
+    return sorted(p for p in ports if 1 <= p <= 65535)
 
 def resolve_target(target):
     try:
@@ -75,74 +92,152 @@ def resolve_target(target):
         print(f"[-] Could not resolve {target}")
         return None
 
-def scan_port(target_ip, port, open_ports):
-    pkt = IP(dst=target_ip)/TCP(dport=port, flags="S")
-    resp = sr1(pkt, timeout=0.5, verbose=0)
+def scan_port(ip, port, open_ports):
+    pkt = IP(dst=ip) / TCP(dport=port, flags="S")
+    resp = sr1(pkt, timeout=0.5)
     if resp is not None and resp.haslayer(TCP):
-        if resp[TCP].flags == 0x12:
+        flags = resp[TCP].flags
+        # SYN/ACK means open
+        if flags == 0x12:
             open_ports.append(port)
-            rst_pkt = IP(dst=target_ip)/TCP(dport=port, flags="R")
-            sr1(rst_pkt, timeout=0.2, verbose=0)
-            print(f"[+] {target_ip} - Open port: {port}")
+            # Send RST to be polite
+            send(IP(dst=ip) / TCP(dport=port, flags="R"), verbose=0)
 
-def worker(target_ip, open_ports):
-    while not port_queue.empty():
-        port = port_queue.get()
-        scan_port(target_ip, port, open_ports)
-        port_queue.task_done()
-
-def scan_target(target):
-    ip = resolve_target(target)
-    if not ip:
-        return
-    print(f"\n[~] Scanning {target} ({ip})")
-    start = time.time()
-    for port in range(START_PORT, END_PORT + 1):
-        port_queue.put(port)
-    open_ports = []
-    threads = []
-    for _ in range(THREAD_COUNT):
-        t = threading.Thread(target=worker, args=(ip, open_ports))
-        t.start()
-        threads.append(t)
-    port_queue.join()
-    duration = time.time() - start
-    print(f"[✔] Done scanning {target} in {duration:.2f} seconds.")
-    if open_ports:
-        print(f"[+] Open ports: {sorted(open_ports)}")
-        with open("scan_results.txt", "a") as f:
-            f.write(f"\n{target} ({ip}): {sorted(open_ports)}\n")
-    else:
-        print("[-] No open ports found.")
+def worker(ip, q, open_ports):
+    while True:
+        try:
+            port = q.get_nowait()
+        except:
+            break
+        try:
+            scan_port(ip, port, open_ports)
+        finally:
+            q.task_done()
 
 def main():
-    print("\n=== Stealth Port Scanner ===")
-    print("1. Enter IP/domain/subdomain")
-    print("2. Enter filename with list of targets")
-    choice = input("Choose (1 or 2): ").strip()
-    if choice == '1':
-        target = input("Enter IP, domain, or subdomain: ").strip()
-        scan_target(target)
-    elif choice == '2':
-        filename = input("Enter filename: ").strip()
-        if not os.path.isfile(filename):
-            print("[-] File not found.")
-            return
-        with open(filename, 'r') as f:
-            targets = [line.strip() for line in f if line.strip()]
-            for target in targets:
-                scan_target(target)
+    if os.geteuid() != 0:
+        print("[-] Please run as root (required for raw sockets).")
+        sys.exit(1)
+
+    ap = argparse.ArgumentParser(description="Stealth TCP SYN scanner (single target)")
+    ap.add_argument("target", help="IP or hostname")
+    ap.add_argument("-p", "--ports", default=DEFAULT_PORTS,
+                    help="Ports to scan (e.g., '1-1000' or '22,80,443,8000-8100'). Default: %(default)s")
+    ap.add_argument("-t", "--threads", type=int, default=DEFAULT_THREADS,
+                    help="Number of threads (default: %(default)s)")
+    args = ap.parse_args()
+
+    ip = resolve_target(args.target)
+    if not ip:
+        sys.exit(1)
+
+    ports = parse_ports(args.ports)
+    if not ports:
+        print("[-] No valid ports to scan.")
+        sys.exit(1)
+
+    print(f"\n[~] Scanning {args.target} ({ip}) | Ports: {len(ports)} | Threads: {args.threads}")
+    q = Queue()
+    for p in ports:
+        q.put(p)
+
+    open_ports = []
+    t0 = time()
+    threads = []
+    for _ in range(max(1, args.threads)):
+        th = threading.Thread(target=worker, args=(ip, q, open_ports), daemon=True)
+        th.start()
+        threads.append(th)
+
+    q.join()
+    duration = time() - t0
+
+    if open_ports:
+        open_ports.sort()
+        print(f"[+] Open ports on {ip}: {open_ports}")
+        with open("scan_results.txt", "a") as f:
+            f.write(f"{args.target} ({ip}): {open_ports}\n")
     else:
-        print("[-] Invalid choice.")
+        print("[-] No open TCP ports found.")
+
+    print(f"[✔] Finished in {duration:.2f} seconds.")
 
 if __name__ == "__main__":
-    if os.geteuid() != 0:
-        print("[-] Please run this script as root (required for raw sockets).")
-        sys.exit(1)
-    main()</code></pre>
+    main()
+  </code></pre>
+
+  <p><strong>Usage</strong></p>
+  <pre>
+sudo python3 stealth_scan.py &lt;target&gt; -p 1-65535 -t 300
+# or
+sudo python3 stealth_scan.py &lt;target&gt; -p 22,80,443,8000-8100 -t 150
+  </pre>
 </details>
 
 <p>Scan ethically and with permission. ⚠️🔒</p>
+
+<hr />
+
+<h2>2. Port-Scanning Tools in Kali Linux &amp; BlackArch (Single Target Usage)</h2>
+
+<p>These are notable tools available in each distro for scanning a single host (IP or domain). Replace <code>&lt;target&gt;</code> with your host/IP.</p>
+
+<h3>Kali Linux</h3>
+<ul>
+  <li><strong>Nmap</strong> – Flexible port scanner, OS detection, scripting.<br>
+      <code>sudo nmap -A &lt;target&gt; -T4 -Pn</code> (all-in-one scan)<br>
+      <code>sudo nmap -p 1-65535 -T4 -Pn &lt;target&gt;</code> (full TCP range)<br>
+      <code>sudo nmap -sU -T4 -Pn &lt;target&gt;</code> (UDP scan)</li>
+
+  <li><strong>Masscan</strong> – Very high-speed SYN scanner.<br>
+      <code>sudo masscan &lt;target&gt; -p1-65535 --rate 1000</code></li>
+
+  <li><strong>pnscan</strong> – Multithreaded port scanner.<br>
+      <code>pnscan &lt;target&gt; 1 65535</code></li>
+
+  <li><strong>Unicornscan</strong> – Asynchronous stateless port scanner.<br>
+      <code>unicornscan &lt;target&gt;:a</code> (scan all TCP ports)</li>
+
+  <li><strong>hping3</strong> – Packet crafter with scanning ability.<br>
+      <code>sudo hping3 -S &lt;target&gt; -p ++1-1000 -c 1</code></li>
+
+  <li><strong>netcat (nc)</strong> – Simple port scanner.<br>
+      <code>nc -zv &lt;target&gt; 1-1024</code></li>
+
+  <li><strong>Netdiscover</strong> – Host discovery before scanning.<br>
+      <code>netdiscover -i eth0 -P -r &lt;target&gt;/32</code></li>
+
+  <li><strong>Kismet</strong> – Wireless network detection.<br>
+      <code>kismet -c wlan0</code> (not a direct port scan but useful pre-scan)</li>
+</ul>
+
+<h3>BlackArch Linux</h3>
+<ul>
+  <li><strong>kscan</strong> – Asset mapping with port scanning.<br>
+      <code>kscan -t &lt;target&gt;</code></li>
+
+  <li><strong>krbrelayx</strong> – Kerberos delegation abuse with scan capability.<br>
+      <code>krbrelayx --target &lt;target&gt;</code></li>
+
+  <li><strong>laf</strong> – Login Area Finder (includes port check).<br>
+      <code>laf -u http://&lt;target&gt;</code></li>
+
+  <li><strong>lanmap2</strong> – Passive network mapper.<br>
+      <code>sudo lanmap2 -i eth0</code></li>
+
+  <li><strong>netreconn</strong> – Lightweight network scan/recon.<br>
+      <code>netreconn -t &lt;target&gt;</code></li>
+
+  <li><strong>Amap</strong> – Application protocol identifier.<br>
+      <code>amap &lt;target&gt; 1-65535</code></li>
+
+  <li><strong>Nmap / Masscan</strong> – Also available in BlackArch.<br>
+      <code>sudo nmap -A &lt;target&gt; -T4 -Pn</code><br>
+      <code>sudo masscan &lt;target&gt; -p1-65535 --rate 1000</code></li>
+</ul>
+
+<p><em>⚠️ Always scan ethically and with permission from the system owner.</em></p>
+
 
 <div style="margin-top: 2em;">
   <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">

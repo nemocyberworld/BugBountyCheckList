@@ -3,83 +3,136 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Wayback Machine / Archive Recon Notes</title>
+<title>Wayback Machine / Archive Recon Notes (Single Target)</title>
 <style>
   body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 2em auto; padding: 0 1em; }
-  h1, h2 { color: #2a7ae2; }
+  h1, h2, h3 { color: #2a7ae2; }
   code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
   pre { background: #f9f9f9; border-left: 4px solid #2a7ae2; padding: 1em; overflow-x: auto; }
   ul { margin-top: 0; }
   .tool { margin-bottom: 1.5em; }
+  details > summary { cursor:pointer; font-weight:600; color:#2a7ae2 }
 </style>
 </head>
 <body>
 
-<h1>📚 Wayback Machine / Archive Recon Notes</h1>
-
+<h1>📚 Wayback Machine / Archive Recon Notes — Single Target</h1>
 
 <div class="tool">
-  <h3>Waybackurls</h3>
-  <p>Fetches URLs from the Wayback Machine for a given domain.</p>
-  <pre>echo example.com | waybackurls > wayback.txt</pre>
+  <h3>waybackurls</h3>
+  <p>Fetch archived URLs for a single domain from the Wayback Machine.</p>
+  <pre>echo &lt;domain&gt; | waybackurls &gt; wayback.txt</pre>
 </div>
+
 <div class="tool">
   <h3>📑 Filter Live URLs from Wayback Results</h3>
-  <p>Use this Bash one-liner to check which URLs from <code>wayback.txt</code> are live (HTTP 200/301/302):</p>
-
+  <p>Check which URLs from <code>wayback.txt</code> are live (HTTP 200/301/302):</p>
   <details>
-    <summary style="cursor: pointer; font-weight: bold; color: #2a7ae2;">Toggle Script</summary>
-    <pre><code>while read url; do
-  status=$(curl -o /dev/null -s -w "%{http_code}" "$url")
-  if [[ "$status" == "200" || "$status" == "301" || "$status" == "302" ]]; then
-    echo "$status $url"
-  fi
+    <summary>Toggle Bash one-liner</summary>
+    <pre><code>while read -r url; do
+  code=$(curl -m 10 -o /dev/null -s -w "%{http_code}" "$url")
+  [[ "$code" =~ ^(200|301|302)$ ]] &amp;&amp; echo "$code $url"
 done &lt; wayback.txt</code></pre>
   </details>
 </div>
 
-
 <div class="tool">
   <h3>gau (GetAllUrls)</h3>
-  <p>Retrieves URLs from multiple sources like Wayback, Common Crawl, etc.</p>
-  <pre>echo example.com | gau > gau.txt</pre>
+  <p>Retrieve URLs for a single domain from Wayback, Common Crawl, URLScan, etc.</p>
+  <pre>echo &lt;domain&gt; | gau &gt; gau.txt</pre>
 </div>
 
 <div class="tool">
   <h3>hakrawler</h3>
-  <p>Crawls target website and optionally pulls archived data like JS endpoints.</p>
-  <pre>echo "url" | hakrawler -d 5 -u > hakrawler.txt</pre>
+  <p>Lightweight crawler (use it to augment archive results with fresh endpoints).</p>
+  <pre>echo "https://&lt;domain&gt;" | hakrawler -d 3 -u &gt; hakrawler.txt</pre>
 </div>
 
 <div class="tool">
   <h3>waymore</h3>
-  <p>Advanced Python tool for Wayback recon with filtering and deduplication.</p>
-  <pre>waymore -i "url" -mode U -oU waymore.txt
-t</pre>
+  <p>Advanced archiving recon with filtering/dedup for a single target.</p>
+  <pre>waymore -i "&lt;domain&gt;" -mode U -oU waymore.txt</pre>
 </div>
 
-<!-- Summary Section -->
-<h2>Summary</h2>
+<div class="tool">
+  <h3>waybackpy</h3>
+  <p>Python client for Wayback Machine (good for scripting single-domain pulls).</p>
+  <pre>waybackpy --url https://&lt;domain&gt;/ --last-statuscode 200 --unique &gt; waybackpy.txt</pre>
+</div>
+
+<hr />
+
+<h2>Summary (Single Target)</h2>
 <ul>
-  <li>Use <code>waybackurls</code>, <code>gau</code>, and <code>waymore</code> to extract archived URLs.</li>
-  <li>Filter interesting file types: <code>.php</code>, <code>.zip</code>, <code>.bak</code>, <code>.sql</code>, etc.</li>
-  <li>Analyze responses using <code>curl</code> or <code>httpx</code>.</li>
-  <li>Use <code>arjun</code> to discover hidden parameters in old endpoints.</li>
-  <li>Use online archives to manually explore changes over time.</li>
+  <li>Use <code>waybackurls</code>, <code>gau</code>, <code>waymore</code>/<code>waybackpy</code> to extract archived URLs for <code>&lt;domain&gt;</code>.</li>
+  <li>Filter interesting file types (e.g., <code>.php</code>, <code>.zip</code>, <code>.bak</code>, <code>.sql</code>, <code>.js</code>).</li>
+  <li>Probe live endpoints with <code>curl</code> or <code>httpx</code>.</li>
+  <li>Use <code>arjun</code> to discover hidden parameters on revived endpoints.</li>
+  <li>Optionally crawl current site with <code>hakrawler</code>/<code>katana</code> to enrich the archive set.</li>
 </ul>
 
-<p>Happy hunting! 🕵️‍♂️🔍</p>
-
-<!-- Embedded URL Extractor Tool -->
 <h2>🧠 URL Extractor Tool (Web Version)</h2>
-<p>Use the embedded URL Extractor to paste and extract unique URLs from raw Wayback output or recon results.</p>
-
+<p>Paste raw Wayback output or recon results and extract unique URLs.</p>
 <iframe src="https://nemocyberworld.github.io/URL-Extractor/"
         style="width:100%; height:600px; border:2px solid #2a7ae2; border-radius:8px; margin-top:1em;"
-        title="URL Extractor Tool"
-        loading="lazy">
-</iframe>
+        title="URL Extractor Tool" loading="lazy"></iframe>
 
+<hr />
+
+<h2>Tools in Kali Linux &amp; BlackArch for Wayback/Archive Recon (Single Target)</h2>
+<p><em>Note:</em> Distros evolve; this is a practical, widely-used set. Replace <code>&lt;domain&gt;</code> with your target.</p>
+
+<h3>Kali Linux</h3>
+<ul>
+  <li><strong>waybackurls</strong> — Pull URLs for one domain from Wayback Machine.<br>
+      <code>echo &lt;domain&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Aggregate archived URLs (Wayback, CC, etc.).<br>
+      <code>echo &lt;domain&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>waymore</strong> — Powerful archive recon with filtering/dedup.<br>
+      <code>waymore -i "&lt;domain&gt;" -mode U -oU waymore.txt</code></li>
+  <li><strong>waybackpy</strong> — Python Wayback client for single-domain scripts.<br>
+      <code>waybackpy --url https://&lt;domain&gt;/ --unique &gt; waybackpy.txt</code></li>
+  <li><strong>hakrawler</strong> — Crawler to discover fresh endpoints (supplements archive).<br>
+      <code>echo "https://&lt;domain&gt;" | hakrawler -d 3 -u &gt; hakrawler.txt</code></li>
+  <li><strong>katana</strong> — High-speed crawler to seed/augment URL lists.<br>
+      <code>katana -u https://&lt;domain&gt; -o katana.txt</code></li>
+  <li><strong>httpx</strong> — Probe archived URLs to find live ones quickly.<br>
+      <code>httpx -l wayback.txt -o live.txt -mc 200,301,302</code></li>
+  <li><strong>arjun</strong> — Find hidden parameters on revived endpoints.<br>
+      <code>arjun -u https://&lt;domain&gt;/path</code></li>
+  <li><strong>unfurl</strong> — Extract paths/params/hosts from URL lists.<br>
+      <code>cat wayback.txt | unfurl -u paths &gt; paths.txt</code></li>
+  <li><strong>uro</strong> — Normalize &amp; de-duplicate messy URL lists.<br>
+      <code>cat wayback.txt | uro &gt; wayback_clean.txt</code></li>
+</ul>
+
+<h3>BlackArch</h3>
+<ul>
+  <li><strong>waybackurls</strong> — Wayback pull for one domain.<br>
+      <code>echo &lt;domain&gt; | waybackurls &gt; wayback.txt</code></li>
+  <li><strong>gau</strong> — Get archived URLs from multiple sources.<br>
+      <code>echo &lt;domain&gt; | gau &gt; gau.txt</code></li>
+  <li><strong>waymore</strong> — Advanced archive recon/filters.<br>
+      <code>waymore -i "&lt;domain&gt;" -mode U -oU waymore.txt</code></li>
+  <li><strong>waybackpy</strong> — Wayback Machine client (Python/CLI).<br>
+      <code>waybackpy --url https://&lt;domain&gt;/ --unique &gt; waybackpy.txt</code></li>
+  <li><strong>hakrawler</strong> — Lightweight crawler to complement archive data.<br>
+      <code>echo "https://&lt;domain&gt;" | hakrawler -d 3 -u &gt; hakrawler.txt</code></li>
+  <li><strong>katana</strong> — Fast crawler to enrich URL corpus.<br>
+      <code>katana -u https://&lt;domain&gt; -o katana.txt</code></li>
+  <li><strong>httpx</strong> — Batch probe archived endpoints for liveness/status.<br>
+      <code>httpx -l wayback.txt -o live.txt -mc 200,301,302</code></li>
+  <li><strong>arjun</strong> — Parameter discovery for legacy/archived endpoints.<br>
+      <code>arjun -u https://&lt;domain&gt;/path</code></li>
+  <li><strong>unfurl</strong> — Quick parsing of URL components from lists.<br>
+      <code>cat wayback.txt | unfurl -u keys &gt; keys.txt</code></li>
+  <li><strong>uro</strong> — Clean &amp; normalize URL lists (dedupe, strip noise).<br>
+      <code>cat wayback.txt | uro &gt; wayback_clean.txt</code></li>
+</ul>
+
+<p><small>Tip: If a tool isn’t present on your image, install via <code>apt install &lt;tool&gt;</code> (Kali) or <code>pacman -S &lt;tool&gt;</code>/<code>blackman -i &lt;tool&gt;</code> (BlackArch), or use project release binaries.</small></p>
+
+<hr />
 
 <div style="margin-top: 2em;">
   <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">
